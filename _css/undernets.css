@@ -68,4 +68,23 @@ table.ss-7 th {
 	background: #FFCEA1;
 	user-select: none;
 	-moz-user-select: none;
+	margin-bottom: 1em;
+}
+
+.subnet-option {
+	padding: 0;
+	width: 1.6em;
+	height: 1.6em;
+	margin-right: 0.25em;
+	margin-bottom: 0.25em;
+}
+
+.subnet-table {
+	padding: 10px;
+	border-radius: 5px;
+	border: 1px solid #d5d5d5;
+}
+
+.subnet-table table {
+	margin-bottom: 0;
 }

@@ -124,6 +124,7 @@ input[type="text"] {
 	font-family:'Roboto Mono', monospace;
 	font-weight: 300;
 	color: #585858;
+	margin-right: 0.5em;
 }
 
 input[type="text"]::placeholder {
@@ -133,7 +134,6 @@ input[type="text"]::placeholder {
 button {
 	color: #FFF;
 	background: #8ED0E4;
-	margin: 0 0.5em;
 	border-radius: 5px;
 	padding: 0.4em 0.8em;
 	cursor: pointer;
@@ -149,6 +149,7 @@ table {
 	border: 1px solid #d9d8d8;
 	margin-bottom: 1em;
 	border-collapse: separate;
+	overflow: hidden;
 }
 
 tr {
