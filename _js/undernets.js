@@ -3,13 +3,12 @@
 
 const ELEMENT_STYLES = ['ss-0','ss-1','ss-2','ss-3','ss-4','ss-5','ss-6','ss-7'];
 let rootElement = id("root_net");
+let tooltip = id("tooltip");
 let rootNet = null;
 
 // updateElements() - Atualiza as cores das divs
 
 function updateElements(net = rootNet, index = 0) {
-
-	console.log(net);
 
 	if (net != null) {
 		if (net.subnets.length > 0) {
@@ -27,7 +26,7 @@ function updateElements(net = rootNet, index = 0) {
 
 }
 
-rootNet = {subnets:[],dom:rootElement,parent:null};
+rootNet = {subnets:[],dom:rootElement,parent:null,mask:24};
 
 function divide(net) {
 
@@ -38,8 +37,13 @@ function divide(net) {
 	dom2.classList = "subnet";
 	dom1.name = "foobar";
 
-	let newNet1 = {subnets:[],dom:dom1,parent:net};
-	let newNet2 = {subnets:[],dom:dom2,parent:net};
+	let newNet1 = {subnets:[],dom:dom1,parent:net,mask:net.mask+1};
+	let newNet2 = {subnets:[],dom:dom2,parent:net,mask:net.mask+1};
+
+	dom1.addEventListener("mouseover",function(){
+		let n = hostNumber(newNet1.mask);
+		tooltip.textContent = "/"+newNet1.mask+" ("+n+" host"+(n==1?'':'s')+")";
+	});
 
 	net.dom.appendChild(newNet1.dom);
 	net.dom.appendChild(newNet2.dom);
@@ -68,3 +72,7 @@ divide(
 );
 
 updateElements();
+
+rootNet.dom.addEventListener("mouseleave",function(){
+	tooltip.textContent = "Passe o mouse para ver informações";
+});

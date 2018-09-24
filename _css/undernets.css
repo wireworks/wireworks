@@ -1,9 +1,12 @@
 .subnet {
 	height: 250px;
 	display: flex;
-	justify-content: flex-start;
-	align-items: stretch;
+	justify-content: center;
+	align-items: center;
 	flex: 1;
+	color: white;
+	font-size: 30px;
+	text-shadow: 1px 1px 5px rgba(0,0,0,0.4);
 }
 
 #root_net {
@@ -12,34 +15,57 @@
 	margin-bottom: 20px;
 }
 
-.subnet.ss-0 {
+table.ss-0 th,
+table.ss-1 th,
+table.ss-2 th,
+table.ss-3 th,
+table.ss-4 th,
+table.ss-5 th,
+table.ss-6 th,
+table.ss-7 th {
+	color: #FFF;
+	padding: 0.5em;
+}
+
+.subnet.ss-0, table.ss-0 th {
 	background: #67874b;
 }
 
-.subnet.ss-1 {
+.subnet.ss-1, table.ss-1 th {
 	background: #4d4486;
 }
 
-.subnet.ss-2 {
+.subnet.ss-2, table.ss-2 th {
 	background: #c1a945;
 }
 
-.subnet.ss-3 {
+.subnet.ss-3, table.ss-3 th {
 	background: #ab452f;
 }
 
-.subnet.ss-4 {
+.subnet.ss-4, table.ss-4 th {
 	background: #228f7f;
 }
 
-.subnet.ss-5 {
+.subnet.ss-5, table.ss-5 th {
 	background: #774280;
 }
 
-.subnet.ss-6 {
+.subnet.ss-6, table.ss-6 th {
 	background: #868b2f;
 }
 
-.subnet.ss-7 {
+.subnet.ss-7, table.ss-7 th {
 	background: #9a3040;
+}
+
+#tooltip {
+	font-size: 14px;
+	padding: 0.4em;
+	border-radius: 5px;
+	border: 1px solid #F3B780;
+	display: inline-block;
+	background: #FFCEA1;
+	user-select: none;
+	-moz-user-select: none;
 }

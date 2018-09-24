@@ -11,7 +11,7 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: #e6d2bd;
+	background: #E2C19E;
 }
 
 .container {
@@ -24,10 +24,6 @@ body {
 
 .container>*:last-child {
 	margin-bottom: 0;
-}
-
-.container.free {
-	width: auto;
 }
 
 .spacer {
@@ -62,7 +58,7 @@ h3 {
 }
 
 .logo {
-	background: #e0c1a0;
+	background: #E0B78B;
 	color: #FFF;
 	padding: 0.25em 0.4em;
 	border-radius: 5px;
@@ -71,7 +67,7 @@ h3 {
 }
 
 .logo.logo-secondary {
-	background: #e0e0e0;
+	background: #C5C5C5;
 }
 
 a.logo:hover {
@@ -99,12 +95,12 @@ li h2 {
 }
 
 a {
-	color:#94c0ee;
+	color:#54BCDB;
 	text-decoration:none;
 }
 
 a:hover {
-	color: #a8c7e8;
+	color: #8ED0E4;
 }
 
 input, button {
@@ -123,7 +119,7 @@ label {
 
 input[type="text"] {
 	padding: 0.25em;
-	border: 2px solid #a7cafd;
+	border: 2px solid #8ED0E4;
 	border-radius: 5px;
 	font-family:'Roboto Mono', monospace;
 	font-weight: 300;
@@ -131,12 +127,12 @@ input[type="text"] {
 }
 
 input[type="text"]::placeholder {
-	color: #d6d6d6;
+	color: #BFBFBF;
 }
 
 button {
 	color: #FFF;
-	background: #a7cafd;
+	background: #8ED0E4;
 	margin: 0 0.5em;
 	border-radius: 5px;
 	padding: 0.4em 0.8em;
@@ -144,7 +140,7 @@ button {
 }
 
 button:hover {
-	background: #bbd7ff;
+	background: #97DAEF;
 }
 
 table {
