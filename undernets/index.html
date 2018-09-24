@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+		<link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Montserrat:300,400" rel="stylesheet">
+		<link rel="stylesheet" href="../_css/style.css">
+		<link rel="stylesheet" href="../_css/undernets.css">
+		<link rel="shortcut icon" href="../favicon.png">
+		<title>IPTools - Undernets</title>
+	</head>
+	<body>
+		<div class="container" id="container">
+			<div class="spacer">
+				<h1>
+					<a href="../" class="logo"><i class="fas fa-wrench"></i> IPTools</a><span class="logo logo-secondary"><i class="fas fa-cube"></i> Undernets</span>
+				</h1>
+				<h1><span class="lighter-text">Visualizar Sub-redes</span></h1>
+			</div>
+			<label for="ipmask">Rede/Máscara</label>
+			<h1>
+				<input type="text" name="ipmask" id="ipmask" placeholder="0.0.0.0/0" onkeydown = "if (event.keyCode == 13) createPlan()">
+				<button type="button" onclick="createPlan()">Visualizar Rede</button>
+			</h1>
+			<div class="subnet" id="root_net"></div>
+			<h3 class="info spacer" id="info"><span></span>Insira sua rede</h3>
+		</div>
+		<script type="text/javascript" src="../_js/iptools.js"></script>
+		<script type="text/javascript" src="../_js/undernets.js"></script>
+	</body>
+</html>

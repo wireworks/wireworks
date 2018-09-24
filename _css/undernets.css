@@ -1,0 +1,45 @@
+.subnet {
+	height: 250px;
+	display: flex;
+	justify-content: flex-start;
+	align-items: stretch;
+	flex: 1;
+}
+
+#root_net {
+	border-radius: 5px;
+	overflow: hidden;
+	margin-bottom: 20px;
+}
+
+.subnet.ss-0 {
+	background: #67874b;
+}
+
+.subnet.ss-1 {
+	background: #4d4486;
+}
+
+.subnet.ss-2 {
+	background: #c1a945;
+}
+
+.subnet.ss-3 {
+	background: #ab452f;
+}
+
+.subnet.ss-4 {
+	background: #228f7f;
+}
+
+.subnet.ss-5 {
+	background: #774280;
+}
+
+.subnet.ss-6 {
+	background: #868b2f;
+}
+
+.subnet.ss-7 {
+	background: #9a3040;
+}
