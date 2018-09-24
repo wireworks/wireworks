@@ -2,27 +2,19 @@
 // Versão: 1.0 (2018-09-23)
 
 const ELEMENT_STYLES = ['ss-0','ss-1','ss-2','ss-3','ss-4','ss-5','ss-6','ss-7'];
-let rootElement = id("root_net");
+let rootElement = id("root_block");
 let tooltip = id("tooltip");
 let rootNet = null;
 
-// updateElements() - Atualiza as cores das divs
+// updateBlocks() - Atualiza as cores das divs
 
-function updateElements(net = rootNet, index = 0) {
+function updateBlocks() {
 
-	if (net != null) {
-		if (net.subnets.length > 0) {
-			for (let i = 0; i < net.subnets.length; i++) {
-				if (net.subnets[i].subnets.length > 0) {
-					updateElements(net.subnets[i], index);
-				}
-				else {
-					net.subnets[i].dom.classList = "subnet " + ELEMENT_STYLES[index++];
-					if (index >= ELEMENT_STYLES.length) index = 0;
-				}
-			}
-		}
-	}
+	let index = 0;
+	[].forEach(document.getElementsByClassName("subnet-block"), function(el){
+		el.style.classList = "subnet-block " + ELEMENT_STYLES[index++];
+		index = index >= ELEMENT_STYLES.length ? 0 : index;
+	});
 
 }
 
@@ -71,7 +63,7 @@ divide(
 	)[1]
 );
 
-updateElements();
+updateBlocks();
 
 rootNet.dom.addEventListener("mouseleave",function(){
 	tooltip.textContent = "Passe o mouse para ver informações";

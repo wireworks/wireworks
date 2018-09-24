@@ -23,37 +23,48 @@
 				<input type="text" name="ipmask" id="ipmask" placeholder="0.0.0.0/0" onkeydown = "if (event.keyCode == 13) createPlan()">
 				<button type="button" onclick="createPlan()">Visualizar Rede</button>
 			</h1>
-			<div class="subnet" id="root_net"></div>
+			<div class="subnet-block" id="root_block"></div>
 			<div class="spacer">
 				<span></span>
 				<h3 id="tooltip">Passe o mouse para ver informações</h3>
 			</div>
 
-			<div class="subnet-table">
-				<button type="button" class="subnet-option"><i class="fa fa-compress"></i></button>
-				<span class="monospace">10.10.10.0/24</span>
-				<div class="subnet-table">
-					<button type="button" class="subnet-option"><i class="fa fa-expand-arrows-alt"></i></button>
-					<span class="monospace">10.10.10.0/24</span>
+			<div class="subnet-tree" id="root_tree">
+				<span class="subnet-merge">10.10.10.0/24</span>
+				<div class="subnet-tree">
+					<span class="subnet-divide">10.10.10.0/24</span>
 				</div>
-				<div class="subnet-table">
-					<button type="button" class="subnet-option"><i class="fa fa-compress"></i></button>
-					<span class="monospace">10.10.10.0/24</span>
-					<div class="subnet-table">
-						<button type="button" class="subnet-option"><i class="fa fa-compress"></i></button>
-						<span class="monospace">10.10.10.0/24</span>
-						<div class="subnet-table">
-							<button type="button" class="subnet-option"><i class="fa fa-expand-arrows-alt"></i></button>
-							<span class="monospace">10.10.10.0/24</span>
+				<div class="subnet-tree">
+					<span class="subnet-merge">10.10.10.0/24</span>
+					<div class="subnet-tree">
+						<span class="subnet-merge">10.10.10.0/24</span>
+						<div class="subnet-tree">
+							<span class="subnet-divide">10.10.10.0/24</span>
 						</div>
-						<div class="subnet-table">
-							<button type="button" class="subnet-option"><i class="fa fa-expand-arrows-alt"></i></button>
-							<span class="monospace">10.10.10.0/24</span>
+						<div class="subnet-tree">
+							<span class="subnet-divide">10.10.10.0/24</span>
 						</div>
 					</div>
-					<div class="subnet-table">
-						<button type="button" class="subnet-option"><i class="fa fa-expand-arrows-alt"></i></button>
-						<span class="monospace">10.10.10.0/24</span>
+					<div class="subnet-tree">
+						<span class="subnet-merge">10.10.10.0/24</span>
+						<div class="subnet-tree">
+							<span class="subnet-divide">10.10.10.0/24</span>
+						</div>
+						<div class="subnet-tree">
+							<span class="subnet-merge">10.10.10.0/24</span>
+							<div class="subnet-tree">
+								<span class="subnet-merge">10.10.10.0/24</span>
+								<div class="subnet-tree">
+									<span class="subnet-divide disabled">10.10.10.0/24</span>
+								</div>
+								<div class="subnet-tree">
+									<span class="subnet-divide disabled">10.10.10.0/24</span>
+								</div>
+							</div>
+							<div class="subnet-tree">
+								<span class="subnet-divide">10.10.10.0/24</span>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

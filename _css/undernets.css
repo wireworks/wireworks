@@ -1,4 +1,4 @@
-.subnet {
+.subnet-block {
 	height: 250px;
 	display: flex;
 	justify-content: center;
@@ -12,47 +12,35 @@
 	margin-bottom: 20px;
 }
 
-table.ss-0 th,
-table.ss-1 th,
-table.ss-2 th,
-table.ss-3 th,
-table.ss-4 th,
-table.ss-5 th,
-table.ss-6 th,
-table.ss-7 th {
-	color: #FFF;
-	padding: 0.5em;
-}
-
-.subnet.ss-0, table.ss-0 th {
+.subnet-block.ss-0 {
 	background: #67874b;
 }
 
-.subnet.ss-1, table.ss-1 th {
+.subnet-block.ss-1 {
 	background: #4d4486;
 }
 
-.subnet.ss-2, table.ss-2 th {
+.subnet-block.ss-2 {
 	background: #c1a945;
 }
 
-.subnet.ss-3, table.ss-3 th {
+.subnet-block.ss-3 {
 	background: #ab452f;
 }
 
-.subnet.ss-4, table.ss-4 th {
+.subnet-block.ss-4 {
 	background: #228f7f;
 }
 
-.subnet.ss-5, table.ss-5 th {
+.subnet-block.ss-5 {
 	background: #774280;
 }
 
-.subnet.ss-6, table.ss-6 th {
+.subnet-block.ss-6 {
 	background: #868b2f;
 }
 
-.subnet.ss-7, table.ss-7 th {
+.subnet-block.ss-7 {
 	background: #9a3040;
 }
 
@@ -75,13 +63,55 @@ table.ss-7 th {
 	margin-right: 0.25em;
 }
 
-.subnet-table .subnet-table {
+.subnet-tree .subnet-tree {
 	padding-left: 10px;
 	padding-top: 20px;
-	border-left: 2px solid #b9b9b9;
-	margin-left: 15px;
+	border-left: 4px solid #b9afa9;
+	margin-left: 14px;
 }
 
-.subnet-table table {
-	margin-bottom: 0;
+.subnet-divide, .subnet-merge {
+	pointer-events: none;
+}
+
+.subnet-divide::before, .subnet-merge::before {
+	font-family: "Font Awesome 5 Free";
+	border-radius: 32px;
+	width: 32px;
+	height: 32px;
+	color: #fff;
+	display: inline-block;
+	font-weight: 900;
+	font-size: 20px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 10px;
+	pointer-events: all;
+	cursor: pointer;
+}
+
+.subnet-divide {
+	color: #2d453a;
+}
+
+.subnet-merge {
+	color: #b9afa9;
+}
+
+.subnet-divide::before {
+	background: #48cf8e;
+	content: "\f337";
+}
+
+.subnet-merge::before {
+	background: #b9afa9;
+	content: "\f066";
+}
+
+.subnet-divide.disabled::before {
+	background: #56ad83;
+	/*font-weight: 400;*/
+	font-size: 12px;
+	content: "\f05e";
 }
