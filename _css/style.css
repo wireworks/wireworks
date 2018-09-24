@@ -8,13 +8,11 @@ html, body {
 
 body {
 	font-family: 'Montserrat', sans-serif;
-	display: flex;
-	align-items: center;
-	justify-content: center;
 	background: #E2C19E;
 }
 
 .container {
+	margin: 60px auto;
 	background: #FFF;
     width: 1200px;
     padding: 40px 30px 30px 30px;
@@ -33,7 +31,7 @@ body {
 	justify-content: space-between;
 }
 
-h1, h2, h3, p, label, input, buton {
+h1, h2, h3, p, label, input {
 	color: #505050;
 }
 
