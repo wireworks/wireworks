@@ -145,8 +145,6 @@ function prepElements(net) {
 
 	net.block.classList = "subnet-block";
 
-	console.log(net.block);
-
 	net.block.addEventListener("mouseover",function(){
 		tooltip.textContent = ipValuesToStr(net.ipValues) + " (" + net.hosts + " host" + (net.hosts==1?'':'s') + ")";
 	});
