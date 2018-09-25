@@ -101,17 +101,28 @@ function divide(net) {
 function merge(net) {
 	if (net.subnets.length >= 2) {
 
+		net.subnets = [];
+
 		while (net.block.lastChild)
 			net.block.removeChild(net.block.lastChild);
 
-		let ul = net.treeText.parentNode.getElementsByTagName('ul')[0];
+		let uls = net.treeText.parentNode.getElementsByTagName('ul');
 
-		while (ul.lastChild)
-			ul.removeChild(ul.lastChild);
+		for (let i = 0; i < uls.length; i++) {
+			while (uls[i].lastChild)
+			uls[i].removeChild(uls[i].lastChild);
 
-		net.subnets = [];
-		net.treeText = null;
-		net.block = null;
+			uls[i].remove();
+		}
+
+
+		let tmpBlock = net.block.cloneNode(true);
+		net.block.parentNode.replaceChild(tmpBlock, net.block);
+		net.block = tmpBlock;
+
+		let tmpTree = net.treeText.cloneNode(true);
+		net.treeText.parentNode.replaceChild(tmpTree, net.treeText);
+		net.treeText = tmpTree;
 
 		prepElements(net);
 
@@ -126,13 +137,16 @@ function merge(net) {
 
 function prepElements(net) {
 
-	if (!net.block)
+	if (net.block === undefined)
 		net.block = document.createElement("div");
 
-	if (!net.treeText)
+	if (net.treeText === undefined)
 		net.treeText = document.createElement("span");
 
 	net.block.classList = "subnet-block";
+
+	console.log(net.block);
+
 	net.block.addEventListener("mouseover",function(){
 		tooltip.textContent = ipValuesToStr(net.ipValues) + " (" + net.hosts + " host" + (net.hosts==1?'':'s') + ")";
 	});
@@ -143,7 +157,7 @@ function prepElements(net) {
 	}
 	net.treeText.addEventListener("click",function(){
 		if (net.subnets.length > 0) {
-			if (confirm("Tem certeza de quer fundir essas duas sub-redes?\n\nTodas as sub-redes dessas duas serão apagadas para sempre.")) {
+			if ((net.subnets[0].subnets.length+net.subnets[1].subnets.length==0) || confirm("Tem certeza de quer fundir essas duas sub-redes?\n\nTodas as sub-redes dessas duas serão apagadas para sempre.")) {
 				if(!merge(net))
 					alert("Você não pode fundir essas sub-redes");
 				updateBlocks();
@@ -156,11 +170,6 @@ function prepElements(net) {
 		}
 	});
 }
-
-// <div class="subnet-block ss-0" id="root_block">
-// 	<h1>Insira a sua rede</h1>
-// </div>
-// <span class="subnet-merge">.0/24 (254 hosts)</span>
 
 // start() - Inicializa toda a lógica, seta os blocos coloridos e a árvore de redes
 
@@ -206,6 +215,7 @@ function start() {
 							values[2] == netDecimals[2] && values[3] == netDecimals[3]) {
 
 						if (firstStart) {
+							tooltip.style.display = 'inline-block';
 							rootBlock.addEventListener("mouseleave",function(){
 								tooltip.textContent = "Passe o mouse para ver informações";
 							});

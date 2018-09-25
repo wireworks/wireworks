@@ -1,5 +1,5 @@
 // Autor: Henrique Colini
-// Versão: 1.1 (2018-09-25)
+// Versão: 1.1.1 (2018-09-25)
 
 // Códigos de erro
 
@@ -107,16 +107,16 @@ function forEachBit(bytes,callback,starting=0) {
 function validateIpValues(values) {
 	let validation = [];
 
-	if (values.length && values.length > 4)
+	if (values.length > 4)
 		validation.push(V_TOOMANYBYTES);
 
-	if (!values.length || values.length < 4)
+	if (values.length < 4)
 		validation.push(V_TOOFEWBYTES);
 
-	if (values.mask && values.mask > 32)
+	if (values.mask > 32)
 		validation.push(V_BIGMASK);
 
-	if (!values.mask || values.mask < 0)
+	if (values.mask < 0)
 		validation.push(V_SMALLMASK);
 
 	if (values.length) {
