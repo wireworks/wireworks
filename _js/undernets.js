@@ -2,6 +2,7 @@
 // Versão: 1.0 (2018-09-23)
 
 const ELEMENT_STYLES = ['ss-0','ss-1','ss-2','ss-3','ss-4','ss-5','ss-6','ss-7'];
+let errorWrapper = id("error_wrapper");
 let rootBlock = id("root_block");
 let rootTree = id("root_tree");
 let tooltip = id("tooltip");
@@ -145,10 +146,12 @@ function prepElements(net) {
 
 	net.block.classList = "subnet-block";
 
+	let desc = ipValuesToStr(net.ipValues) + " (" + (net.hosts).toLocaleString() + " host" + (net.hosts==1?'':'s') + ")";
+
 	net.block.addEventListener("mouseover",function(){
-		tooltip.textContent = ipValuesToStr(net.ipValues) + " (" + net.hosts + " host" + (net.hosts==1?'':'s') + ")";
+		tooltip.textContent = desc;
 	});
-	net.treeText.textContent = ipValuesToStr(net.ipValues) + " (" + net.hosts + " host" + (net.hosts==1?'':'s') + ")";
+	net.treeText.textContent = desc;
 	net.treeText.classList = "subnet-divide";
 	if (net.ipValues.mask === 32) {
 		net.treeText.classList.add("disabled");
@@ -265,7 +268,7 @@ function start() {
 					</td>
 				`;
 				table.id = "error_view";
-				id('container').appendChild(table);
+				errorWrapper.appendChild(table);
 			}
 	}
 
