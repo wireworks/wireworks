@@ -92,6 +92,7 @@
 	margin-right: 10px;
 	pointer-events: all;
 	cursor: pointer;
+	transition: background 0.2s;
 }
 
 .subnet-divide {
@@ -100,7 +101,6 @@
 
 .subnet-merge {
 	color: #b9afa9;
-	text-decoration: line-through;
 }
 
 .subnet-divide::before {
@@ -113,11 +113,18 @@
 	content: "\f066";
 }
 
+.subnet-divide:hover::before {
+	background: #64dba2;
+}
+
+.subnet-merge:hover::before {
+	background: #ccc4c0;
+}
+
 .subnet-divide.disabled::before {
 	background: #56ad83;
 	pointer-events: none;
 	cursor: auto;
-	/*font-weight: 400;*/
 	font-size: 12px;
 	content: "\f05e";
 }
@@ -152,9 +159,9 @@
     border-left: 4px solid #b9afa9;
     height: 100%;
     width: 0px;
-    top: -11px;
+    top: -10px;
 }
 
 .subnet-tree ul > li:last-child::after {
-    height: 39px;
+    height: 38px;
 }

@@ -178,98 +178,96 @@ function start() {
 
 	if (firstStart || confirm("Visualizar rede?\n\nIsso irá excluir todas as sub-redes existentes.")) {
 
-			let values = strToIPValues(id('ipmask').value);
-			let errorView = id('error_view');
+		let values = strToIPValues(id('ipmask').value);
+		let errorView = id('error_view');
 
-			if (errorView !== null) {
-				errorView.remove();
-			}
+		if (errorView !== null) {
+			errorView.remove();
+		}
 
-			let errstr = '';
+		let errstr = '';
 
-			if (values !== undefined) {
+		if (values !== undefined) {
 
-				let validation = validateIpValues(values);
+			let validation = validateIpValues(values);
 
-				if (validation[0] !== V_SUCCESS) {
+			if (validation[0] !== V_SUCCESS) {
 
-					for (let i = 0; i < validation.length; i++) {
+				for (let i = 0; i < validation.length; i++) {
 
-						switch (validation[i]) {
-							case V_BIGBYTES:
-								errstr += ' Um ou mais octetos possui um valor alto demais (deve estar entre 0-255).';
-								break;
-							case V_BIGMASK:
-								errstr += ' O valor da máscara é alto demais (deve estar entre 0-32).';
-								break;
-							default:
-								errstr += ' Erro desconhecido.';
-						}
-
-					}
-				}
-				else {
-
-					let netDecimals = getNetDecimals(values);
-
-					if (values[0] == netDecimals[0] && values[1] == netDecimals[1] &&
-							values[2] == netDecimals[2] && values[3] == netDecimals[3]) {
-
-						if (firstStart) {
-							tooltip.style.display = 'inline-block';
-							rootBlock.addEventListener("mouseleave",function(){
-								tooltip.textContent = "Passe o mouse para ver informações";
-							});
-							tooltip.textContent = "Passe o mouse para ver informações";
-						}
-
-						while (rootBlock.lastChild)
-							rootBlock.removeChild(rootBlock.lastChild);
-						while (rootTree.lastChild)
-							rootTree.removeChild(rootTree.lastChild);
-
-						rootNet = {
-							ipValues: values,
-							bytes: decimalsToBytes(values),
-							hosts: hostNumber(values.mask),
-							subnets: []
-						};
-
-						prepElements(rootNet);
-
-						rootBlock.appendChild(rootNet.block);
-						rootTree.appendChild(rootNet.treeText);
-
-						firstStart = false;
-						updateBlocks();
-
-					}
-					else {
-
-						let likelyValues = netDecimals.slice();
-						likelyValues.mask = values.mask;
-						let likely = ipValuesToStr(likelyValues);
-
-						errstr = `Esse endereço de rede é icompatível com a máscara. Você quis dizer ${likely}?`;
-
+					switch (validation[i]) {
+						case V_BIGBYTES:
+							errstr += ' Um ou mais octetos possui um valor alto demais (deve estar entre 0-255).';
+							break;
+						case V_BIGMASK:
+							errstr += ' O valor da máscara é alto demais (deve estar entre 0-32).';
+							break;
+						default:
+							errstr += ' Erro desconhecido.';
 					}
 
 				}
 			}
 			else {
-				errstr = "A entrada deve seguir o seguinte padrão: 0.0.0.0/0";
-			}
 
-			if (errstr.length > 0) {
-				let table = document.createElement('table');
-				table.innerHTML = `
-					<td>
-						<h2 class="error">Entrada inválida. ${errstr}</h2>
-					</td>
-				`;
-				table.id = "error_view";
-				errorWrapper.appendChild(table);
+				let netDecimals = getNetDecimals(values);
+
+				if (values[0] == netDecimals[0] && values[1] == netDecimals[1] &&
+						values[2] == netDecimals[2] && values[3] == netDecimals[3]) {
+
+					if (firstStart) {
+						tooltip.style.display = 'inline-block';
+						rootBlock.addEventListener("mouseleave",function(){
+							tooltip.textContent = "Passe o mouse para ver informações";
+						});
+						tooltip.textContent = "Passe o mouse para ver informações";
+					}
+
+					while (rootBlock.lastChild)
+						rootBlock.removeChild(rootBlock.lastChild);
+					while (rootTree.lastChild)
+						rootTree.removeChild(rootTree.lastChild);
+
+					rootNet = {
+						ipValues: values,
+						bytes: decimalsToBytes(values),
+						hosts: hostNumber(values.mask),
+						subnets: []
+					};
+
+					prepElements(rootNet);
+
+					rootBlock.appendChild(rootNet.block);
+					rootTree.appendChild(rootNet.treeText);
+
+					firstStart = false;
+					updateBlocks();
+
+				}
+				else {
+
+					let likelyValues = netDecimals.slice();
+					likelyValues.mask = values.mask;
+					let likely = ipValuesToStr(likelyValues);
+
+					errstr = `Esse endereço de rede é icompatível com a máscara. Você quis dizer ${likely}?`;
+
+				}
 			}
+		}
+		else {
+			errstr = "A entrada deve seguir o seguinte padrão: 0.0.0.0/0";
+		}
+
+		if (errstr.length > 0) {
+			let table = document.createElement('table');
+			table.innerHTML = `
+				<td>
+					<h2 class="error">Entrada inválida. ${errstr}</h2>
+				</td>
+			`;
+			table.id = "error_view";
+			errorWrapper.appendChild(table);
+		}
 	}
-
 }

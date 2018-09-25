@@ -4,7 +4,7 @@
 // Códigos de erro
 
 const V_SUCCESS = 0;
-const V_BIGBYTES = 1; // values[0] > 255 || values[1] > 255 || values[2] > 255 || values[3] > 255
+const V_BIGBYTES = 1;
 const V_SMALLBYTES = 2;
 const V_BIGMASK = 3;
 const V_SMALLMASK = 4;
