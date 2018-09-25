@@ -73,22 +73,22 @@ a.logo:hover {
 	background: #ebccab;
 }
 
-ul {
+ul.collection {
 	border-radius: 10px;
 	border: 1px solid #d9d8d8;
 	margin-bottom: 30px;
 }
 
-li {
+ul.collection li {
 	padding: 20px;
 	border-bottom: 1px solid #d9d8d8;
 }
 
-li:last-child {
+ul.collection li:last-child {
 	border-bottom: none;
 }
 
-li h2 {
+ul.collection li h2 {
 	margin: 0 0 0.5em 0;
 }
 

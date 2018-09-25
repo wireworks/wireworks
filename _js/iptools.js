@@ -1,5 +1,5 @@
 // Autor: Henrique Colini
-// Versão: 1.0 (2018-09-23)
+// Versão: 1.1 (2018-09-25)
 
 // Códigos de erro
 
@@ -68,15 +68,34 @@ function decimalsToBytes(decimals) {
 	return bytes;
 }
 
+// bitIndexToBytePos() - Transforma um índice de bit (0..31) em uma posição no byte (0..3,0..7)
+
+function bitIndexToBytePos(bitIndex) {
+	return {
+		i: Math.floor(bitIndex/8),
+		j: bitIndex%8
+	};
+}
+
+// bytePosToBitIndex() - Transforma uma posição no byte (0..3,0..7) em um índice de bit (0..31)
+
+function bytePosToBitIndex(i,j) {
+	return (8*i)+j;
+}
+
 // forEachBit() - Itera por todos os bits de uma série de bytes
 
 function forEachBit(bytes,callback,starting=0) {
 	let running = true;
 	let str = '';
-	for (let i = Math.floor(starting/8); i < bytes.length && running; i++) {
-		for (let j = starting%8; j < bytes[i].length && running; j++) {
+	let bytePos = bitIndexToBytePos(starting);
+	let startI = bytePos.i;
+	let startJ = bytePos.j;
+
+	for (let i = startI; i < 4 && running; i++) {
+		for (let j = startJ; j < 8 && running; j++) {
 			str+=bytes[i][j];
-			if (callback(bytes[i][j],((bytes[i].length*i)+j),i,j) === false) {
+			if (callback(bytes[i][j],bytePosToBitIndex(i,j),i,j) === false) {
 				running = false;
 			}
 		}
