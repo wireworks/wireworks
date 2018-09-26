@@ -1,5 +1,11 @@
+// Undernets
+// +=========================+
 // Autor: Henrique Colini
 // Versão: 1.0 (2018-09-23)
+
+// --------------------------------------------------------------------------------------------------------------------------
+// Variáveis globais
+// --------------------------------------------------------------------------------------------------------------------------
 
 const ELEMENT_STYLES = ['ss-0','ss-1','ss-2','ss-3','ss-4','ss-5','ss-6','ss-7'];
 let errorWrapper = id("error_wrapper");
@@ -9,7 +15,9 @@ let tooltip = id("tooltip");
 let rootNet = undefined;
 let firstStart = true;
 
+// --------------------------------------------------------------------------------------------------------------------------
 // updateBlocks() - Atualiza as cores das divs
+// --------------------------------------------------------------------------------------------------------------------------
 
 function updateBlocks() {
 
@@ -26,7 +34,9 @@ function updateBlocks() {
 
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // divide() - Divide a rede em duas sub-redes
+// --------------------------------------------------------------------------------------------------------------------------
 
 function divide(net) {
 
@@ -97,7 +107,9 @@ function divide(net) {
 	return false;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // merge() - Funde duas sub-redes que já foram juntas um dia
+// --------------------------------------------------------------------------------------------------------------------------
 
 function merge(net) {
 	if (net.subnets.length >= 2) {
@@ -116,7 +128,6 @@ function merge(net) {
 			uls[i].remove();
 		}
 
-
 		let tmpBlock = net.block.cloneNode(true);
 		net.block.parentNode.replaceChild(tmpBlock, net.block);
 		net.block = tmpBlock;
@@ -134,7 +145,9 @@ function merge(net) {
 	}
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // prepElements() - Prepara os elementos do DOM (adiciona classes,eventos etc)
+// --------------------------------------------------------------------------------------------------------------------------
 
 function prepElements(net) {
 
@@ -151,14 +164,17 @@ function prepElements(net) {
 	net.block.addEventListener("mouseover",function(){
 		tooltip.textContent = desc;
 	});
+
 	net.treeText.textContent = desc;
 	net.treeText.classList = "subnet-divide";
+
 	if (net.ipValues.mask === 32) {
 		net.treeText.classList.add("disabled");
 	}
+
 	net.treeText.addEventListener("click",function(){
 		if (net.subnets.length > 0) {
-			if ((net.subnets[0].subnets.length+net.subnets[1].subnets.length==0) || confirm("Tem certeza de quer fundir essas duas sub-redes?\n\nTodas as sub-redes dessas duas serão apagadas para sempre.")) {
+			if ((net.subnets[0].subnets.length+net.subnets[1].subnets.length==0) || confirm("Tem certeza de quer fundir essas duas sub-redes?\nTodas as sub-redes dessas duas serão apagadas para sempre.")) {
 				if(!merge(net))
 					alert("Você não pode fundir essas sub-redes");
 				updateBlocks();
@@ -172,13 +188,15 @@ function prepElements(net) {
 	});
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // start() - Inicializa toda a lógica, seta os blocos coloridos e a árvore de redes
+// --------------------------------------------------------------------------------------------------------------------------
 
 function start() {
 
-	if (firstStart || confirm("Visualizar rede?\n\nIsso irá excluir todas as sub-redes existentes.")) {
+	if (firstStart || confirm("Tem certeza de que quer visualizar uma nova rede?\nIsso irá excluir todas as sub-redes existentes.")) {
 
-		let values = strToIPValues(id('ipmask').value);
+		let values = parseIpValues(id('ipmask').value);
 		let errorView = id('error_view');
 
 		if (errorView !== null) {
@@ -189,7 +207,7 @@ function start() {
 
 		if (values !== undefined) {
 
-			let validation = validateIpValues(values);
+			let validation = validateIpValues(values, true);
 
 			if (validation[0] !== V_SUCCESS) {
 
@@ -202,6 +220,12 @@ function start() {
 						case V_BIGMASK:
 							errstr += ' O valor da máscara é alto demais (deve estar entre 0-32).';
 							break;
+						case V_NOTNETADDRESS:
+							let likelyValues = getNetDecimals(values);
+							likelyValues.mask = values.mask;
+							let likely = ipValuesToStr(likelyValues);
+							errstr += ` Esse endereço de rede é icompatível com a máscara. Você quis dizer ${likely}?`;
+							break;
 						default:
 							errstr += ' Erro desconhecido.';
 					}
@@ -210,60 +234,46 @@ function start() {
 			}
 			else {
 
-				let netDecimals = getNetDecimals(values);
-
-				if (values[0] == netDecimals[0] && values[1] == netDecimals[1] &&
-						values[2] == netDecimals[2] && values[3] == netDecimals[3]) {
-
-					if (firstStart) {
-						tooltip.style.display = 'inline-block';
-						rootBlock.addEventListener("mouseleave",function(){
-							tooltip.textContent = "Passe o mouse para ver informações";
-						});
+				if (firstStart) {
+					tooltip.style.display = 'inline-block';
+					rootBlock.addEventListener("mouseleave",function(){
 						tooltip.textContent = "Passe o mouse para ver informações";
-					}
-
-					while (rootBlock.lastChild)
-						rootBlock.removeChild(rootBlock.lastChild);
-					while (rootTree.lastChild)
-						rootTree.removeChild(rootTree.lastChild);
-
-					rootNet = {
-						ipValues: values,
-						bytes: decimalsToBytes(values),
-						hosts: hostNumber(values.mask),
-						subnets: []
-					};
-
-					prepElements(rootNet);
-
-					rootBlock.appendChild(rootNet.block);
-					rootTree.appendChild(rootNet.treeText);
-
-					firstStart = false;
-					updateBlocks();
-
+					});
+					tooltip.textContent = "Passe o mouse para ver informações";
 				}
-				else {
 
-					let likelyValues = netDecimals.slice();
-					likelyValues.mask = values.mask;
-					let likely = ipValuesToStr(likelyValues);
+				while (rootBlock.lastChild)
+					rootBlock.removeChild(rootBlock.lastChild);
+				while (rootTree.lastChild)
+					rootTree.removeChild(rootTree.lastChild);
 
-					errstr = `Esse endereço de rede é icompatível com a máscara. Você quis dizer ${likely}?`;
+				rootNet = {
+					ipValues: values,
+					bytes: decimalsToBytes(values),
+					hosts: hostNumber(values.mask),
+					subnets: []
+				};
 
-				}
+				prepElements(rootNet);
+
+				rootBlock.appendChild(rootNet.block);
+				rootTree.appendChild(rootNet.treeText);
+
+				updateBlocks();
+
+				firstStart = false;
+
 			}
 		}
 		else {
-			errstr = "A entrada deve seguir o seguinte padrão: 0.0.0.0/0";
+			errstr = " A entrada deve seguir o seguinte padrão: 0.0.0.0/0";
 		}
 
 		if (errstr.length > 0) {
 			let table = document.createElement('table');
 			table.innerHTML = `
 				<td>
-					<h2 class="error">Entrada inválida. ${errstr}</h2>
+					<h2 class="error">Entrada inválida.${errstr}</h2>
 				</td>
 			`;
 			table.id = "error_view";

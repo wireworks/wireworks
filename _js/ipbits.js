@@ -1,11 +1,15 @@
+// IPBits
+// +=========================+
 // Autor: Henrique Colini
 // Versão: 2.2.1 (2018-09-23)
+
+// --------------------------------------------------------------------------------------------------------------------------
+// Variáveis globais
+// --------------------------------------------------------------------------------------------------------------------------
 
 const numbers = ['0','1','2','3','4','5','6','7','8','9'];
 const IP = [];
 const MASK = [];
-
-// Pega os "elementos de bit" (os números 0 e 1 clicáveis como checkboxes) da página
 
 for (let i=0; i<4; i++) {
 	IP[i] = [];
@@ -16,7 +20,9 @@ for (let i=0; i<4; i++) {
 	}
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // getBytes() - Retorna os valores dos bits da página em grupos de 4 bytes. Podem ser os bytes do IP ou da máscara
+// --------------------------------------------------------------------------------------------------------------------------
 
 function getBytes(kind) {
 
@@ -35,7 +41,9 @@ function getBytes(kind) {
 
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // setByte() - Transforma um número decimal em elementos de bit do IP, dado o índice do byte
+// --------------------------------------------------------------------------------------------------------------------------
 
 function setByte (decimal, index) {
 
@@ -47,7 +55,9 @@ function setByte (decimal, index) {
 
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // updateIPShort() - Atualiza o pequeno texto cinza contendo o valor do IP.
+// --------------------------------------------------------------------------------------------------------------------------
 
 function updateIPShort() {
 
@@ -57,7 +67,9 @@ function updateIPShort() {
 
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // updateIPDisplay() - Atualiza o display do IP (ou seja, as caixas vermelhas) baseado no valor dos elementos de bit
+// --------------------------------------------------------------------------------------------------------------------------
 
 function updateIPDisplay() {
 
@@ -70,7 +82,9 @@ function updateIPDisplay() {
 
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // updateMaskDisplay() - Atualiza o display da máscara (ou seja, as caixas azuis). O valor passado é o índice do último bit
+// --------------------------------------------------------------------------------------------------------------------------
 
 function updateMaskDisplay(lastBit) {
 
@@ -88,7 +102,9 @@ function updateMaskDisplay(lastBit) {
 
 }
 
-// copyDecimals() - [EVENTO: onclick nos ícones de copiar IP/Máscara] Copia decimais para a área de transferência
+// --------------------------------------------------------------------------------------------------------------------------
+// copyDecimals() - Copia decimais para a área de transferência
+// --------------------------------------------------------------------------------------------------------------------------
 
 function copyDecimals(type) {
 
@@ -122,7 +138,9 @@ function copyDecimals(type) {
 
 }
 
-// validateInput() - [EVENTO: oninput nos displays de IP] Verifica se o valor digitado nos bytes de IP é válido, e limpa-o caso não seja.
+// --------------------------------------------------------------------------------------------------------------------------
+// validateInput() - Verifica se o valor digitado nos bytes de IP é válido, e limpa-o caso não seja.
+// --------------------------------------------------------------------------------------------------------------------------
 
 function validateInput(evt,display,index) {
 
@@ -182,9 +200,10 @@ function validateInput(evt,display,index) {
 
 }
 
-// validateKey() - [EVENTO: onkeypress nos displays de IP] Verifica se o caractere digitado num byte de IP é válido.
-//                 Semelhante ao validateInput(), mas faz verificações mais simples que cancelam a entrada de um caractere,
-//                 como quando o usuário digita uma letra.
+// --------------------------------------------------------------------------------------------------------------------------
+// validateKey() - Verifica se o caractere digitado num byte de IP é válido. Semelhante ao validateInput(), mas faz verificações
+//				   mais simples que cancelam a entrada de um caractere, como quando o usuário digita uma letra.
+// --------------------------------------------------------------------------------------------------------------------------
 
 function validateKey(evt,display,nextFocus){
 
@@ -209,7 +228,9 @@ function validateKey(evt,display,nextFocus){
 
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // Limpa os campos, pois há casos no qual navegadores mantém os valores mesmo após um F5 (e ctrl+F5 para limpar campos não é legal)
+// --------------------------------------------------------------------------------------------------------------------------
 
 setByte(0,0);
 setByte(0,1);

@@ -1,9 +1,15 @@
+// Planner
+// +=========================+
 // Autor: Henrique Colini
 // Versão: 1.1 (2018-09-23)
 
+// --------------------------------------------------------------------------------------------------------------------------
+// createPlan() - Gera a tabela do Plano de Endereçamento
+// --------------------------------------------------------------------------------------------------------------------------
+
 function createPlan() {
 
-	let values = strToIPValues(id('ipmask').value);
+	let values = parseIpValues(id('ipmask').value);
 	let oldPlan = id('plan');
 
 	if (oldPlan !== null) {
@@ -14,11 +20,11 @@ function createPlan() {
 
 	if (values !== undefined) {
 
-		let validation = validateIpValues(values);
+		let validation = validateIpValues(values, true);
 
 		if (validation[0] !== V_SUCCESS) {
 
-			let errstr = 'Entrada inválida.';
+			let errstr = '';
 
 			for (let i = 0; i < validation.length; i++) {
 
@@ -29,94 +35,81 @@ function createPlan() {
 					case V_BIGMASK:
 						errstr += ' O valor da máscara é alto demais (deve estar entre 0-32).';
 						break;
+					case V_NOTNETADDRESS:
+						let likelyValues = getNetDecimals(values);
+						likelyValues.mask = values.mask;
+						let likely = ipValuesToStr(likelyValues);
+						errstr += ` Esse endereço de rede é icompatível com a máscara. Você quis dizer ${likely}?`;
+						break;
 					default:
 						errstr += ' Erro desconhecido.';
-
 				}
 
 			}
 
 			table.innerHTML = `
 				<td>
-					<h2 class="error">${errstr}</h2>
+					<h2 class="error">Entrada inválida.${errstr}</h2>
 				</td>
 			`;
 
 		}
 		else {
-			let netDecimals = getNetDecimals(values);
+			let mask = decimalsToStr(bytesToDecimals(maskNumberToBytes(values.mask)));
+			let hosts = hostNumber(values.mask).toLocaleString();
+			let network = '';
+			let firstValid = '';
+			let broadcast = '';
+			let lastValid = '';
 
-			if (values[0] == netDecimals[0] && values[1] == netDecimals[1] &&
-					values[2] == netDecimals[2] && values[3] == netDecimals[3]) {
+			if (values.mask < 31) {
+				network = ipValuesToStr(values);
+				let firstValidDecimals = values.slice();
+				firstValidDecimals[3]++;
+				firstValid = decimalsToStr(firstValidDecimals);
 
-				let mask = decimalsToStr(bytesToDecimals(maskNumberToBytes(values.mask)));
-				let hosts = hostNumber(values.mask).toLocaleString();
-				let network = '';
-				let firstValid = '';
-				let broadcast = '';
-				let lastValid = '';
+				let broadcastDecimals = getBroadcastDecimals(values);
+				let lastValidDecimals = broadcastDecimals.slice();
+				lastValidDecimals[3]--;
 
-				if (values.mask < 31) {
-					network = ipValuesToStr(values);
-					let firstValidDecimals = values.slice();
-					firstValidDecimals[3]++;
-					firstValid = decimalsToStr(firstValidDecimals);
-
-					let broadcastDecimals = getBroadcastDecimals(values);
-					let lastValidDecimals = broadcastDecimals.slice();
-					lastValidDecimals[3]--;
-
-					broadcast = decimalsToStr(broadcastDecimals);
-					lastValid = decimalsToStr(lastValidDecimals);
-				}
-				else {
-					if (values.mask == 31) {
-						network = 'N/A';
-						broadcast = 'N/A';
-						let lastValidDecimals = values.slice();
-						lastValidDecimals[3]++;
-						firstValid = decimalsToStr(values);
-						lastValid = decimalsToStr(lastValidDecimals);
-					}
-					else if (values.mask == 32) {
-						network = 'N/A';
-						broadcast = 'N/A';
-						firstValid = decimalsToStr(values);
-						lastValid = firstValid;
-					}
-				}
-
-				table.innerHTML = `
-					<tr>
-						<th>Rede</th>
-						<th>Máscara</th>
-						<th>Primeiro Válido</th>
-						<th>Último Válido</th>
-						<th>Broadcast</th>
-						<th>Hosts</th>
-					</tr>
-					<tr>
-						<td>${network}</td>
-						<td>${mask}</td>
-						<td>${firstValid}</td>
-						<td>${lastValid}</td>
-						<td>${broadcast}</td>
-						<td>${hosts}</td>
-					</tr>
-				`;
+				broadcast = decimalsToStr(broadcastDecimals);
+				lastValid = decimalsToStr(lastValidDecimals);
 			}
 			else {
-
-				let likelyValues = netDecimals.slice();
-				likelyValues.mask = values.mask;
-				let likely = ipValuesToStr(likelyValues);
-
-				table.innerHTML = `
-					<td>
-						<h2 class="error">Esse endereço de rede é icompatível com a máscara. Você quis dizer ${likely}?</h2>
-					</td>
-				`;
+				if (values.mask == 31) {
+					network = 'N/A';
+					broadcast = 'N/A';
+					let lastValidDecimals = values.slice();
+					lastValidDecimals[3]++;
+					firstValid = decimalsToStr(values);
+					lastValid = decimalsToStr(lastValidDecimals);
+				}
+				else if (values.mask == 32) {
+					network = 'N/A';
+					broadcast = 'N/A';
+					firstValid = decimalsToStr(values);
+					lastValid = firstValid;
+				}
 			}
+
+			table.innerHTML = `
+				<tr>
+					<th>Rede</th>
+					<th>Máscara</th>
+					<th>Primeiro Válido</th>
+					<th>Último Válido</th>
+					<th>Broadcast</th>
+					<th>Hosts</th>
+				</tr>
+				<tr>
+					<td>${network}</td>
+					<td>${mask}</td>
+					<td>${firstValid}</td>
+					<td>${lastValid}</td>
+					<td>${broadcast}</td>
+					<td>${hosts}</td>
+				</tr>
+			`;
 		}
 	}
 	else {

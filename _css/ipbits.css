@@ -3,12 +3,6 @@
 	margin:0;
 	padding:0;
 }
-.bit-box {
-	align-items:center;
-	display:flex;
-	justify-content:space-between;
-	margin-top:10px;
-}
 .block {
 	margin:0 5px;
 	flex: 1;
@@ -16,6 +10,12 @@
 .box {
 	display:flex;
 	margin: 0 -5px 30px -5px;
+}
+.bit-box {
+	align-items:center;
+	display:flex;
+	justify-content:space-between;
+	margin-top:10px;
 }
 .copy-icon {
 	cursor:pointer;

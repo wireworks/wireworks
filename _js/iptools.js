@@ -1,7 +1,11 @@
+// IPTools
+// +=========================+
 // Autor: Henrique Colini
 // Versão: 1.1.1 (2018-09-25)
 
-// Códigos de erro
+// --------------------------------------------------------------------------------------------------------------------------
+// Códigos de erro na validação de um endereço
+// --------------------------------------------------------------------------------------------------------------------------
 
 const V_SUCCESS = 0;
 const V_BIGBYTES = 1;
@@ -10,14 +14,19 @@ const V_BIGMASK = 3;
 const V_SMALLMASK = 4;
 const V_TOOMANYBYTES = 5;
 const V_TOOFEWBYTES = 6;
+const V_NOTNETADDRESS = 7;
 
+// --------------------------------------------------------------------------------------------------------------------------
 // id() - Abreviação de document.getElementById()
+// --------------------------------------------------------------------------------------------------------------------------
 
 function id (id) {
 	return document.getElementById(id);
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // byteToDecimal() - Converte um byte (array de bits) em um número decimal. Exemplo: byteToDecimal([1,1,0,0,0,0,0,0]) = 192
+// --------------------------------------------------------------------------------------------------------------------------
 
 function byteToDecimal (byte) {
 
@@ -30,7 +39,9 @@ function byteToDecimal (byte) {
 
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // decimalToByte() - Converte um número decimal (entre 0 e 255) em um byte (array de bits).
+// --------------------------------------------------------------------------------------------------------------------------
 
 function decimalToByte(decimal) {
 	let byte = [0,0,0,0,0,0,0,0];
@@ -46,7 +57,9 @@ function decimalToByte(decimal) {
 	return byte;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // bytesToDecimals() - Coverte 4 bytes em 4 decimais
+// --------------------------------------------------------------------------------------------------------------------------
 
 function bytesToDecimals(bytes) {
 	let decimals = [];
@@ -57,7 +70,9 @@ function bytesToDecimals(bytes) {
 	return decimals;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // decimalsToBytes() - Coverte 4 decimais em 4 bytes
+// --------------------------------------------------------------------------------------------------------------------------
 
 function decimalsToBytes(decimals) {
 	let bytes = [];
@@ -68,7 +83,9 @@ function decimalsToBytes(decimals) {
 	return bytes;
 }
 
-// bitIndexToBytePos() - Transforma um índice de bit (0..31) em uma posição no byte (0..3,0..7)
+// --------------------------------------------------------------------------------------------------------------------------
+// bitIndexToBytePos() - Transforma um índice de bit (0..31) em uma posição nos bytes (0..3,0..7)
+// --------------------------------------------------------------------------------------------------------------------------
 
 function bitIndexToBytePos(bitIndex) {
 	return {
@@ -77,13 +94,17 @@ function bitIndexToBytePos(bitIndex) {
 	};
 }
 
-// bytePosToBitIndex() - Transforma uma posição no byte (0..3,0..7) em um índice de bit (0..31)
+// --------------------------------------------------------------------------------------------------------------------------
+// bytePosToBitIndex() - Transforma uma posição nos bytes (0..3,0..7) em um índice de bit (0..31)
+// --------------------------------------------------------------------------------------------------------------------------
 
 function bytePosToBitIndex(i,j) {
 	return (8*i)+j;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // forEachBit() - Itera por todos os bits de uma série de bytes
+// --------------------------------------------------------------------------------------------------------------------------
 
 function forEachBit(bytes,callback,starting=0) {
 	let running = true;
@@ -102,9 +123,11 @@ function forEachBit(bytes,callback,starting=0) {
 	}
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // validateIpValues() - Valida um endereço IP+máscara
+// --------------------------------------------------------------------------------------------------------------------------
 
-function validateIpValues(values) {
+function validateIpValues(values,testNet = false) {
 	let validation = [];
 
 	if (values.length > 4)
@@ -134,13 +157,26 @@ function validateIpValues(values) {
 			validation.push(V_SMALLBYTES);
 	}
 
-	if (validation.length == 0)
+	if (validation.length == 0 && testNet) {
+		let netDecimals = getNetDecimals(values);
+
+		if (values[0] == netDecimals[0] &&
+				values[1] == netDecimals[1] &&
+				values[2] == netDecimals[2] &&
+				values[3] == netDecimals[3])
+			validation.push(V_SUCCESS);
+		else
+			validation.push(V_NOTNETADDRESS);
+	}
+	else if (validation.length == 0)
 		validation.push(V_SUCCESS);
 
 	return validation;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // getNetDecimals() - Retorna o endereço de rede de um endereço IP+máscara qualquer
+// --------------------------------------------------------------------------------------------------------------------------
 
 function getNetDecimals(ipValues) {
 
@@ -155,7 +191,9 @@ function getNetDecimals(ipValues) {
 
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // getBroadcastDecimals() - Retorna o endereço de broadcast de um endereço IP+máscara qualquer
+// --------------------------------------------------------------------------------------------------------------------------
 
 function getBroadcastDecimals(ipValues) {
 
@@ -170,9 +208,11 @@ function getBroadcastDecimals(ipValues) {
 
 }
 
-// strToIPValues() - Converte uma string de ip (exemplo "192.168.0.0/24") em um ipValue (array de octetos + máscara)
+// --------------------------------------------------------------------------------------------------------------------------
+// parseIpValues() - Converte uma string de ip (exemplo "192.168.0.0/24") em um ipValue (array de octetos + máscara)
+// --------------------------------------------------------------------------------------------------------------------------
 
-function strToIPValues(ipmask) {
+function parseIpValues(ipmask) {
 	if (ipmask && typeof ipmask === 'string') {
 		ipmask = ipmask.trim();
 		const regex = /^(\d+)\.(\d+)\.(\d+)\.(\d+)\/(\d+)$/;
@@ -192,7 +232,9 @@ function strToIPValues(ipmask) {
 	return undefined;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // maskNumberToBytes() - Converte uma máscara de número para bytes (exemplo: /24 -> 255.255.255.0)
+// --------------------------------------------------------------------------------------------------------------------------
 
 function maskNumberToBytes(number) {
 	let bytes = [];
@@ -220,24 +262,30 @@ function maskNumberToBytes(number) {
 	return bytes;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // decimalsToStr() - Converte array de decimais em uma string
+// --------------------------------------------------------------------------------------------------------------------------
 
 function decimalsToStr(decimals) {
 	return `${decimals[0]}.${decimals[1]}.${decimals[2]}.${decimals[3]}`;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // ipValuesToStr() - Converte array de decimais + máscara em uma string
+// --------------------------------------------------------------------------------------------------------------------------
 
 function ipValuesToStr(ipValues) {
 	return `${ipValues[0]}.${ipValues[1]}.${ipValues[2]}.${ipValues[3]}/${ipValues.mask}`;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------
 // hostNumber() - Retorna a quantidade de hosts que essa máscara possui
+// --------------------------------------------------------------------------------------------------------------------------
 
 function hostNumber(mask) {
 	if (mask==31)
-		return '2';
+		return 2;
 	if (mask==32)
-		return '1';
+		return 1;
 	return (Math.pow(2,32-mask)-2);
 }
