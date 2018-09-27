@@ -22,36 +22,100 @@
 	text-shadow: 2px 2px 10px rgba(0,0,0,0.25);
 }
 
-.subnet-block.ss-0 {
+.subnet-block.ss-0, .subnet-divide.ss-0::before {
 	background: #67874b;
 }
 
-.subnet-block.ss-1 {
+.subnet-block.ss-1, .subnet-divide.ss-1::before {
 	background: #4d4486;
 }
 
-.subnet-block.ss-2 {
+.subnet-block.ss-2, .subnet-divide.ss-2::before {
 	background: #c1a945;
 }
 
-.subnet-block.ss-3 {
+.subnet-block.ss-3, .subnet-divide.ss-3::before {
 	background: #ab452f;
 }
 
-.subnet-block.ss-4 {
+.subnet-block.ss-4, .subnet-divide.ss-4::before {
 	background: #228f7f;
 }
 
-.subnet-block.ss-5 {
+.subnet-block.ss-5, .subnet-divide.ss-5::before {
 	background: #774280;
 }
 
-.subnet-block.ss-6 {
+.subnet-block.ss-6, .subnet-divide.ss-6::before {
 	background: #868b2f;
 }
 
-.subnet-block.ss-7 {
+.subnet-block.ss-7, .subnet-divide.ss-7::before {
 	background: #9a3040;
+}
+
+.subnet-block.ss-8, .subnet-divide.ss-8::before {
+	background: #95612b;
+}
+
+.subnet-block.ss-9, .subnet-divide.ss-9::before {
+	background: #e6628a;
+}
+
+.subnet-block.ss-10, .subnet-divide.ss-10::before {
+	background: #2393b6;
+}
+
+.subnet-block.ss-11, .subnet-divide.ss-11::before {
+	background: #8b9c74;
+}
+
+.subnet-block.ss-12, .subnet-divide.ss-12::before {
+	background: #4453a5;
+}
+
+.subnet-block.ss-13, .subnet-divide.ss-13::before {
+	background: #ab80b7;
+}
+
+.subnet-block.ss-14, .subnet-divide.ss-14::before {
+	background: #8e6d4d;
+}
+
+.subnet-block.ss-15, .subnet-divide.ss-15::before {
+	background: #5833a4;
+}
+
+.subnet-block.ss-16, .subnet-divide.ss-16::before {
+	background: #bb793a;
+}
+
+.subnet-block.ss-17, .subnet-divide.ss-17::before {
+	background: #632d44;
+}
+
+.subnet-block.ss-18, .subnet-divide.ss-18::before {
+	background: #b5bb51;
+}
+
+.subnet-block.ss-19, .subnet-divide.ss-19::before {
+	background: #44a482;
+}
+
+.subnet-block.ss-20, .subnet-divide.ss-20::before {
+	background: #9c449e;
+}
+
+.subnet-block.ss-21, .subnet-divide.ss-21::before {
+	background: #aa4c33;
+}
+
+.subnet-block.ss-22, .subnet-divide.ss-22::before {
+	background: #963860;
+}
+
+.subnet-block.ss-23, .subnet-divide.ss-23::before {
+	background: #2e94b4;
 }
 
 .tooltip-wrapper {
@@ -92,7 +156,7 @@
 	margin-right: 10px;
 	pointer-events: all;
 	cursor: pointer;
-	transition: background 0.2s;
+	transition: background 0.2s, filter 0.2s;
 }
 
 .subnet-divide {
@@ -104,8 +168,19 @@
 }
 
 .subnet-divide::before {
-	background: #48cf8e;
 	content: "\f337";
+}
+
+.subnet-divide:hover::before {
+	filter: brightness(1.2);
+}
+
+.subnet-divide.disabled {
+	filter: grayscale(0.6);
+}
+
+.subnet-merge:hover::before {
+	background: #c9bcb3;
 }
 
 .subnet-merge::before {
@@ -113,16 +188,7 @@
 	content: "\f066";
 }
 
-.subnet-divide:hover::before {
-	background: #64dba2;
-}
-
-.subnet-merge:hover::before {
-	background: #ccc4c0;
-}
-
 .subnet-divide.disabled::before {
-	background: #56ad83;
 	pointer-events: none;
 	cursor: auto;
 	font-size: 12px;

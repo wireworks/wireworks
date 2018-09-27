@@ -7,7 +7,12 @@
 // Variáveis globais
 // --------------------------------------------------------------------------------------------------------------------------
 
-const ELEMENT_STYLES = ['ss-0','ss-1','ss-2','ss-3','ss-4','ss-5','ss-6','ss-7'];
+const ELEMENT_STYLES = [];
+
+for (let i = 0; i < 24; i++) {
+	ELEMENT_STYLES[i] = 'ss-'+i;
+}
+
 let errorWrapper = id("error_wrapper");
 let rootBlock = id("root_block");
 let rootTree = id("root_tree");
@@ -16,10 +21,10 @@ let rootNet = undefined;
 let firstStart = true;
 
 // --------------------------------------------------------------------------------------------------------------------------
-// updateBlocks() - Atualiza as cores das divs
+// updateColors() - Atualiza as cores das divs
 // --------------------------------------------------------------------------------------------------------------------------
 
-function updateBlocks() {
+function updateColors() {
 
 	let index = 0;
 	[].forEach.call(document.getElementsByClassName("subnet-block"), function(el){
@@ -30,6 +35,13 @@ function updateBlocks() {
 		else {
 			el.classList = "subnet-block";
 		}
+	});
+
+	index = 0;
+	[].forEach.call(document.getElementsByClassName("subnet-divide"), function(el){
+		let disabled = el.classList.contains("disabled") ? 'disabled' : '';
+		el.classList = disabled + " subnet-divide " + ELEMENT_STYLES[index++];
+		index = (index >= ELEMENT_STYLES.length) ? 0 : index;
 	});
 
 }
@@ -177,13 +189,13 @@ function prepElements(net) {
 			if ((net.subnets[0].subnets.length+net.subnets[1].subnets.length==0) || confirm("Tem certeza de quer fundir essas duas sub-redes?\nTodas as sub-redes dessas duas serão apagadas para sempre.")) {
 				if(!merge(net))
 					alert("Você não pode fundir essas sub-redes");
-				updateBlocks();
+				updateColors();
 			}
 		}
 		else {
 			if(!divide(net))
 				alert("Você não pode dividir essa rede");
-			updateBlocks();
+			updateColors();
 		}
 	});
 }
@@ -259,7 +271,7 @@ function start() {
 				rootBlock.appendChild(rootNet.block);
 				rootTree.appendChild(rootNet.treeText);
 
-				updateBlocks();
+				updateColors();
 
 				firstStart = false;
 
