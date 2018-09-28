@@ -21,29 +21,70 @@ let rootNet = undefined;
 let firstStart = true;
 
 // --------------------------------------------------------------------------------------------------------------------------
-// updateColors() - Atualiza as cores das divs
+// firstSubnet() - Primeira sub-rede de uma rede
 // --------------------------------------------------------------------------------------------------------------------------
 
-function updateColors() {
+function firstSubnet(net) {
+	if (net.subnets[0])
+		return firstSubnet(net.subnets[0]);
+	else
+		return net;
+}
 
-	let index = 0;
-	[].forEach.call(document.getElementsByClassName("subnet-block"), function(el){
-		if (el.children.length == 0) {
-			el.classList = "subnet-block " + ELEMENT_STYLES[index++];
-			index = (index >= ELEMENT_STYLES.length) ? 0 : index;
+// --------------------------------------------------------------------------------------------------------------------------
+// lastSubnet() - Última sub-rede de uma rede
+// --------------------------------------------------------------------------------------------------------------------------
+
+function lastSubnet(net) {
+	if (net.subnets[1])
+		return lastSubnet(net.subnets[1]);
+	else
+		return net;
+}
+
+// --------------------------------------------------------------------------------------------------------------------------
+// subnetBefore() - Sub-rede anterior (na lista)
+// --------------------------------------------------------------------------------------------------------------------------
+
+function subnetBefore(net) {
+	if (net.parent) {
+		if (net.parent.subnets[0] === net) {
+			return subnetBefore(net.parent);
 		}
 		else {
-			el.classList = "subnet-block";
+			return lastSubnet(net.parent.subnets[0]);
 		}
-	});
+	}
+	else {
+		return null;
+	}
+}
 
-	index = 0;
-	[].forEach.call(document.getElementsByClassName("subnet-divide"), function(el){
-		let disabled = el.classList.contains("disabled") ? 'disabled' : '';
-		el.classList = disabled + " subnet-divide " + ELEMENT_STYLES[index++];
-		index = (index >= ELEMENT_STYLES.length) ? 0 : index;
-	});
+// --------------------------------------------------------------------------------------------------------------------------
+// subnetAfter() - Sub-rede seguinte (na lista)
+// --------------------------------------------------------------------------------------------------------------------------
 
+function subnetAfter(net) {
+	if (net.parent) {
+		if (net.parent.subnets[1] === net) {
+			return subnetBefore(net.parent);
+		}
+		else {
+			return firstSubnet(net.parent.subnets[1]);
+		}
+	}
+	else {
+		return null;
+	}
+}
+
+// removeColorFromList() - Remove a cor de uma lista
+
+function removeColorFromList(list,color) {
+	let index = list.indexOf(color);
+	if (index > -1) {
+		list.splice(index, 1);
+	}
 }
 
 // --------------------------------------------------------------------------------------------------------------------------
@@ -73,18 +114,38 @@ function divide(net) {
 
 		let newHosts = hostNumber(newMaskNumber);
 
+		let colorList1 = ELEMENT_STYLES.slice();
+		removeColorFromList(colorList1, net.color);
+		let before = subnetBefore(net);
+		if (before) {
+			removeColorFromList(colorList1, before.color);
+		}
+		let color1 = colorList1[Math.floor(Math.random()*colorList1.length)];
+
+		let colorList2 = ELEMENT_STYLES.slice();
+		removeColorFromList(colorList2, color1);
+		let after = subnetAfter(net);
+		if (after) {
+			removeColorFromList(colorList2, after.color);
+		}
+		let color2 = colorList2[Math.floor(Math.random()*colorList2.length)];
+
 		let sub1 = {
 			ipValues: newIpValues1,
 			bytes: newBytes1,
 			hosts: newHosts,
-			subnets: []
+			subnets: [],
+			parent: net,
+			color: color1
 		};
 
 		let sub2 = {
 			ipValues: newIpValues2,
 			bytes: newBytes2,
 			hosts: newHosts,
-			subnets: []
+			subnets: [],
+			parent: net,
+			color: color2
 		};
 
 		let tmpBlock = net.block.cloneNode(true);
@@ -169,7 +230,7 @@ function prepElements(net) {
 	if (net.treeText === undefined)
 		net.treeText = document.createElement("span");
 
-	net.block.classList = "subnet-block";
+	net.block.classList = "subnet-block " + net.color;
 
 	let desc = ipValuesToStr(net.ipValues) + " (" + (net.hosts).toLocaleString() + " host" + (net.hosts==1?'':'s') + ")";
 
@@ -178,7 +239,7 @@ function prepElements(net) {
 	});
 
 	net.treeText.textContent = desc;
-	net.treeText.classList = "subnet-divide";
+	net.treeText.classList = "subnet-divide " + net.color;
 
 	if (net.ipValues.mask === 32) {
 		net.treeText.classList.add("disabled");
@@ -189,13 +250,11 @@ function prepElements(net) {
 			if ((net.subnets[0].subnets.length+net.subnets[1].subnets.length==0) || confirm("Tem certeza de quer fundir essas duas sub-redes?\nTodas as sub-redes dessas duas serão apagadas para sempre.")) {
 				if(!merge(net))
 					alert("Você não pode fundir essas sub-redes");
-				updateColors();
 			}
 		}
 		else {
 			if(!divide(net))
 				alert("Você não pode dividir essa rede");
-			updateColors();
 		}
 	});
 }
@@ -263,15 +322,15 @@ function start() {
 					ipValues: values,
 					bytes: decimalsToBytes(values),
 					hosts: hostNumber(values.mask),
-					subnets: []
+					color: 'ss-0',
+					subnets: [],
+					parent: null
 				};
 
 				prepElements(rootNet);
 
 				rootBlock.appendChild(rootNet.block);
 				rootTree.appendChild(rootNet.treeText);
-
-				updateColors();
 
 				firstStart = false;
 
