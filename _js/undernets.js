@@ -7,11 +7,9 @@
 // Variáveis globais
 // --------------------------------------------------------------------------------------------------------------------------
 
-const ELEMENT_STYLES = [];
-
-for (let i = 0; i < 24; i++) {
-	ELEMENT_STYLES[i] = 'ss-'+i;
-}
+const COLORS = [];
+for (let i = 0; i < 10; i++) COLORS[i] = 'ss-'+i;
+const COLOR_QUEUE = COLORS.slice();
 
 let errorWrapper = id("error_wrapper");
 let rootBlock = id("root_block");
@@ -67,7 +65,7 @@ function subnetBefore(net) {
 function subnetAfter(net) {
 	if (net.parent) {
 		if (net.parent.subnets[1] === net) {
-			return subnetBefore(net.parent);
+			return subnetAfter(net.parent);
 		}
 		else {
 			return firstSubnet(net.parent.subnets[1]);
@@ -78,14 +76,17 @@ function subnetAfter(net) {
 	}
 }
 
-// removeColorFromList() - Remove a cor de uma lista
+// --------------------------------------------------------------------------------------------------------------------------
+// removeItem() - Remove um item de um array
+// --------------------------------------------------------------------------------------------------------------------------
 
-function removeColorFromList(list,color) {
-	let index = list.indexOf(color);
+function removeItem(list,item) {
+	let index = list.indexOf(item);
 	if (index > -1) {
 		list.splice(index, 1);
 	}
 }
+
 
 // --------------------------------------------------------------------------------------------------------------------------
 // divide() - Divide a rede em duas sub-redes
@@ -114,21 +115,19 @@ function divide(net) {
 
 		let newHosts = hostNumber(newMaskNumber);
 
-		let colorList1 = ELEMENT_STYLES.slice();
-		removeColorFromList(colorList1, net.color);
-		let before = subnetBefore(net);
-		if (before) {
-			removeColorFromList(colorList1, before.color);
-		}
-		let color1 = colorList1[Math.floor(Math.random()*colorList1.length)];
+		COLOR_QUEUE.unshift(COLOR_QUEUE[COLOR_QUEUE.length-1]);
+		COLOR_QUEUE.pop();
 
-		let colorList2 = ELEMENT_STYLES.slice();
-		removeColorFromList(colorList2, color1);
+		let colorList = COLOR_QUEUE.slice();
+
+		let before = subnetBefore(net);
 		let after = subnetAfter(net);
-		if (after) {
-			removeColorFromList(colorList2, after.color);
-		}
-		let color2 = colorList2[Math.floor(Math.random()*colorList2.length)];
+
+		removeItem(colorList,net.color);
+		if(before) removeItem(colorList,before.color);
+		if(after) removeItem(colorList,after.color);
+
+		let color = colorList[0];
 
 		let sub1 = {
 			ipValues: newIpValues1,
@@ -136,7 +135,7 @@ function divide(net) {
 			hosts: newHosts,
 			subnets: [],
 			parent: net,
-			color: color1
+			color: net.color
 		};
 
 		let sub2 = {
@@ -145,7 +144,7 @@ function divide(net) {
 			hosts: newHosts,
 			subnets: [],
 			parent: net,
-			color: color2
+			color: color
 		};
 
 		let tmpBlock = net.block.cloneNode(true);
@@ -173,11 +172,13 @@ function divide(net) {
 
 		net.treeText.parentNode.appendChild(ul);
 
+		net.block.classList = "subnet-block";
 		net.treeText.classList = "subnet-merge";
 
 		return true;
 	}
 	return false;
+
 }
 
 // --------------------------------------------------------------------------------------------------------------------------
@@ -186,6 +187,9 @@ function divide(net) {
 
 function merge(net) {
 	if (net.subnets.length >= 2) {
+
+		COLOR_QUEUE.push(COLOR_QUEUE[0]);
+		COLOR_QUEUE.shift();
 
 		net.subnets = [];
 
@@ -210,7 +214,6 @@ function merge(net) {
 		net.treeText = tmpTree;
 
 		prepElements(net);
-
 		return true;
 	}
 	else {
@@ -236,6 +239,8 @@ function prepElements(net) {
 
 	net.block.addEventListener("mouseover",function(){
 		tooltip.textContent = desc;
+		tooltip.style.opacity = 1;
+		tooltip.style.transform = "scaleY(1)";
 	});
 
 	net.treeText.textContent = desc;
@@ -245,18 +250,30 @@ function prepElements(net) {
 		net.treeText.classList.add("disabled");
 	}
 
-	net.treeText.addEventListener("click",function(){
-		if (net.subnets.length > 0) {
-			if ((net.subnets[0].subnets.length+net.subnets[1].subnets.length==0) || confirm("Tem certeza de quer fundir essas duas sub-redes?\nTodas as sub-redes dessas duas serão apagadas para sempre.")) {
-				if(!merge(net))
-					alert("Você não pode fundir essas sub-redes");
+	if (net.ipValues.mask != 32) {
+		net.treeText.addEventListener("click",function(){
+			if (net.subnets.length > 0) {
+				if ((net.subnets[0].subnets.length+net.subnets[1].subnets.length==0) || confirm("Tem certeza de quer fundir essas duas sub-redes?\nTodas as sub-redes dessas duas serão apagadas para sempre.")) {
+					if(!merge(net))
+						alert("Você não pode fundir essas sub-redes");
+				}
 			}
-		}
-		else {
-			if(!divide(net))
-				alert("Você não pode dividir essa rede");
-		}
+			else {
+				if(!divide(net))
+					alert("Você não pode dividir essa rede");
+			}
+			net.block.classList.add("highlight");
+		});
+	}
+
+	net.treeText.addEventListener("mouseover",function() {
+		net.block.classList.add("highlight");
 	});
+
+	net.treeText.addEventListener("mouseleave",function() {
+		net.block.classList.remove("highlight");
+	});
+
 }
 
 // --------------------------------------------------------------------------------------------------------------------------
@@ -307,10 +324,12 @@ function start() {
 
 				if (firstStart) {
 					tooltip.style.display = 'inline-block';
+					tooltip.style.transform = "scaleY(0)";
+					tooltip.style.opacity = 0;
 					rootBlock.addEventListener("mouseleave",function(){
-						tooltip.textContent = "Passe o mouse para ver informações";
+						tooltip.style.opacity = 0;
+						tooltip.style.transform = "scaleY(0)";
 					});
-					tooltip.textContent = "Passe o mouse para ver informações";
 				}
 
 				while (rootBlock.lastChild)
