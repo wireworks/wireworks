@@ -155,6 +155,18 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
                 throw new Error("Invalid IP/mask address string");
             }
         };
+        /**
+         * Returns the string representation of this Address in the X.X.X.X/X format.
+         * @param  {boolean=false} omitMask Whether the mask should be ommited.
+         */
+        Address.prototype.toString = function (omitMask) {
+            if (omitMask === void 0) { omitMask = false; }
+            return "" +
+                this.ip[0].getDecimal() + "." +
+                this.ip[1].getDecimal() + "." +
+                this.ip[2].getDecimal() + "." +
+                this.ip[3].getDecimal() + (omitMask ? "" : "/" + this.getMaskShort());
+        };
         return Address;
     }());
     exports.Address = Address;

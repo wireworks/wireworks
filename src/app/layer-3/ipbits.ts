@@ -1,5 +1,5 @@
 import { id } from "../../core/helpers"
-import { Byte4, Byte4Zero } from "../../core/networking/layers/layer-3/address";
+import { Byte4, Byte4Zero, Address } from "../../core/networking/layers/layer-3/address";
 
 const IP: HTMLElement[][] = [];
 const MASK: HTMLElement[][] = [];
@@ -8,24 +8,48 @@ for (let i=0; i<4; i++) {
 	IP[i] = [];
 	MASK[i] = [];
 	for (let j=0; j<8; j++) {
-		IP[i][j] = id("byte_ip_"+i+"_"+j);
-		MASK[i][j] = id("byte_ip_" + i + "_" + j);
+
+		let ipBit = id("byte_ip_" + i + "_" + j);
+		let maskBit = id("byte_mask_" + i + "_" + j);
+
+		ipBit.addEventListener("change", function() {
+			updateIPDisplay();
+		});
+
+		IP[i][j] = ipBit;
+		MASK[i][j] = maskBit;
 	}
 }
 
-function extractDOMByte4(from: HTMLElement[][]): Byte4 {
+function extractAddress(): Address {
 
-	let bytes = Byte4Zero()
+	let ipBytes = Byte4Zero()
+	let maskBytes = Byte4Zero()
 
 	for (let i = 0; i < 4; i++) {
 		for (let j = 0; j < 8; j++) {
-			bytes[i].bit(j, (<HTMLInputElement>from[i][j]).checked ? true : false);
+			ipBytes[i].bit(j, (<HTMLInputElement>IP[i][j]).checked ? true : false);
+			maskBytes[i].bit(j, (<HTMLInputElement>MASK[i][j]).checked ? true : false);
 		}
 	}
 
-	return bytes;
+	return new Address(ipBytes,maskBytes);
 
 }
 
-console.log("HELLO!!!!");
-console.log(extractDOMByte4(IP));
+function updateIPShort(str?: string): void {
+
+	id("ip_value").textContent = str ? str : extractAddress().toString();
+
+}
+
+function updateIPDisplay(): void {
+
+	let address = extractAddress();
+
+	for (let i = 0; i < 4; i++)
+		id("display_ip_" + i).textContent = "" + address.getIp()[i].getDecimal();
+
+	updateIPShort(address.toString(true));
+
+}

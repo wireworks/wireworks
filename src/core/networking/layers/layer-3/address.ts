@@ -216,7 +216,7 @@ export class Address {
 			this.ip[0].getDecimal() + "." +
 			this.ip[1].getDecimal() + "." +
 			this.ip[2].getDecimal() + "." +
-			this.ip[3].getDecimal() + (omitMask? "" : "/" + this.getMaskShort);
+			this.ip[3].getDecimal() + (omitMask? "" : "/" + this.getMaskShort());
 
 	}
 

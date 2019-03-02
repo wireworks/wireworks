@@ -7,19 +7,33 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
         IP[i] = [];
         MASK[i] = [];
         for (var j = 0; j < 8; j++) {
-            IP[i][j] = helpers_1.id("byte_ip_" + i + "_" + j);
-            MASK[i][j] = helpers_1.id("byte_ip_" + i + "_" + j);
+            var ipBit = helpers_1.id("byte_ip_" + i + "_" + j);
+            var maskBit = helpers_1.id("byte_mask_" + i + "_" + j);
+            ipBit.addEventListener("change", function () {
+                updateIPDisplay();
+            });
+            IP[i][j] = ipBit;
+            MASK[i][j] = maskBit;
         }
     }
-    function extractDOMByte4(from) {
-        var bytes = address_1.Byte4Zero();
+    function extractAddress() {
+        var ipBytes = address_1.Byte4Zero();
+        var maskBytes = address_1.Byte4Zero();
         for (var i = 0; i < 4; i++) {
             for (var j = 0; j < 8; j++) {
-                bytes[i].bit(j, from[i][j].checked ? true : false);
+                ipBytes[i].bit(j, IP[i][j].checked ? true : false);
+                maskBytes[i].bit(j, MASK[i][j].checked ? true : false);
             }
         }
-        return bytes;
+        return new address_1.Address(ipBytes, maskBytes);
     }
-    console.log("HELLO!!!!");
-    console.log(extractDOMByte4(IP));
+    function updateIPShort(str) {
+        helpers_1.id("ip_value").textContent = str ? str : extractAddress().toString();
+    }
+    function updateIPDisplay() {
+        var address = extractAddress();
+        for (var i = 0; i < 4; i++)
+            helpers_1.id("display_ip_" + i).textContent = "" + address.getIp()[i].getDecimal();
+        updateIPShort(address.toString());
+    }
 });
