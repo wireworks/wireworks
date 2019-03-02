@@ -54,16 +54,20 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
         Address.prototype.setMask = function (mask) {
             var maskShortTmp = 0;
             var end = false;
-            for (var i = 0; !end && i < 4; i++) {
-                for (var j = 0; !end && j < 8; j++) {
+            for (var i = 0; i < 4; i++) {
+                for (var j = 0; j < 8; j++) {
                     if (mask[i].bit(8 - 1 - j)) {
-                        maskShortTmp++;
+                        if (!end) {
+                            maskShortTmp++;
+                        }
+                        else {
+                            throw new Error("Mask contains holes");
+                        }
                     }
                     else {
                         end = true;
                     }
                 }
-                end = true;
             }
             this.maskShort = maskShortTmp;
             this.mask = mask;
@@ -165,7 +169,13 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
                 this.ip[0].getDecimal() + "." +
                 this.ip[1].getDecimal() + "." +
                 this.ip[2].getDecimal() + "." +
-                this.ip[3].getDecimal() + (omitMask ? "" : "/" + this.getMaskShort());
+                this.ip[3].getDecimal() + (omitMask ? "" : this.maskString());
+        };
+        /**
+         * Returns the string representation of the mask.
+         */
+        Address.prototype.maskString = function () {
+            return "/" + this.getMaskShort();
         };
         return Address;
     }());

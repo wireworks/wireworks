@@ -81,16 +81,21 @@ export class Address {
 		let maskShortTmp = 0;
 		let end = false;
 
-		for (let i = 0; !end && i < 4; i++) {
-			for (let j = 0; !end && j < 8; j++) {
+		for (let i = 0; i < 4; i++) {
+			for (let j = 0; j < 8; j++) {
+
 				if (mask[i].bit(8 - 1 - j)) {
-					maskShortTmp++;
+					if(!end) {
+						maskShortTmp++;
+					}
+					else {
+						throw new Error("Mask contains holes");
+					}
 				}
 				else {
 					end = true;
 				}
 			}
-			end = true;
 		}
 
 		this.maskShort = maskShortTmp;
