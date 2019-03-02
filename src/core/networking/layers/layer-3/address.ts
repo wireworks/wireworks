@@ -1,12 +1,52 @@
-import { Byte4, BYTE4_ZERO } from "../../constants";
-import { Byte } from "../../byte";
+import { Byte, ByteZero, ByteMax } from "../../byte";
 
+/**
+ * An array of 4 Bytes.
+ */
+export type Byte4 = [Byte,Byte,Byte,Byte];
+
+/**
+ * Returns a Byte4 corresponding to 0, 0, 0, 0.
+ */
+export function Byte4Zero(): Byte4 {
+	return [ByteZero(), ByteZero(), ByteZero(), ByteZero()];
+}
+
+/**
+ * Returns a Byte4 corresponding to 255, 255, 255, 255.
+ */
+export function Byte4Max(): Byte4 {
+	return [ByteMax(), ByteMax(), ByteMax(), ByteMax()];
+}
+
+/**
+ * A full IP/Mask address.
+ * @author Henrique Colini
+ */
 export class Address {
 
+	/**
+	 * This Address' IP.
+	 */
 	private ip: Byte4;
+
+	/**
+	 * This Address' mask.
+	 */
 	private mask: Byte4;
+
+	/**
+	 * The numerical representation of this Address' mask.
+	 */
 	private maskShort: number;
 
+	
+	/**
+	 * Constructs an Address, given an IP and a mask.
+	 * @constructor
+	 * @param  {Byte4|string} ip The IP of this Address. May be a Byte4 or a formatted string.
+	 * @param  {Byte4|number} mask Optional. The mask of this Address. May be a Byte4 or its numerical representation.
+	 */
 	constructor(ip: Byte4 | string, mask?: Byte4 | number) {
 
 		if (typeof ip === "string") {
@@ -26,12 +66,16 @@ export class Address {
 				}
 			}
 			else {
-				this.mask = BYTE4_ZERO.slice() as Byte4;
+				this.mask = Byte4Zero();
 			}
 		}
 
 	}
-
+	
+	/**
+	 * Sets this Address' mask.
+	 * @param  {Byte4} mask
+	 */
 	public setMask(mask: Byte4): void {
 
 		let maskShortTmp = 0;
@@ -54,13 +98,17 @@ export class Address {
 
 	}
 
+	/**
+	 * Sets this Address' mask, given its numerical representation (0-32).
+	 * @param  {number} maskShort
+	 */
 	public setMaskShort(maskShort: number): void {
 
 		if (maskShort < 0 || maskShort > 32) {
 			throw new RangeError("The short mask should be between 0 and 32");
 		}
 
-		let tmpMask: Byte4 = BYTE4_ZERO.slice() as Byte4;
+		let tmpMask: Byte4 = Byte4Zero();
 
 		for (let i = 0; i < 4; i++) {
 			for (let j = 0; j < 8; j++) {
@@ -78,22 +126,40 @@ export class Address {
 
 	}
 
+	/**
+	 * Sets this Address' IP value.
+	 * @param  {Byte4} ip
+	 */
 	public setIp(ip: Byte4): void {
 		this.ip = ip;
 	}
 
+	/**
+	 * Returns this Address' mask.
+	 */
 	public getMask(): Byte4 {
 		return this.mask;
 	}
 
+	/**
+	 * Returns the numerical representation of this Address' mask.
+	 */
 	public getMaskShort(): number {
 		return this.maskShort;
 	}
-
+	
+	/**
+	 * Returns this Address' IP value.
+	 */
 	public getIp(): Byte4 {
 		return this.ip;
 	}
 
+	/**
+	 * Sets this Address IP/Mask values from a parsed string.
+	 * @param  {string} address The full address, in the X.X.X.X/X format. If requireMask is false, the mask can be ommited and defaults to /0.
+	 * @param  {boolean=true} requireMask Whether the address requires the mask to be given.
+	 */
 	public parseAddress(address: string, requireMask: boolean = true): void {
 
 		address = address.trim();
