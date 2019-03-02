@@ -1,15 +1,22 @@
 var Core;
 (function (Core) {
+    Core.BIT8_ZERO = [false, false, false, false, false, false, false, false];
+    Core.BIT8_FULL = [true, true, true, true, true, true, true, true];
     var Byte = /** @class */ (function () {
-        function Byte(decimal) {
-            this.setDecimal(decimal);
+        function Byte(value) {
+            if (typeof value === "number") {
+                this.setDecimal(value);
+            }
+            else {
+                this.setBits(value);
+            }
         }
         Byte.prototype.setDecimal = function (decimal) {
             if (decimal < 0 || decimal > 255 || decimal.toString().indexOf('.') !== -1) {
                 throw new RangeError("The decimal value of a byte must be an integer between 0-255 (inclusive)");
             }
             var tmpDecimal = decimal;
-            var tmpBits = [false, false, false, false, false, false, false, false];
+            var tmpBits = Core.BIT8_ZERO.slice();
             for (var i = 0; i < 8; i++) {
                 tmpBits[i] = tmpDecimal % 2 ? true : false;
                 tmpDecimal = Math.floor(tmpDecimal / 2);
@@ -29,7 +36,21 @@ var Core;
         Byte.prototype.getBits = function () {
             return this.bits;
         };
+        Byte.prototype.bit = function (index, value) {
+            if (value === void 0) { value = undefined; }
+            if (value !== undefined) {
+                var bits = this.bits;
+                bits[index] = value;
+                this.setBits(bits);
+            }
+            return this.bits[index];
+        };
+        Byte.prototype.clone = function () {
+            return new Byte(this.bits.slice());
+        };
         return Byte;
     }());
     Core.Byte = Byte;
+    Core.BYTE_ZERO = new Byte(Core.BIT8_ZERO);
+    Core.BYTE_FULL = new Byte(Core.BIT8_FULL);
 })(Core || (Core = {}));
