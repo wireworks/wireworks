@@ -205,4 +205,19 @@ export class Address {
 
 	}
 
+	
+	/**
+	 * Returns the string representation of this Address in the X.X.X.X/X format.
+	 * @param  {boolean=false} omitMask Whether the mask should be ommited.
+	 */
+	toString(omitMask: boolean = false): string {
+
+		return "" +
+			this.ip[0].getDecimal() + "." +
+			this.ip[1].getDecimal() + "." +
+			this.ip[2].getDecimal() + "." +
+			this.ip[3].getDecimal() + (omitMask? "" : "/" + this.getMaskShort);
+
+	}
+
 }
