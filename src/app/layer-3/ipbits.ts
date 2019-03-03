@@ -1,6 +1,6 @@
-import { id, copyToClipboard, isStringNumeric, isCharNumeric, NUMBERS } from "../../core/helpers"
+import { id, copyToClipboard, isStringNumeric, isCharNumeric, NUMBERS, clamp } from "../../core/helpers"
 import { Byte4, Byte4Zero, Address } from "../../core/networking/layers/layer-3/address";
-import { Byte } from "../../core/networking/byte";
+import { Byte, ByteZero } from "../../core/networking/byte";
 
 /**
  * The checkboxes corresponding to the IP bits.
@@ -42,132 +42,134 @@ function loadDOMComponents(): void {
 			MASK[i][j] = maskBit as HTMLInputElement;
 		}
 
+		const additionalKeys = ["Backspace", "Delete", "Tab", "ArrowLeft", "ArrowRight", "Home", "End", "Insert"];
 		let display = id("display_ip_" + i);
-		
-		let originalText: string;
+		let resultByte: Byte;
 
 		display.addEventListener("focus", function (evt: FocusEvent): void {
 
-			originalText = display.textContent;
-			display.textContent = HIDDENCHAR;
+			let range, selection;
+			if (document.createRange) {
+				range = document.createRange();
+				range.selectNodeContents(display);
+				selection = window.getSelection();
+				selection.removeAllRanges();
+				selection.addRange(range);
+			}
+
+			let originalAddress = extractAddress();
+			resultByte = originalAddress.getIp()[i];
 
 		});
 
 		display.addEventListener("blur", function (evt: FocusEvent): void {
-			if (display.textContent == HIDDENCHAR) {
-				display.textContent = originalText;
-			}
+			setIPByteDOM(resultByte, i, true);
 		});
 
-		display.addEventListener("keyup", function (evt: KeyboardEvent): void { 
+		display.addEventListener("keydown", function (evt: KeyboardEvent): void { 
 
+			if (evt.key === "Enter") {
+				display.blur();
+			}
+			
+			if (display.textContent.indexOf(HIDDENCHAR) !== -1 && display.textContent.length > 1) {
+
+				display.textContent = display.textContent.replace(HIDDENCHAR, "");
+
+				let range, selection;
+				if (document.createRange) {
+					range = document.createRange();
+					range.selectNodeContents(display);
+					range.collapse(false);
+					selection = window.getSelection();
+					selection.removeAllRanges();
+					selection.addRange(range);
+				}
+
+			}
+			
+			if (additionalKeys.indexOf(evt.key) === -1 && !isCharNumeric(evt.key)){				
+				evt.preventDefault();
+				return;
+			}
+
+			let selectedText = window.getSelection().anchorNode.parentNode == display && window.getSelection().toString();
+
+			if (additionalKeys.indexOf(evt.key) === -1 && display.textContent.replace(HIDDENCHAR, "").length == 3 && selectedText.length === 0) {
+
+				evt.preventDefault();
+
+			}
+
+		});
+
+		display.addEventListener("keyup", function (evt: KeyboardEvent): void {
+			
 			let next = i < 3 ? id("display_ip_" + (i + 1)) : undefined;
 
-			if (evt.key !== "Backspace" && evt.key !== "Delete" && !isCharNumeric(evt.key)){
-				evt.preventDefault();
-				return;
-			}
+			let selectedText = window.getSelection().anchorNode.parentNode == display && window.getSelection().toString();
 
-			let selection = window.getSelection().anchorNode.parentNode == display && window.getSelection().toString();
+			if (additionalKeys.indexOf(evt.key) === -1 && display.textContent.replace(HIDDENCHAR, "").length == 3 && selectedText.length === 0) {
 
-			if (!next && display.textContent.length >= 3 && !(selection.length > 0)) {
-				evt.preventDefault();
-				return;
-			}
-
-			if (display.textContent.indexOf(HIDDENCHAR) !== -1) {
-
-				if (display.textContent.length > 1) {
-					display.textContent = display.textContent.replace(HIDDENCHAR, "");
+				if (next) {
+					next.focus();
 				}
 
-				display.focus()
-				document.getSelection().collapse(display, 1);
-
-			}
-
-			if (display.textContent.length >= 3 && next) {
-
-				let address = extractAddress();
-				let minByte = address.getIp()[i];
-				let mask = address.getMask()[i];
-
-				for (let i = 0; i < 8; i++) {
-					if (!mask.bit(i)) {
-						minByte.bit(i, false);
-					}
-				}
-
-				if (minByte.getDecimal() < 100) {
-					next.focus();					
-				}
-
-			}
-
-			if ((evt.key == "Backspace" || evt.key == "Delete") && display.textContent.length <= 1) {
-				display.textContent = HIDDENCHAR;
 			}
 
 		});
 
 		display.addEventListener("input", function (evt: Event): void {
 
-			if (display.textContent !== HIDDENCHAR) {
-
-				let str = display.textContent;
-				let mutatedStr = str;
+			if (display.textContent === "") {
+				display.textContent = HIDDENCHAR;
+				
 				let address = extractAddress();
 
-				if (!isStringNumeric(str)) {
-					str = "";
-					mutatedStr = "";
-					for (let c = 0; c < display.textContent.length; c++) {
-						let char = display.textContent.charAt(c);
-						str += isCharNumeric(char) ? char : "";
-						mutatedStr += char === HIDDENCHAR || isCharNumeric(char) ? char : "";
-					}
-				}
-
 				let minByte = address.getIp()[i];
-				let maxByte = minByte.clone();
 				let mask = address.getMask()[i];
 
 				for (let i = 0; i < 8; i++) {
 					if (!mask.bit(i)) {
 						minByte.bit(i, false);
-						maxByte.bit(i, true);
 					}
 				}
 
-				let value = parseInt(str, 10);
-
-				if (value < minByte.getDecimal()) {
-					value = minByte.getDecimal();
-				}
-
-				if (value > maxByte.getDecimal()) {
-					value = maxByte.getDecimal();
-				}
-
-				if (isNaN(value) || value == undefined) {
-					value = minByte.getDecimal();
-				}
-
-				if (`${value}` != display.textContent.replace(HIDDENCHAR, "")) {
-
-					if (mutatedStr === HIDDENCHAR) {
-						display.textContent = HIDDENCHAR;
-					}
-					else {
-						display.textContent = `${value}`;
-					}
-					document.getSelection().collapse(display, 1);
-
-				}
-
-				setIPByteDOM(new Byte(value), i, false);
+				resultByte = minByte;
 
 			}
+			else {
+
+				if (isStringNumeric(display.textContent)){
+
+					let address = extractAddress();
+
+					let minByte = address.getIp()[i];
+					let maxByte = minByte.clone();
+					let mask = address.getMask()[i];
+
+					for (let i = 0; i < 8; i++) {
+						if (!mask.bit(i)) {
+							minByte.bit(i, false);
+							maxByte.bit(i, true);
+						}
+					}
+
+					let value = new Byte(
+						clamp(
+							parseInt(display.textContent, 10),
+							minByte.getDecimal(),
+							maxByte.getDecimal()
+						)
+					);
+
+					resultByte = value;
+					setIPByteDOM(value, i, false);
+
+				}
+
+			}
+
 		});		
 
 	}

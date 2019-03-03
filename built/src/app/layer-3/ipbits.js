@@ -35,36 +35,61 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
             for (var j = 0; j < 8; j++) {
                 _loop_2(j);
             }
+            var additionalKeys = ["Backspace", "Delete", "Tab", "ArrowLeft", "ArrowRight", "Home", "End", "Insert"];
             var display = helpers_1.id("display_ip_" + i);
-            var originalText;
+            var resultByte;
             display.addEventListener("focus", function (evt) {
-                originalText = display.textContent;
-                display.textContent = HIDDENCHAR;
+                var range, selection;
+                if (document.createRange) {
+                    range = document.createRange();
+                    range.selectNodeContents(display);
+                    selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+                var originalAddress = extractAddress();
+                resultByte = originalAddress.getIp()[i];
             });
             display.addEventListener("blur", function (evt) {
-                if (display.textContent == HIDDENCHAR) {
-                    display.textContent = originalText;
+                setIPByteDOM(resultByte, i, true);
+            });
+            display.addEventListener("keydown", function (evt) {
+                if (evt.key === "Enter") {
+                    display.blur();
+                }
+                if (display.textContent.indexOf(HIDDENCHAR) !== -1 && display.textContent.length > 1) {
+                    display.textContent = display.textContent.replace(HIDDENCHAR, "");
+                    var range = void 0, selection = void 0;
+                    if (document.createRange) {
+                        range = document.createRange();
+                        range.selectNodeContents(display);
+                        range.collapse(false);
+                        selection = window.getSelection();
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                }
+                if (additionalKeys.indexOf(evt.key) === -1 && !helpers_1.isCharNumeric(evt.key)) {
+                    evt.preventDefault();
+                    return;
+                }
+                var selectedText = window.getSelection().anchorNode.parentNode == display && window.getSelection().toString();
+                if (additionalKeys.indexOf(evt.key) === -1 && display.textContent.replace(HIDDENCHAR, "").length == 3 && selectedText.length === 0) {
+                    evt.preventDefault();
                 }
             });
             display.addEventListener("keyup", function (evt) {
                 var next = i < 3 ? helpers_1.id("display_ip_" + (i + 1)) : undefined;
-                if (evt.key !== "Backspace" && evt.key !== "Delete" && !helpers_1.isCharNumeric(evt.key)) {
-                    evt.preventDefault();
-                    return;
-                }
-                var selection = window.getSelection().anchorNode.parentNode == display && window.getSelection().toString();
-                if (!next && display.textContent.length >= 3 && !(selection.length > 0)) {
-                    evt.preventDefault();
-                    return;
-                }
-                if (display.textContent.indexOf(HIDDENCHAR) !== -1) {
-                    if (display.textContent.length > 1) {
-                        display.textContent = display.textContent.replace(HIDDENCHAR, "");
+                var selectedText = window.getSelection().anchorNode.parentNode == display && window.getSelection().toString();
+                if (additionalKeys.indexOf(evt.key) === -1 && display.textContent.replace(HIDDENCHAR, "").length == 3 && selectedText.length === 0) {
+                    if (next) {
+                        next.focus();
                     }
-                    display.focus();
-                    document.getSelection().collapse(display, 1);
                 }
-                if (display.textContent.length >= 3 && next) {
+            });
+            display.addEventListener("input", function (evt) {
+                if (display.textContent === "") {
+                    display.textContent = HIDDENCHAR;
                     var address = extractAddress();
                     var minByte = address.getIp()[i];
                     var mask = address.getMask()[i];
@@ -73,57 +98,24 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
                             minByte.bit(i_1, false);
                         }
                     }
-                    if (minByte.getDecimal() < 100) {
-                        next.focus();
-                    }
+                    resultByte = minByte;
                 }
-                if ((evt.key == "Backspace" || evt.key == "Delete") && display.textContent.length <= 1) {
-                    display.textContent = HIDDENCHAR;
-                }
-            });
-            display.addEventListener("input", function (evt) {
-                if (display.textContent !== HIDDENCHAR) {
-                    var str = display.textContent;
-                    var mutatedStr = str;
-                    var address = extractAddress();
-                    if (!helpers_1.isStringNumeric(str)) {
-                        str = "";
-                        mutatedStr = "";
-                        for (var c = 0; c < display.textContent.length; c++) {
-                            var char = display.textContent.charAt(c);
-                            str += helpers_1.isCharNumeric(char) ? char : "";
-                            mutatedStr += char === HIDDENCHAR || helpers_1.isCharNumeric(char) ? char : "";
+                else {
+                    if (helpers_1.isStringNumeric(display.textContent)) {
+                        var address = extractAddress();
+                        var minByte = address.getIp()[i];
+                        var maxByte = minByte.clone();
+                        var mask = address.getMask()[i];
+                        for (var i_2 = 0; i_2 < 8; i_2++) {
+                            if (!mask.bit(i_2)) {
+                                minByte.bit(i_2, false);
+                                maxByte.bit(i_2, true);
+                            }
                         }
+                        var value = new byte_1.Byte(helpers_1.clamp(parseInt(display.textContent, 10), minByte.getDecimal(), maxByte.getDecimal()));
+                        resultByte = value;
+                        setIPByteDOM(value, i, false);
                     }
-                    var minByte = address.getIp()[i];
-                    var maxByte = minByte.clone();
-                    var mask = address.getMask()[i];
-                    for (var i_2 = 0; i_2 < 8; i_2++) {
-                        if (!mask.bit(i_2)) {
-                            minByte.bit(i_2, false);
-                            maxByte.bit(i_2, true);
-                        }
-                    }
-                    var value = parseInt(str, 10);
-                    if (value < minByte.getDecimal()) {
-                        value = minByte.getDecimal();
-                    }
-                    if (value > maxByte.getDecimal()) {
-                        value = maxByte.getDecimal();
-                    }
-                    if (isNaN(value) || value == undefined) {
-                        value = minByte.getDecimal();
-                    }
-                    if ("" + value != display.textContent.replace(HIDDENCHAR, "")) {
-                        if (mutatedStr === HIDDENCHAR) {
-                            display.textContent = HIDDENCHAR;
-                        }
-                        else {
-                            display.textContent = "" + value;
-                        }
-                        document.getSelection().collapse(display, 1);
-                    }
-                    setIPByteDOM(new byte_1.Byte(value), i, false);
                 }
             });
         };
