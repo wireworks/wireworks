@@ -161,7 +161,7 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
         };
         /**
          * Returns the string representation of this Address in the X.X.X.X/X format.
-         * @param  {boolean=false} omitMask Whether the mask should be ommited.
+         * @param  {boolean} omitMask Whether the mask should be ommited. Defaults to false.
          */
         Address.prototype.toString = function (omitMask) {
             if (omitMask === void 0) { omitMask = false; }
