@@ -115,7 +115,7 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
                         value = minByte.getDecimal();
                     }
                     if ("" + value != display.textContent.replace(HIDDENCHAR, "")) {
-                        if (mutatedStr === HIDDENCHAR) {
+                        if (mutatedStr === HIDDENCHAR || mutatedStr === "") {
                             display.textContent = HIDDENCHAR;
                         }
                         else {

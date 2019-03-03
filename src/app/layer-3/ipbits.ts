@@ -155,12 +155,13 @@ function loadDOMComponents(): void {
 
 				if (`${value}` != display.textContent.replace(HIDDENCHAR, "")) {
 
-					if (mutatedStr === HIDDENCHAR) {
+					if (mutatedStr === HIDDENCHAR || mutatedStr === "") {
 						display.textContent = HIDDENCHAR;
 					}
 					else {
 						display.textContent = `${value}`;
 					}
+
 					document.getSelection().collapse(display, 1);
 
 				}
