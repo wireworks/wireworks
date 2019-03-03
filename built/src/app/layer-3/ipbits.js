@@ -119,6 +119,9 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
         }
         updateDisplays();
     }
+    /**
+     * Copies the IP (in X.X.X.X format) to the clipboard.
+     */
     function copyIPToClipboard() {
         helpers_1.copyToClipboard(extractAddress().toString(true), function (success) {
             var text = helpers_1.id("copy_ip_text");
@@ -130,6 +133,9 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
             }, 2000);
         });
     }
+    /**
+     * Copies the mask (in X.X.X.X format) to the clipboard.
+     */
     function copyMaskToClipboard() {
         helpers_1.copyToClipboard(extractAddress().maskString(), function (success) {
             var text = helpers_1.id("copy_mask_text");

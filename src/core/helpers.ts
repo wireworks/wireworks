@@ -1,8 +1,17 @@
-export function id(id: string) {
-	return document.getElementById(id);
+/**
+ * Shorthand for document.getElementById(id).
+ * @param  {string} elementId String that specifies the ID value. Case-insensitive.
+ */
+export function id(elementId: string): HTMLElement {
+	return document.getElementById(elementId);
 }
 
-export function copyToClipboard(str: string, done: (success: boolean) => void): void {
+/**
+ * Copies a string to the user's clipboard.
+ * @param  {string} str String to be copied.
+ * @param  {(success:boolean)=>void} done What happens on success/failure. Optional.
+ */
+export function copyToClipboard(str: string, done?: (success: boolean) => void): void {
 
 	let tmp = document.createElement("textarea");
 
@@ -19,6 +28,8 @@ export function copyToClipboard(str: string, done: (success: boolean) => void): 
 	let success = document.execCommand('copy');
 	document.body.removeChild(tmp);
 
-	done(success);
+	if(done) {
+		done(success);
+	}
 
 }
