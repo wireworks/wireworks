@@ -1,4 +1,4 @@
-define(["require", "exports", "../../core/helpers", "../../core/networking/layers/layer-3/address"], function (require, exports, helpers_1, address_1) {
+define(["require", "exports", "../../core/helpers", "../../core/networking/layers/layer-3/address", "../../core/networking/byte"], function (require, exports, helpers_1, address_1, byte_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -10,9 +10,13 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
      */
     var MASK = [];
     /**
-     * Loads the DOM checkboxes into IP and MASK.
+     * A zero-width character used to work around empty contenteditable fields issues.
      */
-    function loadDOMBits() {
+    var HIDDENCHAR = String.fromCharCode(8205);
+    /**
+     * Loads the DOM checkboxes into IP and MASK and sets the events for the input displays.
+     */
+    function loadDOMComponents() {
         var _loop_1 = function (i) {
             IP[i] = [];
             MASK[i] = [];
@@ -31,6 +35,97 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
             for (var j = 0; j < 8; j++) {
                 _loop_2(j);
             }
+            var display = helpers_1.id("display_ip_" + i);
+            var originalText;
+            display.addEventListener("focus", function (evt) {
+                originalText = display.textContent;
+                display.textContent = HIDDENCHAR;
+            });
+            display.addEventListener("blur", function (evt) {
+                if (display.textContent == HIDDENCHAR) {
+                    display.textContent = originalText;
+                }
+            });
+            display.addEventListener("keyup", function (evt) {
+                var next = i < 3 ? helpers_1.id("display_ip_" + (i + 1)) : undefined;
+                if (evt.key !== "Backspace" && evt.key !== "Delete" && !helpers_1.isCharNumeric(evt.key)) {
+                    evt.preventDefault();
+                    return;
+                }
+                var selection = window.getSelection().anchorNode.parentNode == display && window.getSelection().toString();
+                if (!next && display.textContent.length >= 3 && !(selection.length > 0)) {
+                    evt.preventDefault();
+                    return;
+                }
+                if (display.textContent.indexOf(HIDDENCHAR) !== -1) {
+                    if (display.textContent.length > 1) {
+                        display.textContent = display.textContent.replace(HIDDENCHAR, "");
+                    }
+                    display.focus();
+                    document.getSelection().collapse(display, 1);
+                }
+                if (display.textContent.length >= 3 && next) {
+                    var address = extractAddress();
+                    var minByte = address.getIp()[i];
+                    var mask = address.getMask()[i];
+                    for (var i_1 = 0; i_1 < 8; i_1++) {
+                        if (!mask.bit(i_1)) {
+                            minByte.bit(i_1, false);
+                        }
+                    }
+                    if (minByte.getDecimal() < 100) {
+                        next.focus();
+                    }
+                }
+                if ((evt.key == "Backspace" || evt.key == "Delete") && display.textContent.length <= 1) {
+                    display.textContent = HIDDENCHAR;
+                }
+            });
+            display.addEventListener("input", function (evt) {
+                if (display.textContent !== HIDDENCHAR) {
+                    var str = display.textContent;
+                    var mutatedStr = str;
+                    var address = extractAddress();
+                    if (!helpers_1.isStringNumeric(str)) {
+                        str = "";
+                        mutatedStr = "";
+                        for (var c = 0; c < display.textContent.length; c++) {
+                            var char = display.textContent.charAt(c);
+                            str += helpers_1.isCharNumeric(char) ? char : "";
+                            mutatedStr += char === HIDDENCHAR || helpers_1.isCharNumeric(char) ? char : "";
+                        }
+                    }
+                    var minByte = address.getIp()[i];
+                    var maxByte = minByte.clone();
+                    var mask = address.getMask()[i];
+                    for (var i_2 = 0; i_2 < 8; i_2++) {
+                        if (!mask.bit(i_2)) {
+                            minByte.bit(i_2, false);
+                            maxByte.bit(i_2, true);
+                        }
+                    }
+                    var value = parseInt(str, 10);
+                    if (value < minByte.getDecimal()) {
+                        value = minByte.getDecimal();
+                    }
+                    if (value > maxByte.getDecimal()) {
+                        value = maxByte.getDecimal();
+                    }
+                    if (isNaN(value) || value == undefined) {
+                        value = minByte.getDecimal();
+                    }
+                    if ("" + value != display.textContent.replace(HIDDENCHAR, "")) {
+                        if (mutatedStr === HIDDENCHAR) {
+                            display.textContent = HIDDENCHAR;
+                        }
+                        else {
+                            display.textContent = "" + value;
+                        }
+                        document.getSelection().collapse(display, 1);
+                    }
+                    setIPByteDOM(new byte_1.Byte(value), i, false);
+                }
+            });
         };
         for (var i = 0; i < 4; i++) {
             _loop_1(i);
@@ -78,11 +173,32 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
         return new address_1.Address(ipBytes, maskBytes);
     }
     /**
+     * Sets the checkboxes and display of a DOM representation of a Byte, given a real one.
+     * @param  {Byte} byte The byte to be displayed.
+     * @param  {number} index The index of the 4 possible IP DOM bytes.
+     * @param  {boolean} updateBig Whether the big displays should be updated as well. Defaults to true.
+     * @param  {boolean} updateShort Whether the short display should be updated as well. Defaults to true.
+     */
+    function setIPByteDOM(byte, index, updateBig, updateShort) {
+        if (updateBig === void 0) { updateBig = true; }
+        if (updateShort === void 0) { updateShort = true; }
+        var dom = IP[index];
+        for (var i = 0; i < 8; i++) {
+            dom[i].checked = byte.bit(i);
+        }
+        if (updateBig) {
+            updateDisplays();
+        }
+        else if (updateShort) {
+            updateIPShort();
+        }
+    }
+    /**
      * Updates the small IP display string.
      * @param  {string} str? The string to be shown. If not given, it will be calculated.
      */
     function updateIPShort(str) {
-        helpers_1.id("ip_value").textContent = str ? str : extractAddress().toString();
+        helpers_1.id("ip_value").textContent = str ? str : extractAddress().toString(true);
     }
     /**
      * Updates the small mask display string.
@@ -148,7 +264,7 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
         });
     }
     // +==============================================+
-    loadDOMBits();
+    loadDOMComponents();
     updateDisplays();
     helpers_1.id("copy_ip").addEventListener("click", function (ev) { return copyIPToClipboard(); });
     helpers_1.id("copy_mask").addEventListener("click", function (ev) { return copyMaskToClipboard(); });
