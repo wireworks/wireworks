@@ -1,3 +1,8 @@
+// IPBits
+// +=========================+
+// Author: Henrique Colini
+// Version: 3.1 (2019-03-03)
+
 import { Byte } from "../../core/networking/byte";
 import { Address, Byte4Zero } from "../../core/networking/layers/layer-3/address";
 import { isCharNumeric, isStringNumeric } from "../../core/helpers/string";
