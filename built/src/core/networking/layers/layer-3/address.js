@@ -52,11 +52,13 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
          * Constructs an Address, given an IP and a mask.
          * @constructor
          * @param  {Byte4|string} ip The IP of this Address. May be a Byte4 or a formatted string.
-         * @param  {Byte4|number} mask Optional. The mask of this Address. May be a Byte4 or its numerical representation.
+         * @param  {Byte4|number} mask Optional. The mask of this Address. May be a Byte4 or its numerical representation. If not given, defaults to /0.
+         * @param  {boolean} requireMask Optional. If set to true, the mask becomes a required parameter in the formatted string.
          */
-        function Address(ip, mask) {
+        function Address(ip, mask, requireMask) {
+            if (requireMask === void 0) { requireMask = false; }
             if (typeof ip === "string") {
-                this.parseAddress(ip, false);
+                this.parseAddress(ip, requireMask);
             }
             else {
                 this.ip = ip;
@@ -71,7 +73,7 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
                     }
                 }
                 else {
-                    this.mask = Byte4Zero();
+                    this.setMask(Byte4Zero());
                 }
             }
         }

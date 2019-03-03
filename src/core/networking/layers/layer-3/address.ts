@@ -78,12 +78,13 @@ export class Address {
 	 * Constructs an Address, given an IP and a mask.
 	 * @constructor
 	 * @param  {Byte4|string} ip The IP of this Address. May be a Byte4 or a formatted string.
-	 * @param  {Byte4|number} mask Optional. The mask of this Address. May be a Byte4 or its numerical representation.
+	 * @param  {Byte4|number} mask Optional. The mask of this Address. May be a Byte4 or its numerical representation. If not given, defaults to /0.
+	 * @param  {boolean} requireMask Optional. If set to true, the mask becomes a required parameter in the formatted string.
 	 */
-	constructor(ip: Byte4 | string, mask?: Byte4 | number) {
+	constructor(ip: Byte4 | string, mask?: Byte4 | number, requireMask: boolean = false) {
 
 		if (typeof ip === "string") {
-			this.parseAddress(ip, false);
+			this.parseAddress(ip, requireMask);
 		}
 		else {
 			this.ip = ip;
@@ -99,7 +100,7 @@ export class Address {
 				}
 			}
 			else {
-				this.mask = Byte4Zero();
+				this.setMask(Byte4Zero());
 			}
 		}
 
