@@ -1,4 +1,4 @@
-import { id } from "../../core/helpers"
+import { id, copyToClipboard } from "../../core/helpers"
 import { Byte4, Byte4Zero, Address } from "../../core/networking/layers/layer-3/address";
 
 /**
@@ -100,7 +100,7 @@ function updateIPShort(str?: string): void {
  */
 function updateMaskShort(str?: string): void {
 
-	id("mask_value").textContent = str ? str : extractAddress().maskString();
+	id("mask_value").textContent = str ? str : extractAddress().shortMaskString();
 
 }
 
@@ -118,7 +118,7 @@ function updateDisplays(address?: Address): void {
 	}
 
 	updateIPShort(address.toString(true));
-	updateMaskShort(address.maskString());
+	updateMaskShort(address.shortMaskString());
 
 }
 
@@ -145,7 +145,47 @@ function selectMaskBit(index: number): void {
 
 }
 
+/**
+ * Copies the IP (in X.X.X.X format) to the clipboard.
+ */
+function copyIPToClipboard(): void {
+
+	copyToClipboard(extractAddress().toString(true), function (success: boolean): void {
+
+		let text = id("copy_ip_text");
+		text.style.transition = "";
+		text.style.opacity = "1";
+		setTimeout(function () {
+			text.style.transition = "opacity 1s";
+			text.style.opacity = "0";
+		}, 2000);
+
+	});
+
+}
+
+/**
+ * Copies the mask (in X.X.X.X format) to the clipboard.
+ */
+function copyMaskToClipboard(): void {
+
+	copyToClipboard(extractAddress().maskString(), function (success: boolean): void {
+
+		let text = id("copy_mask_text");
+		text.style.transition = "";
+		text.style.opacity = "1";
+		setTimeout(function () {
+			text.style.transition = "opacity 1s";
+			text.style.opacity = "0";
+		}, 2000);
+
+	});
+
+}
+
 // +==============================================+
 
 loadDOMBits();
 updateDisplays();
+id("copy_ip").addEventListener("click", ev => copyIPToClipboard())
+id("copy_mask").addEventListener("click", ev => copyMaskToClipboard())

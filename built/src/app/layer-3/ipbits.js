@@ -89,7 +89,7 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
      * @param  {string} str? The string to be shown. If not given, it will be calculated.
      */
     function updateMaskShort(str) {
-        helpers_1.id("mask_value").textContent = str ? str : extractAddress().maskString();
+        helpers_1.id("mask_value").textContent = str ? str : extractAddress().shortMaskString();
     }
     /**
      * Updates the big displays for the IP and mask.
@@ -102,7 +102,7 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
             helpers_1.id("display_mask_" + i).textContent = "" + address.getMask()[i].getDecimal();
         }
         updateIPShort(address.toString(true));
-        updateMaskShort(address.maskString());
+        updateMaskShort(address.shortMaskString());
     }
     /**
      * Selects all the mask bit checkboxes until a given index.
@@ -119,7 +119,31 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
         }
         updateDisplays();
     }
+    function copyIPToClipboard() {
+        helpers_1.copyToClipboard(extractAddress().toString(true), function (success) {
+            var text = helpers_1.id("copy_ip_text");
+            text.style.transition = "";
+            text.style.opacity = "1";
+            setTimeout(function () {
+                text.style.transition = "opacity 1s";
+                text.style.opacity = "0";
+            }, 2000);
+        });
+    }
+    function copyMaskToClipboard() {
+        helpers_1.copyToClipboard(extractAddress().maskString(), function (success) {
+            var text = helpers_1.id("copy_mask_text");
+            text.style.transition = "";
+            text.style.opacity = "1";
+            setTimeout(function () {
+                text.style.transition = "opacity 1s";
+                text.style.opacity = "0";
+            }, 2000);
+        });
+    }
     // +==============================================+
     loadDOMBits();
     updateDisplays();
+    helpers_1.id("copy_ip").addEventListener("click", function (ev) { return copyIPToClipboard(); });
+    helpers_1.id("copy_mask").addEventListener("click", function (ev) { return copyMaskToClipboard(); });
 });
