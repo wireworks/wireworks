@@ -47,6 +47,10 @@ export const ERROR_MASK_RANGE = "MaskRangeError";
  * Error name for a malformated address string.
  */
 export const ERROR_ADDRESS_PARSE = "AddressParseError";
+/**
+ * Error name for a when an Address should be a Network Address, but isn't.
+ */
+export const ERROR_NOT_NETWORK = "NotNetworkError";
 
 /**
  * A full IP/Mask address.
@@ -169,7 +173,7 @@ export class Address {
 	
 	/**
 	 * Returns true if this Address is the same as another.
-	 * @param  {Address} other the Address to be compared with.
+	 * @param {Address} other the Address to be compared with.
 	 */
 	public compare(other: Address): boolean {
 
@@ -193,14 +197,81 @@ export class Address {
 	
 	/**
 	 * Returns the amount of hosts that this Address' network has.
+	 * @param {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address.
 	 */
-	public numberOfHosts(): number {
+	public numberOfHosts(requireNetwork: boolean = false): number {
+
+		if(requireNetwork && !this.isNetworkAddress()) {
+			let err = new Error("Not a Network Address");
+			err.name = ERROR_NOT_NETWORK;
+			throw err;
+		}
 
 		if (this.maskShort == 31)
 			return 2;
 		if (this.maskShort == 32)
 			return 1;
 		return (Math.pow(2, 32 - this.maskShort) - 2);
+
+	}
+
+	/**
+	 * Returns the first valid host Address of this network.
+	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address.
+	 */
+	public firstHost(requireNetwork: boolean = false): Address {
+
+		if (requireNetwork && !this.isNetworkAddress()) {
+			let err = new Error("Not a Network Address");
+			err.name = ERROR_NOT_NETWORK;
+			throw err;
+		}
+
+		let ipBytes: Byte4;
+		let maskBytes: Byte4;
+
+		if (requireNetwork) {
+			ipBytes = cloneByte4(this.ip);
+			maskBytes = cloneByte4(this.mask);
+		}
+		else {
+			let net = this.getNetworkAddress();
+			ipBytes = net.ip;
+			maskBytes = net.mask;
+		}
+
+		if (this.maskShort < 31) {
+			ipBytes[3].setDecimal(ipBytes[3].getDecimal() + 1);
+		}
+
+		return new Address(ipBytes, maskBytes);
+
+	}
+
+	/**
+	 * Returns the last valid host Address of this network.
+	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address.
+	 */
+	public lastHost(requireNetwork: boolean = false): Address {
+
+		if (requireNetwork && !this.isNetworkAddress()) {
+			let err = new Error("Not a Network Address");
+			err.name = ERROR_NOT_NETWORK;
+			throw err;
+		}
+
+		let ipBytes: Byte4;
+		let maskBytes: Byte4;
+
+		let net = this.getBroadcastAddress();
+		ipBytes = net.ip;
+		maskBytes = net.mask;
+
+		if (this.maskShort < 31) {
+			ipBytes[3].setDecimal(ipBytes[3].getDecimal() - 1);
+		}
+
+		return new Address(ipBytes, maskBytes);
 
 	}
 	

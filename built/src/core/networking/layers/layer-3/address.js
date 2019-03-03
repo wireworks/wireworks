@@ -40,6 +40,10 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
      */
     exports.ERROR_ADDRESS_PARSE = "AddressParseError";
     /**
+     * Error name for a when an Address should be a Network Address, but isn't.
+     */
+    exports.ERROR_NOT_NETWORK = "NotNetworkError";
+    /**
      * A full IP/Mask address.
      * @author Henrique Colini
      */
@@ -121,7 +125,7 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
         ;
         /**
          * Returns true if this Address is the same as another.
-         * @param  {Address} other the Address to be compared with.
+         * @param {Address} other the Address to be compared with.
          */
         Address.prototype.compare = function (other) {
             if (this === other)
@@ -139,13 +143,68 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
         };
         /**
          * Returns the amount of hosts that this Address' network has.
+         * @param {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address.
          */
-        Address.prototype.numberOfHosts = function () {
+        Address.prototype.numberOfHosts = function (requireNetwork) {
+            if (requireNetwork === void 0) { requireNetwork = false; }
+            if (requireNetwork && !this.isNetworkAddress()) {
+                var err = new Error("Not a Network Address");
+                err.name = exports.ERROR_NOT_NETWORK;
+                throw err;
+            }
             if (this.maskShort == 31)
                 return 2;
             if (this.maskShort == 32)
                 return 1;
             return (Math.pow(2, 32 - this.maskShort) - 2);
+        };
+        /**
+         * Returns the first valid host Address of this network.
+         * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address.
+         */
+        Address.prototype.firstHost = function (requireNetwork) {
+            if (requireNetwork === void 0) { requireNetwork = false; }
+            if (requireNetwork && !this.isNetworkAddress()) {
+                var err = new Error("Not a Network Address");
+                err.name = exports.ERROR_NOT_NETWORK;
+                throw err;
+            }
+            var ipBytes;
+            var maskBytes;
+            if (requireNetwork) {
+                ipBytes = cloneByte4(this.ip);
+                maskBytes = cloneByte4(this.mask);
+            }
+            else {
+                var net = this.getNetworkAddress();
+                ipBytes = net.ip;
+                maskBytes = net.mask;
+            }
+            if (this.maskShort < 31) {
+                ipBytes[3].setDecimal(ipBytes[3].getDecimal() + 1);
+            }
+            return new Address(ipBytes, maskBytes);
+        };
+        /**
+         * Returns the last valid host Address of this network.
+         * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address.
+         */
+        Address.prototype.lastHost = function (requireNetwork) {
+            if (requireNetwork === void 0) { requireNetwork = false; }
+            if (requireNetwork && !this.isNetworkAddress()) {
+                var err = new Error("Not a Network Address");
+                err.name = exports.ERROR_NOT_NETWORK;
+                throw err;
+            }
+            var ipBytes;
+            var maskBytes;
+            var net = this.getBroadcastAddress();
+            ipBytes = net.ip;
+            maskBytes = net.mask;
+            if (this.maskShort < 31) {
+                ipBytes[3].setDecimal(ipBytes[3].getDecimal() - 1);
+            }
+            return new Address(ipBytes, maskBytes);
         };
         /**
          * Sets this Address' mask.
