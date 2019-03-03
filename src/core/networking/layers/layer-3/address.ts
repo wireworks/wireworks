@@ -107,8 +107,11 @@ export class Address {
 
 	/**
 	 * Returns the Network Address of this Address.
+	 * @param {boolean} allowAbove30 Optional. If false, returns undefined if the mask is greater than 30. Defaults to false.
 	 */
-	public getNetworkAddress(): Address {
+	public getNetworkAddress(allowAbove30: boolean = false): Address {
+
+		if (!allowAbove30 && this.maskShort > 30) return undefined;
 
 		let bytes: Byte4 = Array<Byte>(4) as Byte4;
 
@@ -133,8 +136,11 @@ export class Address {
 
 	/**
 	 * Returns the Broadcast Address of this Address' network.
+	 * @param {boolean} allowAbove30 Optional. If false, returns undefined if the mask is greater than 30. Defaults to false.
 	 */
-	public getBroadcastAddress(): Address {
+	public getBroadcastAddress(allowAbove30: boolean = false): Address {
+
+		if (!allowAbove30 && this.maskShort > 30) return undefined;
 
 		let bytes: Byte4 = Array<Byte>(4) as Byte4;
 
@@ -159,16 +165,18 @@ export class Address {
 	
 	/**
 	 * Returns whether this Address is a Network Address.
+	 * @param {boolean} allowAbove30 Optional. If false, returns false if the mask is greater than 30. Defaults to false.
 	 */
-	public isNetworkAddress(): boolean {
-		return this.compare(this.getNetworkAddress());
+	public isNetworkAddress(allowAbove30: boolean = false): boolean {
+		return this.compare(this.getNetworkAddress(allowAbove30));
 	};
 
 	/**
 	 * Returns whether this Address is a Broadcast Address.
+	 * @param {boolean} allowAbove30 Optional. If false, returns false if the mask is greater than 30. Defaults to false.
 	 */
-	public isBroadcastAddress(): boolean {
-		return this.compare(this.getBroadcastAddress());
+	public isBroadcastAddress(allowAbove30: boolean = false): boolean {
+		return this.compare(this.getBroadcastAddress(allowAbove30));
 	};
 	
 	/**
@@ -176,6 +184,10 @@ export class Address {
 	 * @param {Address} other the Address to be compared with.
 	 */
 	public compare(other: Address): boolean {
+
+		if (!other) {
+			return false;
+		}
 
 		if (this === other)
 			return true;
@@ -197,11 +209,11 @@ export class Address {
 	
 	/**
 	 * Returns the amount of hosts that this Address' network has.
-	 * @param {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address.
+	 * @param {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
 	 */
 	public numberOfHosts(requireNetwork: boolean = false): number {
 
-		if(requireNetwork && !this.isNetworkAddress()) {
+		if(requireNetwork && !this.isNetworkAddress(true)) {
 			let err = new Error("Not a Network Address");
 			err.name = ERROR_NOT_NETWORK;
 			throw err;
@@ -217,11 +229,11 @@ export class Address {
 
 	/**
 	 * Returns the first valid host Address of this network.
-	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address.
+	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
 	 */
 	public firstHost(requireNetwork: boolean = false): Address {
 
-		if (requireNetwork && !this.isNetworkAddress()) {
+		if (requireNetwork && !this.isNetworkAddress(true)) {
 			let err = new Error("Not a Network Address");
 			err.name = ERROR_NOT_NETWORK;
 			throw err;
@@ -235,7 +247,7 @@ export class Address {
 			maskBytes = cloneByte4(this.mask);
 		}
 		else {
-			let net = this.getNetworkAddress();
+			let net = this.getNetworkAddress(true);
 			ipBytes = net.ip;
 			maskBytes = net.mask;
 		}
@@ -250,11 +262,11 @@ export class Address {
 
 	/**
 	 * Returns the last valid host Address of this network.
-	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address.
+	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
 	 */
 	public lastHost(requireNetwork: boolean = false): Address {
 
-		if (requireNetwork && !this.isNetworkAddress()) {
+		if (requireNetwork && !this.isNetworkAddress(true)) {
 			let err = new Error("Not a Network Address");
 			err.name = ERROR_NOT_NETWORK;
 			throw err;
@@ -263,7 +275,7 @@ export class Address {
 		let ipBytes: Byte4;
 		let maskBytes: Byte4;
 
-		let net = this.getBroadcastAddress();
+		let net = this.getBroadcastAddress(true);
 		ipBytes = net.ip;
 		maskBytes = net.mask;
 

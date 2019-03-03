@@ -77,8 +77,12 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
         }
         /**
          * Returns the Network Address of this Address.
+         * @param {boolean} allowAbove30 Optional. If false, returns undefined if the mask is greater than 30. Defaults to false.
          */
-        Address.prototype.getNetworkAddress = function () {
+        Address.prototype.getNetworkAddress = function (allowAbove30) {
+            if (allowAbove30 === void 0) { allowAbove30 = false; }
+            if (!allowAbove30 && this.maskShort > 30)
+                return undefined;
             var bytes = Array(4);
             for (var i = 0; i < 4; i++) {
                 var minByte = this.ip[i].clone();
@@ -94,8 +98,12 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
         };
         /**
          * Returns the Broadcast Address of this Address' network.
+         * @param {boolean} allowAbove30 Optional. If false, returns undefined if the mask is greater than 30. Defaults to false.
          */
-        Address.prototype.getBroadcastAddress = function () {
+        Address.prototype.getBroadcastAddress = function (allowAbove30) {
+            if (allowAbove30 === void 0) { allowAbove30 = false; }
+            if (!allowAbove30 && this.maskShort > 30)
+                return undefined;
             var bytes = Array(4);
             for (var i = 0; i < 4; i++) {
                 var maxByte = this.ip[i].clone();
@@ -111,16 +119,20 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
         };
         /**
          * Returns whether this Address is a Network Address.
+         * @param {boolean} allowAbove30 Optional. If false, returns false if the mask is greater than 30. Defaults to false.
          */
-        Address.prototype.isNetworkAddress = function () {
-            return this.compare(this.getNetworkAddress());
+        Address.prototype.isNetworkAddress = function (allowAbove30) {
+            if (allowAbove30 === void 0) { allowAbove30 = false; }
+            return this.compare(this.getNetworkAddress(allowAbove30));
         };
         ;
         /**
          * Returns whether this Address is a Broadcast Address.
+         * @param {boolean} allowAbove30 Optional. If false, returns false if the mask is greater than 30. Defaults to false.
          */
-        Address.prototype.isBroadcastAddress = function () {
-            return this.compare(this.getBroadcastAddress());
+        Address.prototype.isBroadcastAddress = function (allowAbove30) {
+            if (allowAbove30 === void 0) { allowAbove30 = false; }
+            return this.compare(this.getBroadcastAddress(allowAbove30));
         };
         ;
         /**
@@ -128,6 +140,9 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
          * @param {Address} other the Address to be compared with.
          */
         Address.prototype.compare = function (other) {
+            if (!other) {
+                return false;
+            }
             if (this === other)
                 return true;
             if (this.ip === other.ip && (this.mask === other.mask || this.maskShort === other.maskShort))
@@ -143,11 +158,11 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
         };
         /**
          * Returns the amount of hosts that this Address' network has.
-         * @param {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address.
+         * @param {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
          */
         Address.prototype.numberOfHosts = function (requireNetwork) {
             if (requireNetwork === void 0) { requireNetwork = false; }
-            if (requireNetwork && !this.isNetworkAddress()) {
+            if (requireNetwork && !this.isNetworkAddress(true)) {
                 var err = new Error("Not a Network Address");
                 err.name = exports.ERROR_NOT_NETWORK;
                 throw err;
@@ -160,11 +175,11 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
         };
         /**
          * Returns the first valid host Address of this network.
-         * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address.
+         * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
          */
         Address.prototype.firstHost = function (requireNetwork) {
             if (requireNetwork === void 0) { requireNetwork = false; }
-            if (requireNetwork && !this.isNetworkAddress()) {
+            if (requireNetwork && !this.isNetworkAddress(true)) {
                 var err = new Error("Not a Network Address");
                 err.name = exports.ERROR_NOT_NETWORK;
                 throw err;
@@ -176,7 +191,7 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
                 maskBytes = cloneByte4(this.mask);
             }
             else {
-                var net = this.getNetworkAddress();
+                var net = this.getNetworkAddress(true);
                 ipBytes = net.ip;
                 maskBytes = net.mask;
             }
@@ -187,18 +202,18 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
         };
         /**
          * Returns the last valid host Address of this network.
-         * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address.
+         * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
          */
         Address.prototype.lastHost = function (requireNetwork) {
             if (requireNetwork === void 0) { requireNetwork = false; }
-            if (requireNetwork && !this.isNetworkAddress()) {
+            if (requireNetwork && !this.isNetworkAddress(true)) {
                 var err = new Error("Not a Network Address");
                 err.name = exports.ERROR_NOT_NETWORK;
                 throw err;
             }
             var ipBytes;
             var maskBytes;
-            var net = this.getBroadcastAddress();
+            var net = this.getBroadcastAddress(true);
             ipBytes = net.ip;
             maskBytes = net.mask;
             if (this.maskShort < 31) {
