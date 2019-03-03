@@ -1,6 +1,8 @@
-import { id, copyToClipboard, isStringNumeric, isCharNumeric, NUMBERS, clamp } from "../../core/helpers"
-import { Byte4, Byte4Zero, Address } from "../../core/networking/layers/layer-3/address";
-import { Byte, ByteZero } from "../../core/networking/byte";
+import { Byte } from "../../core/networking/byte";
+import { Address, Byte4Zero } from "../../core/networking/layers/layer-3/address";
+import { isCharNumeric, isStringNumeric } from "../../core/helpers/string";
+import { id, copyToClipboard } from "../../core/helpers/dom";
+import { clamp } from "../../core/helpers/math";
 
 /**
  * The checkboxes corresponding to the IP bits.

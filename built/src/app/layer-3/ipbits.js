@@ -1,4 +1,4 @@
-define(["require", "exports", "../../core/helpers", "../../core/networking/layers/layer-3/address", "../../core/networking/byte"], function (require, exports, helpers_1, address_1, byte_1) {
+define(["require", "exports", "../../core/networking/byte", "../../core/networking/layers/layer-3/address", "../../core/helpers/string", "../../core/helpers/dom", "../../core/helpers/math"], function (require, exports, byte_1, address_1, string_1, dom_1, math_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -21,8 +21,8 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
             IP[i] = [];
             MASK[i] = [];
             var _loop_2 = function (j) {
-                var ipBit = helpers_1.id("byte_ip_" + i + "_" + j);
-                var maskBit = helpers_1.id("byte_mask_" + i + "_" + j);
+                var ipBit = dom_1.id("byte_ip_" + i + "_" + j);
+                var maskBit = dom_1.id("byte_mask_" + i + "_" + j);
                 ipBit.addEventListener("change", function () {
                     updateDisplays();
                 });
@@ -36,7 +36,7 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
                 _loop_2(j);
             }
             var additionalKeys = ["Backspace", "Delete", "Tab", "ArrowLeft", "ArrowRight", "Home", "End", "Insert"];
-            var display = helpers_1.id("display_ip_" + i);
+            var display = dom_1.id("display_ip_" + i);
             var resultByte;
             display.addEventListener("focus", function (evt) {
                 var range, selection;
@@ -69,7 +69,7 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
                         selection.addRange(range);
                     }
                 }
-                if (additionalKeys.indexOf(evt.key) === -1 && !helpers_1.isCharNumeric(evt.key)) {
+                if (additionalKeys.indexOf(evt.key) === -1 && !string_1.isCharNumeric(evt.key)) {
                     evt.preventDefault();
                     return;
                 }
@@ -79,7 +79,7 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
                 }
             });
             display.addEventListener("keyup", function (evt) {
-                var next = i < 3 ? helpers_1.id("display_ip_" + (i + 1)) : undefined;
+                var next = i < 3 ? dom_1.id("display_ip_" + (i + 1)) : undefined;
                 var selectedText = window.getSelection().anchorNode.parentNode == display && window.getSelection().toString();
                 if (additionalKeys.indexOf(evt.key) === -1 && display.textContent.replace(HIDDENCHAR, "").length == 3 && selectedText.length === 0) {
                     if (next) {
@@ -101,7 +101,7 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
                     resultByte = minByte;
                 }
                 else {
-                    if (helpers_1.isStringNumeric(display.textContent)) {
+                    if (string_1.isStringNumeric(display.textContent)) {
                         var address = extractAddress();
                         var minByte = address.getIp()[i];
                         var maxByte = minByte.clone();
@@ -112,7 +112,7 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
                                 maxByte.bit(i_2, true);
                             }
                         }
-                        var value = new byte_1.Byte(helpers_1.clamp(parseInt(display.textContent, 10), minByte.getDecimal(), maxByte.getDecimal()));
+                        var value = new byte_1.Byte(math_1.clamp(parseInt(display.textContent, 10), minByte.getDecimal(), maxByte.getDecimal()));
                         resultByte = value;
                         setIPByteDOM(value, i, false);
                     }
@@ -190,14 +190,14 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
      * @param  {string} str? The string to be shown. If not given, it will be calculated.
      */
     function updateIPShort(str) {
-        helpers_1.id("ip_value").textContent = str ? str : extractAddress().toString(true);
+        dom_1.id("ip_value").textContent = str ? str : extractAddress().toString(true);
     }
     /**
      * Updates the small mask display string.
      * @param  {string} str? The string to be shown. If not given, it will be calculated.
      */
     function updateMaskShort(str) {
-        helpers_1.id("mask_value").textContent = str ? str : extractAddress().shortMaskString();
+        dom_1.id("mask_value").textContent = str ? str : extractAddress().shortMaskString();
     }
     /**
      * Updates the big displays for the IP and mask.
@@ -206,8 +206,8 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
     function updateDisplays(address) {
         address = address ? address : extractAddress();
         for (var i = 0; i < 4; i++) {
-            helpers_1.id("display_ip_" + i).textContent = "" + address.getIp()[i].getDecimal();
-            helpers_1.id("display_mask_" + i).textContent = "" + address.getMask()[i].getDecimal();
+            dom_1.id("display_ip_" + i).textContent = "" + address.getIp()[i].getDecimal();
+            dom_1.id("display_mask_" + i).textContent = "" + address.getMask()[i].getDecimal();
         }
         updateIPShort(address.toString(true));
         updateMaskShort(address.shortMaskString());
@@ -218,12 +218,12 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
      */
     function selectMaskBit(index) {
         var _a = splitBitIndex(index), bitIndex = _a.bitIndex, byteIndex = _a.byteIndex;
-        index += (helpers_1.id("byte_mask_" + byteIndex + "_" + bitIndex).checked ? 1 : 0);
+        index += (dom_1.id("byte_mask_" + byteIndex + "_" + bitIndex).checked ? 1 : 0);
         for (var byte4Index = 0; byte4Index < 32; byte4Index++) {
             var _b = splitBitIndex(byte4Index), bitIndex_1 = _b.bitIndex, byteIndex_1 = _b.byteIndex;
             var on = byte4Index < index;
-            helpers_1.id("byte_mask_" + byteIndex_1 + "_" + bitIndex_1).checked = on;
-            helpers_1.id("byte_ip_" + byteIndex_1 + "_" + bitIndex_1).disabled = on;
+            dom_1.id("byte_mask_" + byteIndex_1 + "_" + bitIndex_1).checked = on;
+            dom_1.id("byte_ip_" + byteIndex_1 + "_" + bitIndex_1).disabled = on;
         }
         updateDisplays();
     }
@@ -231,8 +231,8 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
      * Copies the IP (in X.X.X.X format) to the clipboard.
      */
     function copyIPToClipboard() {
-        helpers_1.copyToClipboard(extractAddress().toString(true), function (success) {
-            var text = helpers_1.id("copy_ip_text");
+        dom_1.copyToClipboard(extractAddress().toString(true), function (success) {
+            var text = dom_1.id("copy_ip_text");
             text.style.transition = "";
             text.style.opacity = "1";
             setTimeout(function () {
@@ -245,8 +245,8 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
      * Copies the mask (in X.X.X.X format) to the clipboard.
      */
     function copyMaskToClipboard() {
-        helpers_1.copyToClipboard(extractAddress().maskString(), function (success) {
-            var text = helpers_1.id("copy_mask_text");
+        dom_1.copyToClipboard(extractAddress().maskString(), function (success) {
+            var text = dom_1.id("copy_mask_text");
             text.style.transition = "";
             text.style.opacity = "1";
             setTimeout(function () {
@@ -258,6 +258,6 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
     // +==============================================+
     loadDOMComponents();
     updateDisplays();
-    helpers_1.id("copy_ip").addEventListener("click", function (ev) { return copyIPToClipboard(); });
-    helpers_1.id("copy_mask").addEventListener("click", function (ev) { return copyMaskToClipboard(); });
+    dom_1.id("copy_ip").addEventListener("click", function (ev) { return copyIPToClipboard(); });
+    dom_1.id("copy_mask").addEventListener("click", function (ev) { return copyMaskToClipboard(); });
 });
