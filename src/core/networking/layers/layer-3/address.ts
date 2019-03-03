@@ -221,7 +221,7 @@ export class Address {
 			this.ip[0].getDecimal() + "." +
 			this.ip[1].getDecimal() + "." +
 			this.ip[2].getDecimal() + "." +
-			this.ip[3].getDecimal() + (omitMask? "" : this.maskString());
+			this.ip[3].getDecimal() + (omitMask? "" : this.shortMaskString());
 
 	}
 
@@ -229,6 +229,14 @@ export class Address {
 	 * Returns the string representation of the mask.
 	 */
 	maskString(): string {
+		return "" +
+			this.mask[0].getDecimal() + "." +
+			this.mask[1].getDecimal() + "." +
+			this.mask[2].getDecimal() + "." +
+			this.mask[3].getDecimal();
+	}
+
+	shortMaskString(): string {
 		return "/" + this.getMaskShort();
 	}
 
