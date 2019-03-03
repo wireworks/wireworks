@@ -16,6 +16,18 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
     }
     exports.Byte4Max = Byte4Max;
     /**
+     * Clones a Byte4.
+     * @param  {Byte4} byte4 The Byte4 to be cloned.
+     */
+    function cloneByte4(byte4) {
+        byte4 = byte4.slice();
+        for (var i = 0; i < 4; i++) {
+            byte4[i] = byte4[i].clone();
+        }
+        return byte4;
+    }
+    exports.cloneByte4 = cloneByte4;
+    /**
      * A full IP/Mask address.
      * @author Henrique Colini
      */
@@ -48,8 +60,74 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
             }
         }
         /**
+         * Returns the Network Address of this Address.
+         */
+        Address.prototype.getNetworkAddress = function () {
+            var bytes = Array(4);
+            for (var i = 0; i < 4; i++) {
+                var minByte = this.ip[i].clone();
+                var maskByte = this.mask[i];
+                for (var i_1 = 0; i_1 < 8; i_1++) {
+                    if (!maskByte.bit(i_1)) {
+                        minByte.bit(i_1, false);
+                    }
+                }
+                bytes[i] = minByte;
+            }
+            return new Address(bytes, cloneByte4(this.mask));
+        };
+        /**
+         * Returns the Broadcast Address of this Address' network.
+         */
+        Address.prototype.getBroadcastAddress = function () {
+            var bytes = Array(4);
+            for (var i = 0; i < 4; i++) {
+                var maxByte = this.ip[i].clone();
+                var maskByte = this.mask[i];
+                for (var i_2 = 0; i_2 < 8; i_2++) {
+                    if (!maskByte.bit(i_2)) {
+                        maxByte.bit(i_2, true);
+                    }
+                }
+                bytes[i] = maxByte;
+            }
+            return new Address(bytes, cloneByte4(this.mask));
+        };
+        /**
+         * Returns whether this Address is a Network Address.
+         */
+        Address.prototype.isNetworkAddress = function () {
+            return this.compare(this.getNetworkAddress());
+        };
+        ;
+        /**
+         * Returns whether this Address is a Broadcast Address.
+         */
+        Address.prototype.isBroadcastAddress = function () {
+            return this.compare(this.getBroadcastAddress());
+        };
+        ;
+        /**
+         * Returns true if this Address is the same as another.
+         * @param  {Address} other the Address to be compared with.
+         */
+        Address.prototype.compare = function (other) {
+            if (this === other)
+                return true;
+            if (this.ip === other.ip && (this.mask === other.mask || this.maskShort === other.maskShort))
+                return true;
+            for (var i = 0; i < 4; i++) {
+                for (var j = 0; j < 8; j++) {
+                    if ((this.ip[i].bit(j) !== other.ip[i].bit(j)) || (this.mask[i].bit(j) !== other.mask[i].bit(j))) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        };
+        /**
          * Sets this Address' mask.
-         * @param  {Byte4} mask
+         * @param  {Byte4} mask The Byte4 mask to be set.
          */
         Address.prototype.setMask = function (mask) {
             var maskShortTmp = 0;
@@ -74,7 +152,7 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
         };
         /**
          * Sets this Address' mask, given its numerical representation (0-32).
-         * @param  {number} maskShort
+         * @param  {number} maskShort The numerical mask to be set.
          */
         Address.prototype.setMaskShort = function (maskShort) {
             if (maskShort < 0 || maskShort > 32) {

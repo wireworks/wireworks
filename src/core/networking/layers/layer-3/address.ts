@@ -20,6 +20,22 @@ export function Byte4Max(): Byte4 {
 }
 
 /**
+ * Clones a Byte4.
+ * @param  {Byte4} byte4 The Byte4 to be cloned.
+ */
+export function cloneByte4(byte4: Byte4): Byte4 {
+
+	byte4 = byte4.slice() as Byte4;
+
+	for (let i = 0; i < 4; i++) {
+		byte4[i] = byte4[i].clone();		
+	}
+
+	return byte4;
+
+}
+
+/**
  * A full IP/Mask address.
  * @author Henrique Colini
  */
@@ -71,10 +87,100 @@ export class Address {
 		}
 
 	}
+
+	/**
+	 * Returns the Network Address of this Address.
+	 */
+	public getNetworkAddress(): Address {
+
+		let bytes: Byte4 = Array<Byte>(4) as Byte4;
+
+		for (let i = 0; i < 4; i++) {
+
+			let minByte = this.ip[i].clone();
+			let maskByte = this.mask[i];
+
+			for (let i = 0; i < 8; i++) {
+				if (!maskByte.bit(i)) {
+					minByte.bit(i, false);
+				}
+			}
+
+			bytes[i] = minByte;
+
+		}
+
+		return new Address(bytes, cloneByte4(this.mask));
+
+	}
+
+	/**
+	 * Returns the Broadcast Address of this Address' network.
+	 */
+	public getBroadcastAddress(): Address {
+
+		let bytes: Byte4 = Array<Byte>(4) as Byte4;
+
+		for (let i = 0; i < 4; i++) {
+
+			let maxByte = this.ip[i].clone();
+			let maskByte = this.mask[i];
+
+			for (let i = 0; i < 8; i++) {
+				if (!maskByte.bit(i)) {
+					maxByte.bit(i, true);
+				}
+			}
+
+			bytes[i] = maxByte;
+
+		}
+
+		return new Address(bytes, cloneByte4(this.mask));
+
+	}
+	
+	/**
+	 * Returns whether this Address is a Network Address.
+	 */
+	public isNetworkAddress(): boolean {
+		return this.compare(this.getNetworkAddress());
+	};
+
+	/**
+	 * Returns whether this Address is a Broadcast Address.
+	 */
+	public isBroadcastAddress(): boolean {
+		return this.compare(this.getBroadcastAddress());
+	};
+	
+	/**
+	 * Returns true if this Address is the same as another.
+	 * @param  {Address} other the Address to be compared with.
+	 */
+	public compare(other: Address): boolean {
+
+		if (this === other)
+			return true;
+
+		if (this.ip === other.ip && (this.mask === other.mask || this.maskShort === other.maskShort))
+			return true;
+
+		for (let i = 0; i < 4; i++) {
+			for (let j = 0; j < 8; j++) {
+				if ((this.ip[i].bit(j) !== other.ip[i].bit(j)) || (this.mask[i].bit(j) !== other.mask[i].bit(j))) {
+					return false;
+				}
+			}			
+		}
+
+		return true;
+
+	}
 	
 	/**
 	 * Sets this Address' mask.
-	 * @param  {Byte4} mask
+	 * @param  {Byte4} mask The Byte4 mask to be set.
 	 */
 	public setMask(mask: Byte4): void {
 
@@ -105,7 +211,7 @@ export class Address {
 
 	/**
 	 * Sets this Address' mask, given its numerical representation (0-32).
-	 * @param  {number} maskShort
+	 * @param  {number} maskShort The numerical mask to be set.
 	 */
 	public setMaskShort(maskShort: number): void {
 
