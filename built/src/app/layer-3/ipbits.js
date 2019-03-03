@@ -9,27 +9,32 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
      * The checkboxes corresponding to the mask bits.
      */
     var MASK = [];
-    var _loop_1 = function (i) {
-        IP[i] = [];
-        MASK[i] = [];
-        var _loop_2 = function (j) {
-            var ipBit = helpers_1.id("byte_ip_" + i + "_" + j);
-            var maskBit = helpers_1.id("byte_mask_" + i + "_" + j);
-            ipBit.addEventListener("change", function () {
-                updateDisplays();
-            });
-            maskBit.addEventListener("change", function () {
-                selectMaskBit(joinBitIndex(i, j));
-            });
-            IP[i][j] = ipBit;
-            MASK[i][j] = maskBit;
+    /**
+     * Loads the DOM checkboxes into IP and MASK.
+     */
+    function loadDOMBits() {
+        var _loop_1 = function (i) {
+            IP[i] = [];
+            MASK[i] = [];
+            var _loop_2 = function (j) {
+                var ipBit = helpers_1.id("byte_ip_" + i + "_" + j);
+                var maskBit = helpers_1.id("byte_mask_" + i + "_" + j);
+                ipBit.addEventListener("change", function () {
+                    updateDisplays();
+                });
+                maskBit.addEventListener("change", function () {
+                    selectMaskBit(joinBitIndex(i, j));
+                });
+                IP[i][j] = ipBit;
+                MASK[i][j] = maskBit;
+            };
+            for (var j = 0; j < 8; j++) {
+                _loop_2(j);
+            }
         };
-        for (var j = 0; j < 8; j++) {
-            _loop_2(j);
+        for (var i = 0; i < 4; i++) {
+            _loop_1(i);
         }
-    };
-    for (var i = 0; i < 4; i++) {
-        _loop_1(i);
     }
     /**
      * Converts a bit in Byte index to a bit in Byte4 index.
@@ -115,5 +120,6 @@ define(["require", "exports", "../../core/helpers", "../../core/networking/layer
         updateDisplays();
     }
     // +==============================================+
+    loadDOMBits();
     updateDisplays();
 });

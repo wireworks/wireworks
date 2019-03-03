@@ -10,24 +10,29 @@ const IP: HTMLInputElement[][] = [];
  */
 const MASK: HTMLInputElement[][] = [];
 
-for (let i=0; i<4; i++) {
-	IP[i] = [];
-	MASK[i] = [];
-	for (let j=0; j<8; j++) {
+/**
+ * Loads the DOM checkboxes into IP and MASK.
+ */
+function loadDOMBits(): void {
+	for (let i = 0; i < 4; i++) {
+		IP[i] = [];
+		MASK[i] = [];
+		for (let j = 0; j < 8; j++) {
 
-		let ipBit = id("byte_ip_" + i + "_" + j);
-		let maskBit = id("byte_mask_" + i + "_" + j);
+			let ipBit = id("byte_ip_" + i + "_" + j);
+			let maskBit = id("byte_mask_" + i + "_" + j);
 
-		ipBit.addEventListener("change", function() {
-			updateDisplays();
-		});
+			ipBit.addEventListener("change", function () {
+				updateDisplays();
+			});
 
-		maskBit.addEventListener("change", function () {
-			selectMaskBit(joinBitIndex(i,j));
-		});
+			maskBit.addEventListener("change", function () {
+				selectMaskBit(joinBitIndex(i, j));
+			});
 
-		IP[i][j] = ipBit as HTMLInputElement;
-		MASK[i][j] = maskBit as HTMLInputElement;
+			IP[i][j] = ipBit as HTMLInputElement;
+			MASK[i][j] = maskBit as HTMLInputElement;
+		}
 	}
 }
 
@@ -142,4 +147,5 @@ function selectMaskBit(index: number): void {
 
 // +==============================================+
 
+loadDOMBits();
 updateDisplays();
