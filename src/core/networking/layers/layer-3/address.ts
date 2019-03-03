@@ -192,6 +192,19 @@ export class Address {
 	}
 	
 	/**
+	 * Returns the amount of hosts that this Address' network has.
+	 */
+	public numberOfHosts(): number {
+
+		if (this.maskShort == 31)
+			return 2;
+		if (this.maskShort == 32)
+			return 1;
+		return (Math.pow(2, 32 - this.maskShort) - 2);
+
+	}
+	
+	/**
 	 * Sets this Address' mask.
 	 * @param  {Byte4} mask The Byte4 mask to be set.
 	 */
