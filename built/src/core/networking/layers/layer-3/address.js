@@ -28,6 +28,18 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
     }
     exports.cloneByte4 = cloneByte4;
     /**
+     * Error name for a mask with holes.
+     */
+    exports.ERROR_MASK_HOLES = "MaskHolesError";
+    /**
+     * Error name for a mask outside the correct range.
+     */
+    exports.ERROR_MASK_RANGE = "MaskRangeError";
+    /**
+     * Error name for a malformated address string.
+     */
+    exports.ERROR_ADDRESS_PARSE = "AddressParseError";
+    /**
      * A full IP/Mask address.
      * @author Henrique Colini
      */
@@ -139,7 +151,9 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
                             maskShortTmp++;
                         }
                         else {
-                            throw new Error("Mask contains holes");
+                            var err = new Error("Mask contains holes");
+                            err.name = exports.ERROR_MASK_HOLES;
+                            throw err;
                         }
                     }
                     else {
@@ -156,7 +170,9 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
          */
         Address.prototype.setMaskShort = function (maskShort) {
             if (maskShort < 0 || maskShort > 32) {
-                throw new RangeError("The short mask should be between 0 and 32");
+                var err = new RangeError("The short mask should be between 0 and 32");
+                err.name = exports.ERROR_MASK_RANGE;
+                throw err;
             }
             var tmpMask = Byte4Zero();
             for (var i = 0; i < 4; i++) {
@@ -215,7 +231,9 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
                 var ipByte3 = new byte_1.Byte(parseInt(match[4], 10));
                 var maskShort = parseInt(match[5], 10);
                 if (maskShort < 0 || maskShort > 32) {
-                    throw new RangeError("The short mask should be between 0 and 32");
+                    var err = new RangeError("The short mask should be between 0 and 32");
+                    err.name = exports.ERROR_MASK_RANGE;
+                    throw err;
                 }
                 this.setIp([ipByte0, ipByte1, ipByte2, ipByte3]);
                 this.setMaskShort(maskShort);
@@ -230,11 +248,15 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
                     this.setIp([ipByte0, ipByte1, ipByte2, ipByte3]);
                 }
                 else {
-                    throw new Error("Invalid IP/mask address string");
+                    var err = new Error("Invalid IP/mask address string");
+                    err.name = exports.ERROR_ADDRESS_PARSE;
+                    throw err;
                 }
             }
             else {
-                throw new Error("Invalid IP/mask address string");
+                var err = new Error("Invalid IP/mask address string");
+                err.name = exports.ERROR_ADDRESS_PARSE;
+                throw err;
             }
         };
         /**

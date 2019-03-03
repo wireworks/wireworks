@@ -32,6 +32,11 @@ export function ByteMax(): Byte {
 }
 
 /**
+ * Error name for a byte outside the correct range.
+ */
+export const ERROR_BYTE_RANGE = "ByteRangeError";
+
+/**
  * A Byte, composed of 8 bits (boolean values).
  * @author Henrique Colini
  */
@@ -72,7 +77,9 @@ export class Byte {
 	setDecimal(decimal: number): void {
 
 		if (decimal < 0 || decimal > 255 || decimal.toString().indexOf('.') !== -1) {
-			throw new RangeError("The decimal value of a byte must be an integer between 0-255 (inclusive)");
+			let err = new RangeError("The decimal value of a byte must be an integer between 0-255 (inclusive)");
+			err.name = ERROR_BYTE_RANGE;
+			throw err;
 		}
 
 		let tmpDecimal = decimal;

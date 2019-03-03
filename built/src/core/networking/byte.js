@@ -30,6 +30,10 @@ define(["require", "exports"], function (require, exports) {
     }
     exports.ByteMax = ByteMax;
     /**
+     * Error name for a byte outside the correct range.
+     */
+    exports.ERROR_BYTE_RANGE = "ByteRangeError";
+    /**
      * A Byte, composed of 8 bits (boolean values).
      * @author Henrique Colini
      */
@@ -53,7 +57,9 @@ define(["require", "exports"], function (require, exports) {
          */
         Byte.prototype.setDecimal = function (decimal) {
             if (decimal < 0 || decimal > 255 || decimal.toString().indexOf('.') !== -1) {
-                throw new RangeError("The decimal value of a byte must be an integer between 0-255 (inclusive)");
+                var err = new RangeError("The decimal value of a byte must be an integer between 0-255 (inclusive)");
+                err.name = exports.ERROR_BYTE_RANGE;
+                throw err;
             }
             var tmpDecimal = decimal;
             var tmpBits = Bit8Zero();

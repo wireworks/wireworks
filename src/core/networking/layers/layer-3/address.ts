@@ -36,6 +36,19 @@ export function cloneByte4(byte4: Byte4): Byte4 {
 }
 
 /**
+ * Error name for a mask with holes.
+ */
+export const ERROR_MASK_HOLES = "MaskHolesError";
+/**
+ * Error name for a mask outside the correct range.
+ */
+export const ERROR_MASK_RANGE = "MaskRangeError";
+/**
+ * Error name for a malformated address string.
+ */
+export const ERROR_ADDRESS_PARSE = "AddressParseError";
+
+/**
  * A full IP/Mask address.
  * @author Henrique Colini
  */
@@ -195,7 +208,9 @@ export class Address {
 						maskShortTmp++;
 					}
 					else {
-						throw new Error("Mask contains holes");
+						let err = new Error("Mask contains holes");
+						err.name = ERROR_MASK_HOLES;
+						throw err;
 					}
 				}
 				else {
@@ -216,7 +231,9 @@ export class Address {
 	public setMaskShort(maskShort: number): void {
 
 		if (maskShort < 0 || maskShort > 32) {
-			throw new RangeError("The short mask should be between 0 and 32");
+			let err = new RangeError("The short mask should be between 0 and 32");
+			err.name = ERROR_MASK_RANGE;
+			throw err;
 		}
 
 		let tmpMask: Byte4 = Byte4Zero();
@@ -287,7 +304,9 @@ export class Address {
 			let maskShort = parseInt(match[5], 10);
 
 			if (maskShort < 0 || maskShort > 32) {
-				throw new RangeError("The short mask should be between 0 and 32");
+				let err = new RangeError("The short mask should be between 0 and 32");
+				err.name = ERROR_MASK_RANGE;
+				throw err;
 			}
 
 			this.setIp([ipByte0, ipByte1, ipByte2, ipByte3]);
@@ -306,12 +325,16 @@ export class Address {
 				this.setIp([ipByte0, ipByte1, ipByte2, ipByte3]);
 			}
 			else {
-				throw new Error("Invalid IP/mask address string");
+				let err = new Error("Invalid IP/mask address string");
+				err.name = ERROR_ADDRESS_PARSE;
+				throw err;
 			}
 
 		}
 		else {
-			throw new Error("Invalid IP/mask address string");
+			let err = new Error("Invalid IP/mask address string");
+			err.name = ERROR_ADDRESS_PARSE;
+			throw err;
 		}
 
 	}
