@@ -31,7 +31,7 @@ define(["require", "exports", "../../core/networking/byte", "../../core/networki
                     updateDisplays();
                 });
                 maskBit.addEventListener("change", function () {
-                    selectMaskBit(joinBitIndex(i, j));
+                    selectMaskBit(address_1.joinBitIndex(i, j));
                 });
                 IP[i][j] = ipBit;
                 MASK[i][j] = maskBit;
@@ -128,33 +128,6 @@ define(["require", "exports", "../../core/networking/byte", "../../core/networki
         }
     }
     /**
-     * Converts a bit in Byte index to a bit in Byte4 index.
-     * @param  {number} byteIndex The index of the Byte in a Byte4.
-     * @param  {number} bitIndex The index of the bit in the Byte.
-     */
-    function joinBitIndex(byteIndex, bitIndex) {
-        if (byteIndex > 3 || byteIndex < 0) {
-            throw new RangeError("The byteIndex must be between 0-3 (inclusive)");
-        }
-        if (bitIndex > 7 || bitIndex < 0) {
-            throw new RangeError("The bitIndex must be between 0-7 (inclusive)");
-        }
-        return (8 * byteIndex) + (7 - bitIndex);
-    }
-    /**
-     * Converts a bit in Byte4 index to a bit in Byte index.
-     * @param  {number} byte4Index The index of the bit in a Byte4.
-     */
-    function splitBitIndex(byte4Index) {
-        if (byte4Index > 31 || byte4Index < 0) {
-            throw new RangeError("The byte4Index must be between 0-31 (inclusive)");
-        }
-        return {
-            byteIndex: Math.floor(byte4Index / 8),
-            bitIndex: 7 - (byte4Index % 8)
-        };
-    }
-    /**
      * Returns the Address, extracted from the DOM elements.
      */
     function extractAddress() {
@@ -221,10 +194,10 @@ define(["require", "exports", "../../core/networking/byte", "../../core/networki
      * @param  {number} index The last checked bit.
      */
     function selectMaskBit(index) {
-        var _a = splitBitIndex(index), bitIndex = _a.bitIndex, byteIndex = _a.byteIndex;
+        var _a = address_1.splitBitIndex(index), bitIndex = _a.bitIndex, byteIndex = _a.byteIndex;
         index += (dom_1.id("byte_mask_" + byteIndex + "_" + bitIndex).checked ? 1 : 0);
         for (var byte4Index = 0; byte4Index < 32; byte4Index++) {
-            var _b = splitBitIndex(byte4Index), bitIndex_1 = _b.bitIndex, byteIndex_1 = _b.byteIndex;
+            var _b = address_1.splitBitIndex(byte4Index), bitIndex_1 = _b.bitIndex, byteIndex_1 = _b.byteIndex;
             var on = byte4Index < index;
             dom_1.id("byte_mask_" + byteIndex_1 + "_" + bitIndex_1).checked = on;
             dom_1.id("byte_ip_" + byteIndex_1 + "_" + bitIndex_1).disabled = on;

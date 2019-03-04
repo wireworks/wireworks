@@ -44,6 +44,35 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
      */
     exports.ERROR_NOT_NETWORK = "NotNetworkError";
     /**
+     * Converts a bit in Byte index to a bit in Byte4 index.
+     * @param  {number} byteIndex The index of the Byte in a Byte4.
+     * @param  {number} bitIndex The index of the bit in the Byte.
+     */
+    function joinBitIndex(byteIndex, bitIndex) {
+        if (byteIndex > 3 || byteIndex < 0) {
+            throw new RangeError("The byteIndex must be between 0-3 (inclusive)");
+        }
+        if (bitIndex > 7 || bitIndex < 0) {
+            throw new RangeError("The bitIndex must be between 0-7 (inclusive)");
+        }
+        return (8 * byteIndex) + (7 - bitIndex);
+    }
+    exports.joinBitIndex = joinBitIndex;
+    /**
+     * Converts a bit in Byte4 index to a bit in Byte index.
+     * @param  {number} byte4Index The index of the bit in a Byte4.
+     */
+    function splitBitIndex(byte4Index) {
+        if (byte4Index > 31 || byte4Index < 0) {
+            throw new RangeError("The byte4Index must be between 0-31 (inclusive)");
+        }
+        return {
+            byteIndex: Math.floor(byte4Index / 8),
+            bitIndex: 7 - (byte4Index % 8)
+        };
+    }
+    exports.splitBitIndex = splitBitIndex;
+    /**
      * A full IP/Mask address.
      * @author Henrique Colini
      */
@@ -54,9 +83,11 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
          * @param  {Byte4|string} ip The IP of this Address. May be a Byte4 or a formatted string.
          * @param  {Byte4|number} mask Optional. The mask of this Address. May be a Byte4 or its numerical representation. If not given, defaults to /0.
          * @param  {boolean} requireMask Optional. If set to true, the mask becomes a required parameter in the formatted string.
+         * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
          */
-        function Address(ip, mask, requireMask) {
+        function Address(ip, mask, requireMask, requireNetwork) {
             if (requireMask === void 0) { requireMask = false; }
+            if (requireNetwork === void 0) { requireNetwork = false; }
             if (typeof ip === "string") {
                 this.parseAddress(ip, requireMask);
             }
@@ -75,6 +106,11 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
                 else {
                     this.setMask(Byte4Zero());
                 }
+            }
+            if (requireNetwork && !this.isNetworkAddress(true)) {
+                var err = new Error("Not a Network Address");
+                err.name = exports.ERROR_NOT_NETWORK;
+                throw err;
             }
         }
         /**
@@ -222,6 +258,37 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
                 ipBytes[3].setDecimal(ipBytes[3].getDecimal() - 1);
             }
             return new Address(ipBytes, maskBytes);
+        };
+        /**
+         * Divides this Address into two subnets.
+         * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
+         */
+        Address.prototype.subdivide = function (requireNetwork) {
+            if (requireNetwork === void 0) { requireNetwork = false; }
+            if (requireNetwork && !this.isNetworkAddress(true)) {
+                var err = new Error("Not a Network Address");
+                err.name = exports.ERROR_NOT_NETWORK;
+                throw err;
+            }
+            var subnets = [undefined, undefined];
+            if (this.maskShort === 32) {
+                return subnets;
+            }
+            var ipBytes;
+            if (requireNetwork) {
+                ipBytes = cloneByte4(this.ip);
+            }
+            else {
+                var net = this.getNetworkAddress(true);
+                ipBytes = net.ip;
+            }
+            subnets[0] = new Address(cloneByte4(ipBytes), this.maskShort + 1);
+            var secondIpBytes = cloneByte4(ipBytes);
+            var _a = splitBitIndex(this.maskShort), byteIndex = _a.byteIndex, bitIndex = _a.bitIndex;
+            secondIpBytes[byteIndex].bit(bitIndex, true);
+            subnets[1] = new Address(secondIpBytes, this.maskShort + 1);
+            console.log(subnets);
+            return subnets;
         };
         /**
          * Sets this Address' mask.

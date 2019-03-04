@@ -17,12 +17,9 @@ define(["require", "exports", "../../core/helpers/dom", "../../core/networking/l
         table.id = "plan";
         var errStr = undefined;
         try {
-            var address = new address_1.Address(dom_1.id("address").value, undefined, true);
-            var firstValidStr = void 0;
-            var lastValidStr = void 0;
+            var address = void 0;
             try {
-                firstValidStr = address.firstHost(true).toString(true);
-                lastValidStr = address.lastHost(true).toString(true);
+                address = new address_1.Address(dom_1.id("address").value, undefined, true, true);
             }
             catch (error) {
                 if (error.name === address_1.ERROR_NOT_NETWORK) {
@@ -30,6 +27,8 @@ define(["require", "exports", "../../core/helpers/dom", "../../core/networking/l
                 }
                 throw error;
             }
+            var firstValidStr = address.firstHost(true).toString(true);
+            var lastValidStr = address.lastHost(true).toString(true);
             var maskStr = address.maskString();
             var hostsStr = '' + address.numberOfHosts().toLocaleString();
             var network = address.getNetworkAddress();

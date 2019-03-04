@@ -24,17 +24,15 @@ function createPlan() {
 	let errStr: string = undefined;
 
 	try {
-			
-		let address = new Address((<HTMLInputElement>id("address")).value, undefined, true);
-
-		let firstValidStr: string;
-		let lastValidStr: string;
+		
+		let address: Address;
 
 		try {
-			firstValidStr = address.firstHost(true).toString(true);
-			lastValidStr = address.lastHost(true).toString(true);
+
+			address = new Address((<HTMLInputElement>id("address")).value, undefined, true, true);
+
 		} catch (error) {
-			
+
 			if (error.name === ERROR_NOT_NETWORK) {
 				errStr = "Este não é um endereço de rede. Você quis dizer " + address.getNetworkAddress(true).toString() + "?";
 			}
@@ -43,11 +41,14 @@ function createPlan() {
 
 		}
 
+		let firstValidStr = address.firstHost(true).toString(true);
+		let lastValidStr = address.lastHost(true).toString(true);
 		let maskStr = address.maskString();		
 		let hostsStr = '' + address.numberOfHosts().toLocaleString();
 		
 		let network = address.getNetworkAddress();
 		let broadcast = address.getBroadcastAddress();
+		
 		let networkStr = network ? network.toString() : "N/A";
 		let broadcastStr = broadcast ? broadcast.toString(true) : "N/A";
 

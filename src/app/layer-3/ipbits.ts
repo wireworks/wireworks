@@ -4,7 +4,7 @@
 // Version: 3.1 (2019-03-03)
 
 import { Byte } from "../../core/networking/byte";
-import { Address, Byte4Zero } from "../../core/networking/layers/layer-3/address";
+import { Address, Byte4Zero, joinBitIndex, splitBitIndex } from "../../core/networking/layers/layer-3/address";
 import { isCharNumeric, isStringNumeric } from "../../core/helpers/string";
 import { id, copyToClipboard } from "../../core/helpers/dom";
 import { clamp } from "../../core/helpers/math";
@@ -180,35 +180,6 @@ function loadDOMComponents(): void {
 		});		
 
 	}
-}
-
-/**
- * Converts a bit in Byte index to a bit in Byte4 index.
- * @param  {number} byteIndex The index of the Byte in a Byte4.
- * @param  {number} bitIndex The index of the bit in the Byte.
- */
-function joinBitIndex(byteIndex: number, bitIndex: number): number {
-	if (byteIndex > 3 || byteIndex < 0) {
-		throw new RangeError("The byteIndex must be between 0-3 (inclusive)");
-	}
-	if (bitIndex > 7 || bitIndex < 0) {
-		throw new RangeError("The bitIndex must be between 0-7 (inclusive)");
-	}
-	return (8 * byteIndex) + (7 - bitIndex);
-}
-
-/**
- * Converts a bit in Byte4 index to a bit in Byte index.
- * @param  {number} byte4Index The index of the bit in a Byte4.
- */
-function splitBitIndex(byte4Index: number): { byteIndex: number, bitIndex: number} {
-	if (byte4Index > 31 || byte4Index < 0) {
-		throw new RangeError("The byte4Index must be between 0-31 (inclusive)");
-	}
-	return {
-		byteIndex: Math.floor(byte4Index / 8),
-		bitIndex: 7 - (byte4Index % 8)
-	};
 }
 
 /**

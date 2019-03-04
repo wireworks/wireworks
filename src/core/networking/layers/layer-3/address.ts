@@ -53,6 +53,35 @@ export const ERROR_ADDRESS_PARSE = "AddressParseError";
 export const ERROR_NOT_NETWORK = "NotNetworkError";
 
 /**
+ * Converts a bit in Byte index to a bit in Byte4 index.
+ * @param  {number} byteIndex The index of the Byte in a Byte4.
+ * @param  {number} bitIndex The index of the bit in the Byte.
+ */
+export function joinBitIndex(byteIndex: number, bitIndex: number): number {
+	if (byteIndex > 3 || byteIndex < 0) {
+		throw new RangeError("The byteIndex must be between 0-3 (inclusive)");
+	}
+	if (bitIndex > 7 || bitIndex < 0) {
+		throw new RangeError("The bitIndex must be between 0-7 (inclusive)");
+	}
+	return (8 * byteIndex) + (7 - bitIndex);
+}
+
+/**
+ * Converts a bit in Byte4 index to a bit in Byte index.
+ * @param  {number} byte4Index The index of the bit in a Byte4.
+ */
+export function splitBitIndex(byte4Index: number): { byteIndex: number, bitIndex: number } {
+	if (byte4Index > 31 || byte4Index < 0) {
+		throw new RangeError("The byte4Index must be between 0-31 (inclusive)");
+	}
+	return {
+		byteIndex: Math.floor(byte4Index / 8),
+		bitIndex: 7 - (byte4Index % 8)
+	};
+}
+
+/**
  * A full IP/Mask address.
  * @author Henrique Colini
  */
@@ -80,8 +109,9 @@ export class Address {
 	 * @param  {Byte4|string} ip The IP of this Address. May be a Byte4 or a formatted string.
 	 * @param  {Byte4|number} mask Optional. The mask of this Address. May be a Byte4 or its numerical representation. If not given, defaults to /0.
 	 * @param  {boolean} requireMask Optional. If set to true, the mask becomes a required parameter in the formatted string.
+	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
 	 */
-	constructor(ip: Byte4 | string, mask?: Byte4 | number, requireMask: boolean = false) {
+	constructor(ip: Byte4 | string, mask?: Byte4 | number, requireMask: boolean = false, requireNetwork: boolean = false) {
 
 		if (typeof ip === "string") {
 			this.parseAddress(ip, requireMask);
@@ -102,6 +132,12 @@ export class Address {
 			else {
 				this.setMask(Byte4Zero());
 			}
+		}
+
+		if (requireNetwork && !this.isNetworkAddress(true)) {
+			let err = new Error("Not a Network Address");
+			err.name = ERROR_NOT_NETWORK;
+			throw err;
 		}
 
 	}
@@ -285,6 +321,48 @@ export class Address {
 		}
 
 		return new Address(ipBytes, maskBytes);
+
+	}
+
+	/**
+	 * Divides this Address into two subnets.
+	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
+	 */
+	public subdivide(requireNetwork: boolean = false): [Address, Address] {
+
+		if (requireNetwork && !this.isNetworkAddress(true)) {
+			let err = new Error("Not a Network Address");
+			err.name = ERROR_NOT_NETWORK;
+			throw err;
+		}
+
+		let subnets: [Address, Address] = [undefined, undefined];
+
+		if (this.maskShort === 32) {
+			return subnets;
+		}
+
+		let ipBytes: Byte4;
+
+		if (requireNetwork) {
+			ipBytes = cloneByte4(this.ip);
+		}
+		else {
+			let net = this.getNetworkAddress(true);
+			ipBytes = net.ip;
+		}
+
+		subnets[0] = new Address(cloneByte4(ipBytes), this.maskShort+1);
+		
+		let secondIpBytes: Byte4 = cloneByte4(ipBytes);
+		let {byteIndex, bitIndex} = splitBitIndex(this.maskShort);
+		secondIpBytes[byteIndex].bit(bitIndex, true);
+
+		subnets[1] = new Address(secondIpBytes, this.maskShort+1);
+
+		console.log(subnets);
+
+		return subnets;
 
 	}
 	
