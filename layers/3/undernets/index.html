@@ -18,10 +18,10 @@
 				</h1>
 				<h1><span class="lighter-text">Visualizar Sub-redes</span></h1>
 			</div>
-			<label for="ipmask">Rede/Máscara</label>
+			<label for="address">Rede/Máscara</label>
 			<h1>
-				<input type="text" name="ipmask" id="ipmask" placeholder="0.0.0.0/0" onkeydown = "if (event.keyCode == 13) start()">
-				<button type="button" onclick="start()">Visualizar Rede</button>
+				<input type="text" name="address" id="address" placeholder="0.0.0.0/0">
+				<button type="button" id="button_generate">Visualizar Rede</button>
 			</h1>
 			<div id="error_wrapper"></div>
 			<div class="blocks-wrapper">
@@ -35,7 +35,8 @@
 
 			<div class="subnet-tree" id="root_tree"></div>
 		</div>
-		<script type="text/javascript" src="../../../legacy/iptools.js"></script>
-		<script type="text/javascript" src="../../../legacy/undernets.js"></script>
+		
+		<script data-main="../../../built/src/app/layer-3/undernets" type="text/javascript" src="../../../built/require.js"></script>
+
 	</body>
 </html>
