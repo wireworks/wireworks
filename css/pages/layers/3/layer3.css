@@ -233,20 +233,33 @@ a:hover {
 }
 
 .logo {
-  background: #e7bf98;
   color: white;
   padding: 0.25em 0.4em;
   border-radius: 5px;
   user-select: none;
-  margin-right: 0.5em;
+  margin-right: 0.25em;
+}
+.logo.logo-wireworks {
+  background: #686191;
+}
+.logo.logo-primary {
+  background: #e7bf98;
 }
 .logo.logo-secondary {
   background: #C5C5C5;
 }
 
-a.logo:hover {
+a.logo:hover.logo-wireworks {
+  color: white;
+  background: #706a92;
+}
+a.logo:hover.logo-primary {
   color: white;
   background: #eccfb0;
+}
+a.logo:hover.logo-secondary {
+  color: white;
+  background: #d9d8d8;
 }
 
 h1, h2, h3, h4, h5, h6, p {
@@ -306,6 +319,40 @@ table th {
 }
 table h1:last-child, table h2:last-child, table h3:last-child {
   margin-bottom: 0;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  font-family: "Montserrat", sans-serif;
+  color: #505050;
+}
+
+h1 {
+  font-size: 30px;
+  margin-bottom: 1em;
+}
+
+h2 {
+  font-size: 20px;
+  margin-bottom: 0.5em;
+}
+
+h3, h4, h5, h6, p {
+  font-size: 16px;
+  margin-bottom: 0.5em;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.breadcrumb {
+  font-size: 30px;
+  color: #d9d8d8;
+  margin-right: 0.25em;
 }
 
 /*# sourceMappingURL=layer3.css.map */

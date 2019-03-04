@@ -1,8 +1,14 @@
-$color-primary: #686191 !default;
-$color-primary-light: #706a92 !default;
+$wireworks-color-primary: #686191;
+$wireworks-color-primary-light: #706a92;
 
-$color-secondary: #54BCDB !default;
-$color-secondary-light: #8ED0E4 !default;
+$wireworks-color-secondary: #54BCDB;
+$wireworks-color-secondary-light: #8ED0E4;
+
+$color-primary: $wireworks-color-primary !default;
+$color-primary-light: $wireworks-color-primary-light !default;
+
+$color-secondary: $wireworks-color-secondary !default;
+$color-secondary-light: $wireworks-color-secondary-light !default;
 
 $color-text: #505050 !default;
 $color-text-light: #747474 !default;

@@ -1,15 +1,7 @@
-$color-primary: #e7bf98 !default;
-$color-primary-light: #eccfb0 !default;
+@import "../utils/colors/layer3";
 
-$color-secondary: #54BCDB !default;
-$color-secondary-light: #8ED0E4 !default;
+$color-primary: $layer3-$color-primary;
+$color-primary-light: $layer3-$color-primary-light;
 
-$color-text: #505050 !default;
-$color-text-light: #747474 !default;
-$color-text-extralight: #b3b3b3 !default;
-
-$color-gray: #C5C5C5 !default;
-$color-gray-light: #d9d8d8 !default;
-
-$color-error: #b01c1c !default;
-$color-error-light: #c45151 !default;
+$color-secondary: $layer3-$color-secondary;
+$color-secondary-light: $layer3-$color-secondary-light;

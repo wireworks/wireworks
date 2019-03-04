@@ -2,12 +2,19 @@
 
 .logo {
 
-	background: $color-primary;
 	color: white;
 	padding: 0.25em 0.4em;
 	border-radius: 5px;
 	user-select: none;
-	margin-right: 0.5em;
+	margin-right: 0.25em;
+
+	&.logo-wireworks {
+		background: $wireworks-color-primary;
+	}
+
+	&.logo-primary {
+		background: $color-primary;
+	}
 
 	&.logo-secondary {
 		background: $color-gray;
@@ -16,6 +23,20 @@
 }
 
 a.logo:hover {
-	color: white;
-	background: $color-primary-light;
+	
+	&.logo-wireworks {
+		color: white;
+		background: $wireworks-color-primary-light;
+	}
+
+	&.logo-primary {
+		color: white;
+		background: $color-primary-light;
+	}
+
+	&.logo-secondary {
+		color: white;
+		background: $color-gray-light;
+	}
+
 }

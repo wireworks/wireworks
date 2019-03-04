@@ -1,0 +1,10 @@
+@import "../utils/colors/base";
+@import "../base/typography";
+
+.breadcrumb {
+	
+	font-size: $font-size-big;
+	color: $color-gray-light;
+	margin-right: 0.25em;
+
+}
