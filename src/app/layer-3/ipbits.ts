@@ -5,9 +5,9 @@
 
 import { Byte } from "../../core/networking/byte";
 import { Address, Byte4Zero, joinBitIndex, splitBitIndex } from "../../core/networking/layers/layer-3/address";
-import { isCharNumeric, isStringNumeric } from "../../core/helpers/string";
-import { id, copyToClipboard } from "../../core/helpers/dom";
-import { clamp } from "../../core/helpers/math";
+import { isCharNumeric, isStringNumeric } from "../../core/utils/string";
+import { id, copyToClipboard } from "../../core/utils/dom";
+import { clamp } from "../../core/utils/math";
 
 /**
  * The checkboxes corresponding to the IP bits.

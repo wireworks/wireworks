@@ -2,7 +2,7 @@
 // +=========================+
 // Author: Henrique Colini
 // Version: 2.0 (2019-03-03)
-define(["require", "exports", "../../core/helpers/dom", "../../core/networking/layers/layer-3/address", "../../core/networking/byte"], function (require, exports, dom_1, address_1, byte_1) {
+define(["require", "exports", "../../core/utils/dom", "../../core/networking/layers/layer-3/address", "../../core/networking/byte"], function (require, exports, dom_1, address_1, byte_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**

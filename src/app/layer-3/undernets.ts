@@ -3,9 +3,9 @@
 // Author: Henrique Colini
 // Version: 2.0 (2019-03-03)
 
-import { id } from "../../core/helpers/dom";
+import { id } from "../../core/utils/dom";
 import { Address, ERROR_NOT_NETWORK, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE } from "../../core/networking/layers/layer-3/address";
-import { removeItem } from "../../core/helpers/array";
+import { removeItem } from "../../core/utils/array";
 import { ERROR_BYTE_RANGE } from "../../core/networking/byte";
 
 /**
