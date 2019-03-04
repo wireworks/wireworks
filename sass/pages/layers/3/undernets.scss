@@ -1,0 +1,208 @@
+@import "layer3";
+
+.container {
+	padding-bottom: 20px;
+}
+
+.blocks-wrapper {
+
+    position: sticky;
+    top: 0px;
+	z-index: 100000000;
+
+	.subnet-block {
+
+		height: 100px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex: 1;
+		transition: outline-color 0.1s, box-shadow 0.2s;
+		outline: 4px dashed rgba(0,0,0,0);
+
+		&.highlight {
+			/* filter: brightness(1.2); */
+			outline: 4px dashed rgba(0,0,0,0.2);
+			box-shadow: 0 0 20px 4px rgba(0,0,0,0.1);
+			z-index: 1;
+		}
+
+	}
+
+	#root_block {
+
+		border-radius: 15px;
+		overflow: hidden;
+		margin-top: -10px;
+		border: 10px solid white;
+		margin-left: -10px;
+		margin-right: -10px;
+
+		h1 {
+
+			color: #fff;
+			margin: 0;
+			text-shadow: 2px 2px 10px rgba(0,0,0,0.25);
+
+		}
+		
+	}
+
+}
+
+.tooltip-wrapper {
+
+	position: relative;
+
+	#tooltip {
+	
+		position: absolute;
+		bottom: -30px;
+		right: 0;
+		font-size: 14px;
+		padding: 0.4em;
+		border-radius: 5px;
+		border: 1px solid #F3B780;
+		display: none;
+		background: #FFCEA1;
+		user-select: none;
+		-moz-user-select: none;
+		transition: opacity 0.1s, transform 0.1s;
+
+	}
+
+}
+
+#root_tree {
+
+	margin-top: 10px;
+
+}
+
+.subnet-tree, .subnet-tree ul, .subnet-tree li {
+	position: relative;
+}
+
+.subnet-tree {
+
+	.subnet-divide, .subnet-merge {
+		margin: 10px 0;
+	}
+
+	ul {
+
+		list-style: none;
+		padding-left: 32px;
+
+		& > li:last-child::after {
+			height: 38px;
+		}
+
+	}
+
+	li {
+
+		&::before, &::after {
+
+			content: "";
+			position: absolute;
+			left: -18px;
+
+		}
+
+		&::before {
+			border-top: 4px solid #b9afa9;
+			top: 24px;
+			width: 18px;
+			height: 0;
+		}
+
+		&::after {
+			border-left: 4px solid #b9afa9;
+			height: 100%;
+			width: 0px;
+			top: -10px;
+		}
+
+	}
+
+}
+
+.subnet-divide, .subnet-merge {
+
+	pointer-events: none;
+	display: inline-block;
+
+	&::before {
+
+		font-family: "Font Awesome 5 Free";
+		border-radius: 32px;
+		width: 32px;
+		height: 32px;
+		color: #fff;
+		display: inline-block;
+		font-size: 20px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		margin-right: 10px;
+		pointer-events: all;
+		cursor: pointer;
+		transition: background 0.2s, filter 0.2s;
+
+	}
+
+}
+
+.subnet-divide {
+
+	color: #2d453a;
+
+	&::before {
+		content: "\f337";
+	}
+
+	&:hover::before {
+		filter: brightness(1.2);
+	}
+
+	&.disabled {
+
+		filter: grayscale(0.6);
+
+		&::before {
+			cursor: auto;
+			font-size: 12px;
+			content: "\f05e";
+		}
+
+	}
+
+}
+
+.subnet-merge {
+
+	color: #b9afa9;
+
+	&::before {
+		background: #b9afa9;
+		content: "\f066";
+	}
+
+	&:hover::before {
+		background: #c9bcb3;
+	}
+
+}
+
+$colors-list: #659136 #cd4871 #00897b #8a5d4d #7a1e93 #324096 #0783bf #c97000 #cdac1b #b62f2c;
+
+@each $current-color in $colors-list {
+
+	$i: index($colors-list, $current-color) - 1;
+	
+    .subnet-block.ss-#{$i}, .subnet-divide.ss-#{$i}::before { 
+        background: $current-color;
+	}
+	
+}

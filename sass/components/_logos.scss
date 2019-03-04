@@ -1,0 +1,21 @@
+@import "../utils/colors/base";
+
+.logo {
+
+	background: $color-primary;
+	color: white;
+	padding: 0.25em 0.4em;
+	border-radius: 5px;
+	user-select: none;
+	margin-right: 0.5em;
+
+	&.logo-secondary {
+		background: $color-gray;
+	}
+
+}
+
+a.logo:hover {
+	color: white;
+	background: $color-primary-light;
+}

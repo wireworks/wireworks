@@ -139,7 +139,7 @@ h3, h4, h5, h6, p {
 
 body {
   font-family: "Montserrat", sans-serif;
-  background: #686191;
+  background: #e7bf98;
 }
 
 ul.collection {
@@ -233,7 +233,7 @@ a:hover {
 }
 
 .logo {
-  background: #686191;
+  background: #e7bf98;
   color: white;
   padding: 0.25em 0.4em;
   border-radius: 5px;
@@ -246,7 +246,7 @@ a:hover {
 
 a.logo:hover {
   color: white;
-  background: #706a92;
+  background: #eccfb0;
 }
 
 h1, h2, h3, h4, h5, h6, p {
@@ -308,4 +308,4 @@ table h1:last-child, table h2:last-child, table h3:last-child {
   margin-bottom: 0;
 }
 
-/*# sourceMappingURL=main.css.map */
+/*# sourceMappingURL=layer3.css.map */

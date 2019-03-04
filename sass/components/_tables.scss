@@ -1,0 +1,53 @@
+@import "../base/typography";
+@import "../utils/colors/base";
+
+table {
+
+	width: 100%;
+	border-radius: 5px;
+	border: 1px solid $color-gray-light;
+	margin-bottom: 1em;
+	border-collapse: separate;
+	overflow: hidden;
+
+	tr {
+
+		border-bottom: 1px solid $color-gray-light;
+
+		&:last-child {
+			border-bottom: none;
+		}
+
+	}
+
+	td,th {
+
+		text-align: center;
+		padding: 1em;
+
+	}
+
+	td {
+
+		font-family: $font-family-mono;
+		font-weight: $font-weight-light;
+		color: $color-text;
+
+	}
+
+	th {
+
+		color: $color-text;
+		border-bottom: 1px solid $color-gray-light;
+		
+	}
+
+	h1, h2, h3 {
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+	}
+
+}

@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
@@ -139,7 +140,7 @@ h3, h4, h5, h6, p {
 
 body {
   font-family: "Montserrat", sans-serif;
-  background: #686191;
+  background: #e7bf98;
 }
 
 ul.collection {
@@ -233,7 +234,7 @@ a:hover {
 }
 
 .logo {
-  background: #686191;
+  background: #e7bf98;
   color: white;
   padding: 0.25em 0.4em;
   border-radius: 5px;
@@ -246,7 +247,7 @@ a:hover {
 
 a.logo:hover {
   color: white;
-  background: #706a92;
+  background: #eccfb0;
 }
 
 h1, h2, h3, h4, h5, h6, p {
@@ -308,4 +309,186 @@ table h1:last-child, table h2:last-child, table h3:last-child {
   margin-bottom: 0;
 }
 
-/*# sourceMappingURL=main.css.map */
+.container {
+  padding-bottom: 20px;
+}
+
+.blocks-wrapper {
+  position: sticky;
+  top: 0px;
+  z-index: 100000000;
+}
+.blocks-wrapper .subnet-block {
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  transition: outline-color 0.1s, box-shadow 0.2s;
+  outline: 4px dashed rgba(0, 0, 0, 0);
+}
+.blocks-wrapper .subnet-block.highlight {
+  /* filter: brightness(1.2); */
+  outline: 4px dashed rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 20px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+.blocks-wrapper #root_block {
+  border-radius: 15px;
+  overflow: hidden;
+  margin-top: -10px;
+  border: 10px solid white;
+  margin-left: -10px;
+  margin-right: -10px;
+}
+.blocks-wrapper #root_block h1 {
+  color: #fff;
+  margin: 0;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.tooltip-wrapper {
+  position: relative;
+}
+.tooltip-wrapper #tooltip {
+  position: absolute;
+  bottom: -30px;
+  right: 0;
+  font-size: 14px;
+  padding: 0.4em;
+  border-radius: 5px;
+  border: 1px solid #F3B780;
+  display: none;
+  background: #FFCEA1;
+  user-select: none;
+  -moz-user-select: none;
+  transition: opacity 0.1s, transform 0.1s;
+}
+
+#root_tree {
+  margin-top: 10px;
+}
+
+.subnet-tree, .subnet-tree ul, .subnet-tree li {
+  position: relative;
+}
+
+.subnet-tree .subnet-divide, .subnet-tree .subnet-merge {
+  margin: 10px 0;
+}
+.subnet-tree ul {
+  list-style: none;
+  padding-left: 32px;
+}
+.subnet-tree ul > li:last-child::after {
+  height: 38px;
+}
+.subnet-tree li::before, .subnet-tree li::after {
+  content: "";
+  position: absolute;
+  left: -18px;
+}
+.subnet-tree li::before {
+  border-top: 4px solid #b9afa9;
+  top: 24px;
+  width: 18px;
+  height: 0;
+}
+.subnet-tree li::after {
+  border-left: 4px solid #b9afa9;
+  height: 100%;
+  width: 0px;
+  top: -10px;
+}
+
+.subnet-divide, .subnet-merge {
+  pointer-events: none;
+  display: inline-block;
+}
+.subnet-divide::before, .subnet-merge::before {
+  font-family: "Font Awesome 5 Free";
+  border-radius: 32px;
+  width: 32px;
+  height: 32px;
+  color: #fff;
+  display: inline-block;
+  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  pointer-events: all;
+  cursor: pointer;
+  transition: background 0.2s, filter 0.2s;
+}
+
+.subnet-divide {
+  color: #2d453a;
+}
+.subnet-divide::before {
+  content: "";
+}
+.subnet-divide:hover::before {
+  filter: brightness(1.2);
+}
+.subnet-divide.disabled {
+  filter: grayscale(0.6);
+}
+.subnet-divide.disabled::before {
+  cursor: auto;
+  font-size: 12px;
+  content: "";
+}
+
+.subnet-merge {
+  color: #b9afa9;
+}
+.subnet-merge::before {
+  background: #b9afa9;
+  content: "";
+}
+.subnet-merge:hover::before {
+  background: #c9bcb3;
+}
+
+.subnet-block.ss-0, .subnet-divide.ss-0::before {
+  background: #659136;
+}
+
+.subnet-block.ss-1, .subnet-divide.ss-1::before {
+  background: #cd4871;
+}
+
+.subnet-block.ss-2, .subnet-divide.ss-2::before {
+  background: #00897b;
+}
+
+.subnet-block.ss-3, .subnet-divide.ss-3::before {
+  background: #8a5d4d;
+}
+
+.subnet-block.ss-4, .subnet-divide.ss-4::before {
+  background: #7a1e93;
+}
+
+.subnet-block.ss-5, .subnet-divide.ss-5::before {
+  background: #324096;
+}
+
+.subnet-block.ss-6, .subnet-divide.ss-6::before {
+  background: #0783bf;
+}
+
+.subnet-block.ss-7, .subnet-divide.ss-7::before {
+  background: #c97000;
+}
+
+.subnet-block.ss-8, .subnet-divide.ss-8::before {
+  background: #cdac1b;
+}
+
+.subnet-block.ss-9, .subnet-divide.ss-9::before {
+  background: #b62f2c;
+}
+
+/*# sourceMappingURL=undernets.css.map */
