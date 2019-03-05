@@ -17,7 +17,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         table.id = "plan";
         var errStr = undefined;
         try {
-            var address = void 0;
+            var address = new address_1.Address(dom_1.id('address').value);
             try {
                 address = new address_1.Address(dom_1.id("address").value, undefined, true, true);
             }
@@ -51,6 +51,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                         break;
                     default:
                         errStr = "Erro desconhecido (" + error.name + ").";
+                        console.error(error);
                         break;
                 }
             }

@@ -25,7 +25,7 @@ function createPlan() {
 
 	try {
 		
-		let address: Address;
+		let address = new Address((<HTMLInputElement>id('address')).value);
 
 		try {
 
@@ -86,7 +86,8 @@ function createPlan() {
 					errStr = "Um ou mais octetos possui um valor alto demais (deve estar entre 0-255).";
 					break;
 				default:
-					errStr = "Erro desconhecido (" + error.name + ")."
+					errStr = "Erro desconhecido (" + error.name + ").";
+					console.error(error);
 					break;
 			}
 

@@ -77,6 +77,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                             break;
                         default:
                             errStr = "Erro desconhecido (" + error.name + ").";
+                            console.error(error);
                             break;
                     }
                 }

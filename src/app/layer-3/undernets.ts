@@ -101,6 +101,7 @@ function reset() {
 						break;
 					default:
 						errStr = "Erro desconhecido (" + error.name + ")."
+						console.error(error);
 						break;
 				}
 
