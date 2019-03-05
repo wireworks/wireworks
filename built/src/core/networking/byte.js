@@ -1,4 +1,4 @@
-define(["require", "exports"], function (require, exports) {
+define(["require", "exports", "../utils/math"], function (require, exports, math_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -29,6 +29,17 @@ define(["require", "exports"], function (require, exports) {
         return new Byte(Bit8Max());
     }
     exports.ByteMax = ByteMax;
+    function booleanArrayToBit8(arr) {
+        if (arr.length > 8) {
+            throw new RangeError("The boolean array must have a length of 8 or less");
+        }
+        var bit8 = Bit8Zero();
+        for (var i = 0; i < arr.length; i++) {
+            bit8[i] = arr[i] !== undefined ? arr[i] : false;
+        }
+        return bit8;
+    }
+    exports.booleanArrayToBit8 = booleanArrayToBit8;
     /**
      * Error name for a byte outside the correct range.
      */
@@ -56,18 +67,12 @@ define(["require", "exports"], function (require, exports) {
          * @param  {number} decimal
          */
         Byte.prototype.setDecimal = function (decimal) {
-            if (decimal < 0 || decimal > 255 || decimal.toString().indexOf('.') !== -1) {
+            if (decimal < 0 || decimal > 255 || decimal !== Math.floor(decimal)) {
                 var err = new RangeError("The decimal value of a byte must be an integer between 0-255 (inclusive)");
                 err.name = exports.ERROR_BYTE_RANGE;
                 throw err;
             }
-            var tmpDecimal = decimal;
-            var tmpBits = Bit8Zero();
-            for (var i = 0; i < 8; i++) {
-                tmpBits[i] = tmpDecimal % 2 ? true : false;
-                tmpDecimal = Math.floor(tmpDecimal / 2);
-            }
-            this.bits = tmpBits;
+            this.bits = booleanArrayToBit8(math_1.decimalToBinary(decimal));
             this.decimal = decimal;
         };
         /**
@@ -75,10 +80,8 @@ define(["require", "exports"], function (require, exports) {
          * @param  {Bit8} bits
          */
         Byte.prototype.setBits = function (bits) {
-            this.decimal = 0;
             this.bits = bits;
-            for (var i = 0; i < bits.length; i++)
-                this.decimal += this.bits[i] ? Math.pow(2, i) : 0;
+            this.decimal = math_1.binaryToDecimal(bits);
         };
         /**
          * Returns this Byte's numeric value.

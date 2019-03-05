@@ -1,3 +1,5 @@
+import { decimalToBinary, binaryToDecimal } from "../utils/math";
+
 /**
  * An array of 8 bits (boolean values).
  */
@@ -29,6 +31,17 @@ export function ByteZero(): Byte {
  */
 export function ByteMax(): Byte {
 	return new Byte(Bit8Max());
+}
+
+export function booleanArrayToBit8 (arr: boolean[]): Bit8 {
+	if (arr.length > 8) {
+		throw new RangeError("The boolean array must have a length of 8 or less");
+	}
+	let bit8: Bit8 = Bit8Zero();
+	for (let i = 0; i < arr.length; i++) {
+		bit8[i] = arr[i] !== undefined ? arr[i] : false;
+	}
+	return bit8;
 }
 
 /**
@@ -76,21 +89,13 @@ export class Byte {
 
 	setDecimal(decimal: number): void {
 
-		if (decimal < 0 || decimal > 255 || decimal.toString().indexOf('.') !== -1) {
+		if (decimal < 0 || decimal > 255 || decimal !== Math.floor(decimal)) {
 			let err = new RangeError("The decimal value of a byte must be an integer between 0-255 (inclusive)");
 			err.name = ERROR_BYTE_RANGE;
 			throw err;
 		}
 
-		let tmpDecimal = decimal;
-		let tmpBits: Bit8 = Bit8Zero();
-
-		for (let i = 0; i < 8; i++) {
-			tmpBits[i] = tmpDecimal % 2 ? true : false;
-			tmpDecimal = Math.floor(tmpDecimal / 2);
-		}
-
-		this.bits = tmpBits
+		this.bits = booleanArrayToBit8(decimalToBinary(decimal));
 		this.decimal = decimal;
 
 	}
@@ -102,11 +107,8 @@ export class Byte {
 
 	setBits(bits: Bit8): void {
 
-		this.decimal = 0;
 		this.bits = bits;
-
-		for (let i = 0; i < bits.length; i++)
-			this.decimal += this.bits[i] ? Math.pow(2, i) : 0;
+		this.decimal = binaryToDecimal(bits);
 
 	}
 
