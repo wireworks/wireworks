@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
@@ -56,21 +57,19 @@ table {
 h1, h2, h3, h4, h5, h6, p {
   font-family: "Montserrat", sans-serif;
   color: #505050;
+  margin-bottom: 1.5rem;
 }
 
 h1 {
   font-size: 30px;
-  margin-bottom: 1em;
 }
 
 h2 {
   font-size: 20px;
-  margin-bottom: 0.5em;
 }
 
 h3, h4, h5, h6, p {
   font-size: 16px;
-  margin-bottom: 0.5em;
 }
 
 .font-light {
@@ -81,24 +80,98 @@ h3, h4, h5, h6, p {
   font-weight: 700;
 }
 
+.font-medium {
+  font-size: 20px;
+}
+
+.font-big {
+  font-size: 30px;
+}
+
+.font-mono {
+  font-family: "Roboto Mono", monospace;
+}
+
 .text-light {
   color: #747474;
+}
+
+.text-extralight {
+  color: #b3b3b3;
 }
 
 .text-danger {
   color: #b01c1c;
 }
 
-.container {
-  margin: 60px auto;
-  background: white;
-  width: 1200px;
-  padding: 40px 30px 30px 30px;
-  border-radius: 10px;
-  box-shadow: 0px 2px 10px 2px rgba(0, 0, 0, 0.2);
+h1, h2, h3, h4, h5, h6, p {
+  font-family: "Montserrat", sans-serif;
+  color: #505050;
+  margin-bottom: 1.5rem;
 }
 
-.container > *:last-child {
+h1 {
+  font-size: 30px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3, h4, h5, h6, p {
+  font-size: 16px;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-medium {
+  font-size: 20px;
+}
+
+.font-big {
+  font-size: 30px;
+}
+
+.font-mono {
+  font-family: "Roboto Mono", monospace;
+}
+
+.container {
+  margin: 40px auto;
+  background: white;
+  width: 1200px;
+  border-radius: 15px 15px 10px 10px;
+  box-shadow: 0px 2px 6px 1px rgba(0, 0, 0, 0.2);
+}
+.container header {
+  color: white;
+  background: #eeac6b;
+  font-size: 30px;
+  padding: 0.5em;
+  border-radius: 10px 10px 0 0;
+  user-select: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.container header a {
+  color: white;
+  text-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
+  transition: text-shadow 0.5s;
+}
+.container header a:hover {
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+.container main {
+  padding: 25px;
+}
+.container main > *:last-child {
   margin-bottom: 0;
 }
 
@@ -107,26 +180,25 @@ h3, h4, h5, h6, p {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
 }
 
 h1, h2, h3, h4, h5, h6, p {
   font-family: "Montserrat", sans-serif;
   color: #505050;
+  margin-bottom: 1.5rem;
 }
 
 h1 {
   font-size: 30px;
-  margin-bottom: 1em;
 }
 
 h2 {
   font-size: 20px;
-  margin-bottom: 0.5em;
 }
 
 h3, h4, h5, h6, p {
   font-size: 16px;
-  margin-bottom: 0.5em;
 }
 
 .font-light {
@@ -137,15 +209,30 @@ h3, h4, h5, h6, p {
   font-weight: 700;
 }
 
+.font-medium {
+  font-size: 20px;
+}
+
+.font-big {
+  font-size: 30px;
+}
+
+.font-mono {
+  font-family: "Roboto Mono", monospace;
+}
+
 body {
   font-family: "Montserrat", sans-serif;
-  background: #e7bf98;
+  background: #fff4e8;
 }
 
 ul.collection {
   border-radius: 10px;
   border: 1px solid #d9d8d8;
-  margin-bottom: 30px;
+  margin-bottom: 1.5rem;
+}
+ul.collection h1, ul.collection h2, ul.collection h3, ul.collection h4, ul.collection h5, ul.collection h6, ul.collection p {
+  margin-bottom: 1rem;
 }
 ul.collection li {
   padding: 20px;
@@ -161,21 +248,19 @@ ul.collection li *:last-child {
 h1, h2, h3, h4, h5, h6, p {
   font-family: "Montserrat", sans-serif;
   color: #505050;
+  margin-bottom: 1.5rem;
 }
 
 h1 {
   font-size: 30px;
-  margin-bottom: 1em;
 }
 
 h2 {
   font-size: 20px;
-  margin-bottom: 0.5em;
 }
 
 h3, h4, h5, h6, p {
   font-size: 16px;
-  margin-bottom: 0.5em;
 }
 
 .font-light {
@@ -184,6 +269,18 @@ h3, h4, h5, h6, p {
 
 .font-bold {
   font-weight: 700;
+}
+
+.font-medium {
+  font-size: 20px;
+}
+
+.font-big {
+  font-size: 30px;
+}
+
+.font-mono {
+  font-family: "Roboto Mono", monospace;
 }
 
 input, button {
@@ -233,53 +330,36 @@ a:hover {
 }
 
 .logo {
-  color: white;
-  padding: 0.25em 0.4em;
-  border-radius: 5px;
-  user-select: none;
-  margin-right: 0.25em;
+  display: inline-flex;
+  align-content: center;
 }
-.logo.logo-wireworks {
-  background: #686191;
-}
-.logo.logo-primary {
-  background: #e7bf98;
-}
-.logo.logo-secondary {
-  background: #C5C5C5;
-}
-
-a.logo:hover.logo-wireworks {
-  color: white;
-  background: #706a92;
-}
-a.logo:hover.logo-primary {
-  color: white;
-  background: #eccfb0;
-}
-a.logo:hover.logo-secondary {
-  color: white;
-  background: #d9d8d8;
+.logo::before {
+  display: inline-block;
+  font-size: inherit;
+  width: 1em;
+  height: 1em;
+  background: url("../../../../images/logo_small_transparent.png") center center no-repeat;
+  background-size: contain;
+  margin-right: 0.5em;
+  content: "";
 }
 
 h1, h2, h3, h4, h5, h6, p {
   font-family: "Montserrat", sans-serif;
   color: #505050;
+  margin-bottom: 1.5rem;
 }
 
 h1 {
   font-size: 30px;
-  margin-bottom: 1em;
 }
 
 h2 {
   font-size: 20px;
-  margin-bottom: 0.5em;
 }
 
 h3, h4, h5, h6, p {
   font-size: 16px;
-  margin-bottom: 0.5em;
 }
 
 .font-light {
@@ -290,11 +370,23 @@ h3, h4, h5, h6, p {
   font-weight: 700;
 }
 
+.font-medium {
+  font-size: 20px;
+}
+
+.font-big {
+  font-size: 30px;
+}
+
+.font-mono {
+  font-family: "Roboto Mono", monospace;
+}
+
 table {
   width: 100%;
   border-radius: 5px;
   border: 1px solid #d9d8d8;
-  margin-bottom: 1em;
+  margin-bottom: 1.5rem;
   border-collapse: separate;
   overflow: hidden;
 }
@@ -324,21 +416,19 @@ table h1:last-child, table h2:last-child, table h3:last-child {
 h1, h2, h3, h4, h5, h6, p {
   font-family: "Montserrat", sans-serif;
   color: #505050;
+  margin-bottom: 1.5rem;
 }
 
 h1 {
   font-size: 30px;
-  margin-bottom: 1em;
 }
 
 h2 {
   font-size: 20px;
-  margin-bottom: 0.5em;
 }
 
 h3, h4, h5, h6, p {
   font-size: 16px;
-  margin-bottom: 0.5em;
 }
 
 .font-light {
@@ -349,10 +439,28 @@ h3, h4, h5, h6, p {
   font-weight: 700;
 }
 
-.breadcrumb {
+.font-medium {
+  font-size: 20px;
+}
+
+.font-big {
   font-size: 30px;
-  color: #d9d8d8;
-  margin-right: 0.25em;
+}
+
+.font-mono {
+  font-family: "Roboto Mono", monospace;
+}
+
+.breadcrumb {
+  display: inline-block;
+}
+.breadcrumb::before {
+  font-size: 25px;
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0 0.25em;
+  content: "";
 }
 
 /*# sourceMappingURL=layer3.css.map */

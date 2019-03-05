@@ -1,42 +1,21 @@
-@import "../utils/colors/base";
+@import "../utils/assets";
 
 .logo {
 
-	color: white;
-	padding: 0.25em 0.4em;
-	border-radius: 5px;
-	user-select: none;
-	margin-right: 0.25em;
+	display: inline-flex;
+	align-content: center;
 
-	&.logo-wireworks {
-		background: $wireworks-color-primary;
-	}
+	&::before {
 
-	&.logo-primary {
-		background: $color-primary;
-	}
+		display: inline-block;
+		font-size: inherit;
+		width: 1em;
+		height: 1em;		
+		background: image("logo_small_transparent.png") center center no-repeat;
+		background-size: contain;					
+		margin-right: 0.5em;
+		content: '';
 
-	&.logo-secondary {
-		background: $color-gray;
-	}
-
-}
-
-a.logo:hover {
-	
-	&.logo-wireworks {
-		color: white;
-		background: $wireworks-color-primary-light;
-	}
-
-	&.logo-primary {
-		color: white;
-		background: $color-primary-light;
-	}
-
-	&.logo-secondary {
-		color: white;
-		background: $color-gray-light;
 	}
 
 }

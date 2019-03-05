@@ -94,13 +94,13 @@ function createPlan() {
 
 		table.innerHTML = `
 				<td>
-					<h2 class="error">Entrada inválida. ${errStr}</h2>
+					<h2 class="font-mono text-danger">Entrada inválida. ${errStr}</h2>
 				</td>
 			`;
 
 	}	
 
-	id('container').appendChild(table);
+	id('plan-wrapper').appendChild(table);
 	
 }
 

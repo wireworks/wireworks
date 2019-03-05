@@ -360,8 +360,6 @@ export class Address {
 
 		subnets[1] = new Address(secondIpBytes, this.maskShort+1);
 
-		console.log(subnets);
-
 		return subnets;
 
 	}

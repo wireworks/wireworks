@@ -14,21 +14,19 @@ $font-weight-bold: 700;
 h1, h2, h3, h4, h5, h6, p {
 	font-family: $font-family-base;
 	color: $color-text;
+	margin-bottom: 1.5rem;
 }
 
 h1 {
 	font-size: $font-size-big;
-	margin-bottom: 1em;
 }
 
 h2 {
 	font-size: $font-size-medium;
-	margin-bottom: 0.5em;
 }
 
 h3, h4, h5, h6, p {
 	font-size: $font-size-base;
-	margin-bottom: 0.5em;
 }
 
 .font-light {
@@ -37,4 +35,16 @@ h3, h4, h5, h6, p {
 
 .font-bold {
 	font-weight: $font-weight-bold;
+}
+
+.font-medium {
+	font-size: $font-size-medium;
+}
+
+.font-big {
+	font-size: $font-size-big;
+}
+
+.font-mono {
+	font-family: $font-family-mono;
 }

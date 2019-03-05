@@ -287,7 +287,6 @@ define(["require", "exports", "../../byte"], function (require, exports, byte_1)
             var _a = splitBitIndex(this.maskShort), byteIndex = _a.byteIndex, bitIndex = _a.bitIndex;
             secondIpBytes[byteIndex].bit(bitIndex, true);
             subnets[1] = new Address(secondIpBytes, this.maskShort + 1);
-            console.log(subnets);
             return subnets;
         };
         /**

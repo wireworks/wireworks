@@ -1,4 +1,4 @@
-![wireworks](images/logo-readme.png)
+![wireworks](images/logo_readme.png)
 
 # wireworks.github.io
 

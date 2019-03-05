@@ -4,7 +4,11 @@ ul.collection {
 
 	border-radius: 10px;
 	border: 1px solid $color-gray-light;
-	margin-bottom: 30px;
+	margin-bottom: 1.5rem;
+
+	h1, h2, h3, h4, h5, h6, p {
+		margin-bottom: 1rem;
+	}
 
 	li {
 

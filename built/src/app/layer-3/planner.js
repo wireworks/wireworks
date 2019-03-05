@@ -54,9 +54,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                         break;
                 }
             }
-            table.innerHTML = "\n\t\t\t\t<td>\n\t\t\t\t\t<h2 class=\"error\">Entrada inv\u00E1lida. " + errStr + "</h2>\n\t\t\t\t</td>\n\t\t\t";
+            table.innerHTML = "\n\t\t\t\t<td>\n\t\t\t\t\t<h2 class=\"font-mono text-danger\">Entrada inv\u00E1lida. " + errStr + "</h2>\n\t\t\t\t</td>\n\t\t\t";
         }
-        dom_1.id('container').appendChild(table);
+        dom_1.id('plan-wrapper').appendChild(table);
     }
     // +==============================================+
     dom_1.id("address").addEventListener("keydown", function (ev) {
