@@ -61,18 +61,6 @@ define(["require", "exports", "../../core/networking/byte", "../../core/networki
                 if (evt.key === "Enter") {
                     display.blur();
                 }
-                if (display.textContent.indexOf(HIDDENCHAR) !== -1 && display.textContent.length > 1) {
-                    display.textContent = display.textContent.replace(HIDDENCHAR, "");
-                    var range = void 0, selection = void 0;
-                    if (document.createRange) {
-                        range = document.createRange();
-                        range.selectNodeContents(display);
-                        range.collapse(false);
-                        selection = window.getSelection();
-                        selection.removeAllRanges();
-                        selection.addRange(range);
-                    }
-                }
                 if (additionalKeys.indexOf(evt.key) === -1 && !string_1.isCharNumeric(evt.key)) {
                     evt.preventDefault();
                     return;
@@ -105,6 +93,18 @@ define(["require", "exports", "../../core/networking/byte", "../../core/networki
                     resultByte = minByte;
                 }
                 else {
+                    if (display.textContent.indexOf(HIDDENCHAR) !== -1 && display.textContent.length > 1) {
+                        display.textContent = display.textContent.replace(HIDDENCHAR, "");
+                        var range = void 0, selection = void 0;
+                        if (document.createRange) {
+                            range = document.createRange();
+                            range.selectNodeContents(display);
+                            range.collapse(false);
+                            selection = window.getSelection();
+                            selection.removeAllRanges();
+                            selection.addRange(range);
+                        }
+                    }
                     if (string_1.isStringNumeric(display.textContent)) {
                         var address = extractAddress();
                         var minByte = address.getIp()[i];

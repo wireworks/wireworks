@@ -79,22 +79,6 @@ function loadDOMComponents(): void {
 				display.blur();
 			}
 			
-			if (display.textContent.indexOf(HIDDENCHAR) !== -1 && display.textContent.length > 1) {
-
-				display.textContent = display.textContent.replace(HIDDENCHAR, "");
-
-				let range, selection;
-				if (document.createRange) {
-					range = document.createRange();
-					range.selectNodeContents(display);
-					range.collapse(false);
-					selection = window.getSelection();
-					selection.removeAllRanges();
-					selection.addRange(range);
-				}
-
-			}
-			
 			if (additionalKeys.indexOf(evt.key) === -1 && !isCharNumeric(evt.key)){				
 				evt.preventDefault();
 				return;
@@ -146,6 +130,22 @@ function loadDOMComponents(): void {
 
 			}
 			else {
+
+				if (display.textContent.indexOf(HIDDENCHAR) !== -1 && display.textContent.length > 1) {
+
+					display.textContent = display.textContent.replace(HIDDENCHAR, "");
+
+					let range, selection;
+					if (document.createRange) {
+						range = document.createRange();
+						range.selectNodeContents(display);
+						range.collapse(false);
+						selection = window.getSelection();
+						selection.removeAllRanges();
+						selection.addRange(range);
+					}
+
+				}
 
 				if (isStringNumeric(display.textContent)){
 
