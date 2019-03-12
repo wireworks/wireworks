@@ -3,16 +3,51 @@
 // Author: Henrique Colini
 // Version: 1.0 (2019-03-11)
 
-import { id } from "../../core/utils/dom";
+import { id, clearChildren } from "../../core/utils/dom";
 import { ERROR_ADDRESS_PARSE, Address } from "../../core/networking/layers/layer-3/address";
 import { ERROR_BYTE_RANGE } from "../../core/networking/byte";
 import { ERROR_INVALID_LABEL, ERROR_FULL_NAME_RANGE, Domain } from "../../core/networking/layers/layer-5/domain";
+import { make } from "../../core/utils/dom";
 
 const errorWrapper = id("error_wrapper");
 const treeWrapper = id("tree_wrapper");
 let rootDomain = new Domain(".", undefined);
 
-function register() {
+/**
+ * Refreshes the whole tree.
+ */
+function refreshTree(): void {
+
+	function loadTree(domain: Domain, element: HTMLElement) {
+
+		element.appendChild(make("span", "domain", domain.toString()));
+
+		let list = make("ul");
+
+		for (let i = 0; i < domain.getSubdomains().length; i++) {
+			const sub = domain.getSubdomains()[i];
+			let item = make("li");
+			loadTree(sub, item);
+			list.appendChild(item);
+		}
+
+		element.appendChild(list);
+
+	}	
+
+	let rootTree = make("li");
+
+	loadTree(rootDomain, rootTree);
+
+	clearChildren(treeWrapper);
+	treeWrapper.appendChild(rootTree);
+
+}
+
+/**
+ * Registers a domain.
+ */
+function register(): void {
 
 	let oldTable = id('error');
 
@@ -48,6 +83,8 @@ function register() {
 		curr.setAddress(address);
 
 		rootDomain.merge(tmpRoot, "override");
+
+		refreshTree();
 
 	} catch (error) {
 

@@ -2,12 +2,35 @@
 // +=========================+
 // Author: Henrique Colini
 // Version: 1.0 (2019-03-11)
-define(["require", "exports", "../../core/utils/dom", "../../core/networking/layers/layer-3/address", "../../core/networking/byte", "../../core/networking/layers/layer-5/domain"], function (require, exports, dom_1, address_1, byte_1, domain_1) {
+define(["require", "exports", "../../core/utils/dom", "../../core/networking/layers/layer-3/address", "../../core/networking/byte", "../../core/networking/layers/layer-5/domain", "../../core/utils/dom"], function (require, exports, dom_1, address_1, byte_1, domain_1, dom_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var errorWrapper = dom_1.id("error_wrapper");
     var treeWrapper = dom_1.id("tree_wrapper");
     var rootDomain = new domain_1.Domain(".", undefined);
+    /**
+     * Refreshes the whole tree.
+     */
+    function refreshTree() {
+        function loadTree(domain, element) {
+            element.appendChild(dom_2.make("span", "domain", domain.toString()));
+            var list = dom_2.make("ul");
+            for (var i = 0; i < domain.getSubdomains().length; i++) {
+                var sub = domain.getSubdomains()[i];
+                var item = dom_2.make("li");
+                loadTree(sub, item);
+                list.appendChild(item);
+            }
+            element.appendChild(list);
+        }
+        var rootTree = dom_2.make("li");
+        loadTree(rootDomain, rootTree);
+        dom_1.clearChildren(treeWrapper);
+        treeWrapper.appendChild(rootTree);
+    }
+    /**
+     * Registers a domain.
+     */
     function register() {
         var oldTable = dom_1.id('error');
         if (oldTable !== null) {
@@ -31,6 +54,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             }
             curr.setAddress(address);
             rootDomain.merge(tmpRoot, "override");
+            refreshTree();
         }
         catch (error) {
             var table = document.createElement('table');
