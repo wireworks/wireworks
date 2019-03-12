@@ -18,6 +18,14 @@ define(["require", "exports"], function (require, exports) {
      */
     exports.ERROR_ROOT_ADDRESS = "RootAddressError";
     /**
+     * Error name for a when a domain with same label but different address is found during merge.
+     */
+    exports.ERROR_MERGE_OVERLAP = "MergeOverlapError";
+    /**
+     * Error name for a when two merging domains have different labels.
+     */
+    exports.ERROR_MERGE_WRONG_ROOT = "MergeWrongRootError";
+    /**
      * A DNS domain tree.
      * @author Henrique Colini
      */
@@ -52,6 +60,39 @@ define(["require", "exports"], function (require, exports) {
             }
         }
         /**
+         * Merges two domains (combines )
+         * @param  {Domain} other The domain to be merged with this.
+         * @param  {string} overrideAddresses What to do when domains with the same labels and different addresses are found. May be "ignore", "override" or "error".
+         */
+        Domain.prototype.merge = function (other, overrideAddresses) {
+            if (overrideAddresses === void 0) { overrideAddresses = "ignore"; }
+            if (other.label !== this.label) {
+                var err = new Error("Attempting to merge domains with different roots (\"" + this.label + "\" != \"" + other.label + "\")");
+                err.name = exports.ERROR_MERGE_WRONG_ROOT;
+                throw err;
+            }
+            if (this.address !== other.address && ((this.address && !this.address.compare(other.address)) || !other.address.compare(this.address))) {
+                if (overrideAddresses === "override") {
+                    this.address = other.address;
+                }
+                if (overrideAddresses === "error") {
+                    var err = new Error("Overlapping Domain addresses");
+                    err.name = exports.ERROR_MERGE_OVERLAP;
+                    throw err;
+                }
+            }
+            for (var i = 0; i < other.subdomains.length; i++) {
+                var sub = other.subdomains[i];
+                var thisSub = this.getSubdomain(sub.label);
+                if (thisSub) {
+                    thisSub.merge(sub, overrideAddresses);
+                }
+                else {
+                    this.subdomains.push(sub);
+                }
+            }
+        };
+        /**
          * Sets the label of this Domain.
          * @param  {string} label The label to be set. Must follow naming conventions.
          */
@@ -60,18 +101,19 @@ define(["require", "exports"], function (require, exports) {
                 this.label = '';
             }
             else if (!this.parent) {
-                var err = new Error("The root domain's label must be either \".\" or undefined");
+                var err = new Error("The root domain's label must be either \".\", \"\" or undefined");
                 err.name = exports.ERROR_INVALID_ROOT_LABEL;
                 throw err;
             }
-            else if (this.parent) {
-                var err = new Error("The domain's label must not be \".\" or undefined");
+            else if ((label === '.' || label === undefined || label === "") && this.parent) {
+                var err = new Error("The domain's label must not be \".\", \"\" or undefined");
                 err.name = exports.ERROR_INVALID_LABEL;
                 throw err;
             }
             else {
+                var basicReg = /^[a-zA-Z]$/;
                 var reg = /^[a-zA-Z][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$/;
-                if (!reg.test(label)) {
+                if (!basicReg.test(label) && !reg.test(label)) {
                     var err = new Error("Domain label doesn't follow the naming standards");
                     err.name = exports.ERROR_INVALID_LABEL;
                     throw err;
@@ -166,6 +208,28 @@ define(["require", "exports"], function (require, exports) {
                 return this.label;
             }
             return this.label + "." + this.parent.getFullName();
+        };
+        /**
+         * Returns a neatly formatted string showing the whole tree. Raw method.
+         * @param  {boolean} first Whether this is the root of the tree.
+         * @param  {string} prefix The prefix of this line of the tree.
+         * @param  {boolean} isTail Whether this line is the tail of the tree.
+         */
+        Domain.prototype.getTreeStrRaw = function (first, prefix, isTail) {
+            var str = (first ? "" : (prefix + (isTail ? "└── " : "├── "))) + this.toString() + (this.address ? " <" + this.address.toString(true) + ">" : "") + "\n";
+            for (var i = 0; i < this.subdomains.length - 1; i++) {
+                str += this.subdomains[i].getTreeStrRaw(false, (first ? "" : (prefix + (isTail ? "    " : "│   "))), false);
+            }
+            if (this.subdomains.length > 0) {
+                str += this.subdomains[this.subdomains.length - 1].getTreeStrRaw(false, (first ? "" : (prefix + (isTail ? "    " : "│   "))), true);
+            }
+            return str;
+        };
+        /**
+         * Returns a neatly formatted string showing the whole tree.
+         */
+        Domain.prototype.getTreeStr = function () {
+            return this.getTreeStrRaw(true, "", true);
         };
         return Domain;
     }());

@@ -25,13 +25,26 @@
 			
 			<main>
 				
-				
-				
+				<label for="domain">Domínio</label>
+				<h1>
+					<input type="text" name="domain" id="domain" placeholder="www.exemplo.com.br">
+				</h1>
+				<label for="address">Endereço</label>
+				<h1>
+					<input type="text" name="address" id="address" placeholder="0.0.0.0">
+				</h1>
+				<h1>
+					<button type="button" id="button_add">Registrar</button>
+				</h1>
+
+				<div id="error_wrapper"></div>
+				<div id="tree_wrapper"></div>
+
 			</main>
 
 		</div>
 		
-		<script data-main="../../../built/src/app/layer-3/planner" type="text/javascript" src="../../../built/require.js"></script>
+		<script data-main="../../../built/src/app/layer-5/dnstree" type="text/javascript" src="../../../built/require.js"></script>
 
 	</body>
 </html>
