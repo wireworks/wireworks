@@ -6,14 +6,19 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var errorWrapper = dom_1.id("error_wrapper");
-    var treeWrapper = dom_1.id("tree_wrapper");
+    var rootTree = dom_1.id("root_tree");
     var rootDomain = new domain_1.Domain(".", undefined);
     /**
      * Refreshes the whole tree.
      */
     function refreshTree() {
         function loadTree(domain, element) {
-            element.appendChild(dom_2.make("span", "domain", domain.toString()));
+            var domainDOM = dom_2.make("div", "domain");
+            domainDOM.appendChild(dom_2.make("span", "label", domain.toString()));
+            if (domain.getAddress()) {
+                domainDOM.appendChild(dom_2.make("span", "address", domain.getAddress().toString(true)));
+            }
+            element.appendChild(domainDOM);
             var list = dom_2.make("ul");
             for (var i = 0; i < domain.getSubdomains().length; i++) {
                 var sub = domain.getSubdomains()[i];
@@ -23,10 +28,8 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             }
             element.appendChild(list);
         }
-        var rootTree = dom_2.make("li");
+        dom_1.clearChildren(rootTree);
         loadTree(rootDomain, rootTree);
-        dom_1.clearChildren(treeWrapper);
-        treeWrapper.appendChild(rootTree);
     }
     /**
      * Registers a domain.

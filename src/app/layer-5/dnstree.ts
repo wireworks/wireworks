@@ -10,7 +10,7 @@ import { ERROR_INVALID_LABEL, ERROR_FULL_NAME_RANGE, Domain } from "../../core/n
 import { make } from "../../core/utils/dom";
 
 const errorWrapper = id("error_wrapper");
-const treeWrapper = id("tree_wrapper");
+const rootTree = id("root_tree");
 let rootDomain = new Domain(".", undefined);
 
 /**
@@ -20,7 +20,13 @@ function refreshTree(): void {
 
 	function loadTree(domain: Domain, element: HTMLElement) {
 
-		element.appendChild(make("span", "domain", domain.toString()));
+		let domainDOM = make("div", "domain");
+		domainDOM.appendChild(make("span", "label", domain.toString()));
+		if (domain.getAddress()) {
+			domainDOM.appendChild(make("span", "address", domain.getAddress().toString(true)));
+		}
+
+		element.appendChild(domainDOM);
 
 		let list = make("ul");
 
@@ -35,12 +41,8 @@ function refreshTree(): void {
 
 	}	
 
-	let rootTree = make("li");
-
+	clearChildren(rootTree);
 	loadTree(rootDomain, rootTree);
-
-	clearChildren(treeWrapper);
-	treeWrapper.appendChild(rootTree);
 
 }
 

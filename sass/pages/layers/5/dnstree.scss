@@ -1,0 +1,87 @@
+@import "layer5";
+
+#root_tree {
+
+	margin-top: 10px;
+
+}
+
+.domain-tree,
+.domain-tree ul,
+.domain-tree li {
+	position: relative;
+}
+
+.domain-tree {
+
+	.domain {
+		
+		margin: 10px 0;
+		height: 32px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+
+		.label {
+
+			height: 32px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 32px;
+			background: #ffaa2b;
+			color: white;
+			padding: 0 1em;
+			border-radius: 16px;
+			user-select: none;
+
+		}
+
+		.address {
+
+			color: $color-text-light;
+			margin-left: 1em;
+
+		}
+
+	}
+
+	ul {
+
+		list-style: none;
+		padding-left: 32px;
+
+		&>li:last-child::after {
+			height: 38px;
+		}
+
+	}
+
+	li {
+
+		&::before,
+		&::after {
+
+			content: "";
+			position: absolute;
+			left: -18px;
+
+		}
+
+		&::before {
+			border-top: 4px solid #b9afa9;
+			top: 24px;
+			width: 18px;
+			height: 0;
+		}
+
+		&::after {
+			border-left: 4px solid #b9afa9;
+			height: 100%;
+			width: 0px;
+			top: -10px;
+		}
+
+	}
+
+}
