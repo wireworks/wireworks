@@ -61,6 +61,7 @@ define(["require", "exports"], function (require, exports) {
         }
         return dom;
     }
+    exports.make = make;
     /**
      * This removes all children from the element.
      * @param  {HTMLElement} element The parent element.
@@ -69,6 +70,7 @@ define(["require", "exports"], function (require, exports) {
         while (element.lastChild)
             element.removeChild(element.lastChild);
     }
+    exports.clearChildren = clearChildren;
     /**
      * Returns a text node, given a string.
      * @param  {string} text The text of the node.
@@ -76,4 +78,5 @@ define(["require", "exports"], function (require, exports) {
     function textNode(text) {
         return document.createTextNode(text);
     }
+    exports.textNode = textNode;
 });

@@ -41,7 +41,7 @@ export function copyToClipboard(str: string, done?: (success: boolean) => void):
  * @param  {string} text The text content of this element.
  * @param  {string} id The ID of this element.
  */
-function make(tagName: string, classes: string|string[] = undefined, text: string = undefined, id: string = undefined): HTMLElement {
+export function make(tagName: string, classes: string|string[] = undefined, text: string = undefined, id: string = undefined): HTMLElement {
 
 	let dom = document.createElement(tagName);
 	if (classes !== undefined) {
@@ -67,7 +67,7 @@ function make(tagName: string, classes: string|string[] = undefined, text: strin
  * This removes all children from the element.
  * @param  {HTMLElement} element The parent element.
  */
-function clearChildren(element: HTMLElement): void {
+export function clearChildren(element: HTMLElement): void {
 	while (element.lastChild) element.removeChild(element.lastChild);
 }
 
@@ -75,6 +75,6 @@ function clearChildren(element: HTMLElement): void {
  * Returns a text node, given a string.
  * @param  {string} text The text of the node.
  */
-function textNode(text: string): Text {
+export function textNode(text: string): Text {
 	return document.createTextNode(text);
 }
