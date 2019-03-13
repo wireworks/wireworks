@@ -85,3 +85,135 @@
 	}
 
 }
+
+.browser {
+
+	border: 2px solid #cfcfcf;
+	border-radius: 10px;
+	margin-bottom: 1.5rem;
+	overflow: hidden;
+
+	.top-bar {
+
+		display: flex;
+		align-items: center;
+		border-bottom: 2px solid #cfcfcf;
+		padding: 10px;
+		background: #f4f4f4;
+
+		.previous,
+		.next,
+		.reload {
+
+			$size: 36px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: $size;
+			height: $size;
+			border-radius: $size / 2;
+			margin-right: 5px;			
+			color: #808080;
+			transition: background 0.4s;
+
+			&:hover {
+				background: #e5e5e5;
+			}
+
+			&.disabled {
+
+				color: #c7c7c7;
+
+				&:hover {
+					background: transparent;
+				}
+
+			}
+
+		}
+
+		.address-bar {
+
+			flex: 1;
+			margin: 0;
+			height: 1.5em;
+			border: 2px solid #cfcfcf;
+			border-radius: 1.5em;
+			background: white;
+			padding: 0.2em 1em;
+			text-overflow: ellipsis;
+			font-family: 'Segoe UI', Tahoma, sans-serif;
+			font-weight: unset;
+
+			&:focus {
+				border-color: #a2d2d4;
+			}
+
+		}
+
+	}
+
+	.browser-content {
+
+		font-size: $font-size-medium;
+		min-height: 10em;
+		overflow-y: auto;
+
+		.page {
+
+			padding: 20px;
+
+			h1, h2, h3, p {
+				font-family: 'Segoe UI', Tahoma, sans-serif;
+			}
+
+			.font-bold {
+				font-weight: 500;
+			}
+
+			.separator {
+				height: 1px;
+				background: #cfcfcf;
+				margin: 20px 0;
+			}
+
+			.style-0 {
+				font-family: 'Lobster', cursive;
+				color: #b98639;
+			}
+			.style-1 {
+				font-family: 'Lobster', cursive;
+				color: #af2867;
+			}
+			.style-2 {
+				font-family: 'Boogaloo', cursive;
+				color: #2f408f;
+			}
+			.style-3 {
+				font-family: 'Boogaloo', cursive;
+				color: #206b5f;
+			}
+			.style-4 {
+				font-family: 'Kelly Slab', cursive;
+				color: #95aa20;
+			}
+			.style-5 {
+				font-family: 'Kelly Slab', cursive;
+				color: #8a3a3a;
+			}
+
+			img {
+				margin-bottom: 40px;
+			}
+
+		}
+
+	}
+
+}
+
+.hidden {
+
+	display: none !important;
+
+}

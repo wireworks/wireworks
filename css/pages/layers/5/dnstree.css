@@ -521,4 +521,111 @@ h3, h4, h5, h6, p {
   top: -10px;
 }
 
+.browser {
+  border: 2px solid #cfcfcf;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+.browser .top-bar {
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid #cfcfcf;
+  padding: 10px;
+  background: #f4f4f4;
+}
+.browser .top-bar .previous,
+.browser .top-bar .next,
+.browser .top-bar .reload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  margin-right: 5px;
+  color: #808080;
+  transition: background 0.4s;
+}
+.browser .top-bar .previous:hover,
+.browser .top-bar .next:hover,
+.browser .top-bar .reload:hover {
+  background: #e5e5e5;
+}
+.browser .top-bar .previous.disabled,
+.browser .top-bar .next.disabled,
+.browser .top-bar .reload.disabled {
+  color: #c7c7c7;
+}
+.browser .top-bar .previous.disabled:hover,
+.browser .top-bar .next.disabled:hover,
+.browser .top-bar .reload.disabled:hover {
+  background: transparent;
+}
+.browser .top-bar .address-bar {
+  flex: 1;
+  margin: 0;
+  height: 1.5em;
+  border: 2px solid #cfcfcf;
+  border-radius: 1.5em;
+  background: white;
+  padding: 0.2em 1em;
+  text-overflow: ellipsis;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-weight: unset;
+}
+.browser .top-bar .address-bar:focus {
+  border-color: #a2d2d4;
+}
+.browser .browser-content {
+  font-size: 20px;
+  min-height: 10em;
+  overflow-y: auto;
+}
+.browser .browser-content .page {
+  padding: 20px;
+}
+.browser .browser-content .page h1, .browser .browser-content .page h2, .browser .browser-content .page h3, .browser .browser-content .page p {
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+.browser .browser-content .page .font-bold {
+  font-weight: 500;
+}
+.browser .browser-content .page .separator {
+  height: 1px;
+  background: #cfcfcf;
+  margin: 20px 0;
+}
+.browser .browser-content .page .style-0 {
+  font-family: "Lobster", cursive;
+  color: #b98639;
+}
+.browser .browser-content .page .style-1 {
+  font-family: "Lobster", cursive;
+  color: #af2867;
+}
+.browser .browser-content .page .style-2 {
+  font-family: "Boogaloo", cursive;
+  color: #2f408f;
+}
+.browser .browser-content .page .style-3 {
+  font-family: "Boogaloo", cursive;
+  color: #206b5f;
+}
+.browser .browser-content .page .style-4 {
+  font-family: "Kelly Slab", cursive;
+  color: #95aa20;
+}
+.browser .browser-content .page .style-5 {
+  font-family: "Kelly Slab", cursive;
+  color: #8a3a3a;
+}
+.browser .browser-content .page img {
+  margin-bottom: 40px;
+}
+
+.hidden {
+  display: none !important;
+}
+
 /*# sourceMappingURL=dnstree.css.map */
