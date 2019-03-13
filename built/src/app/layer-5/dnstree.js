@@ -41,7 +41,6 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         }
         var errStr = undefined;
         try {
-            var address = new address_1.Address(dom_1.id('address').value);
             var parts = dom_1.id('domain').value.trim().split(".");
             var tmpRoot = new domain_1.Domain(".", undefined);
             var curr = tmpRoot;
@@ -55,8 +54,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 curr.getSubdomains().push(next);
                 curr = next;
             }
+            var address = new address_1.Address(dom_1.id('address').value);
             curr.setAddress(address);
-            rootDomain.merge(tmpRoot, "override");
+            rootDomain.merge(tmpRoot, "merge");
             refreshTree();
         }
         catch (error) {

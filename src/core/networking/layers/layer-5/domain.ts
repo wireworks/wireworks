@@ -79,11 +79,15 @@ export class Domain {
 	}
 	
 	/**
-	 * Merges two domains (combines )
-	 * @param  {Domain} other The domain to be merged with this.
-	 * @param  {string} overrideAddresses What to do when domains with the same labels and different addresses are found. May be "ignore", "override" or "error".
+	 * Merges two domains (combines their subdomains) given the original two have the same label. It has options for what to do when domains with the same labels and different addresses are found:
+	 * "ignore" - Nothing happens. The original address is kept. 
+	 * "override" - The new address replaces the old one, no matter what. 
+	 * "merge" - The new address replaces the old one only if the new one exists. 
+	 * "error" - Throws an error when this happens. 
+	 * @param  {Domain} other The domain to be merged with this. 
+	 * @param  {string} overrideAddresses What to do when domains with the same labels and different addresses are found. May be "ignore", "override", "merge" or "error".
 	 */
-	public merge(other: Domain, overrideAddresses: "ignore" | "override" | "error" = "ignore"): void {
+	public merge(other: Domain, overrideAddresses: "ignore" | "override" | "merge" | "error" = "ignore"): void {
 		
 		if (other.label !== this.label) {
 			let err = new Error(`Attempting to merge domains with different roots ("${this.label}" != "${other.label}")`);
@@ -95,6 +99,12 @@ export class Domain {
 			
 			if (overrideAddresses === "override") {
 				this.address = other.address;
+			}
+
+			if (overrideAddresses === "merge") {
+				if (other.address) {
+					this.address = other.address;
+				}
 			}
 
 			if (overrideAddresses === "error") {

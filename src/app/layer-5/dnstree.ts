@@ -61,8 +61,6 @@ function register(): void {
 
 	try {
 
-		let address = new Address((<HTMLInputElement>id('address')).value);
-
 		let parts = (<HTMLInputElement>id('domain')).value.trim().split(".");
 
 		let tmpRoot = new Domain(".", undefined);
@@ -82,9 +80,11 @@ function register(): void {
 
 		}
 
+		let address = new Address((<HTMLInputElement>id('address')).value);
+
 		curr.setAddress(address);
 
-		rootDomain.merge(tmpRoot, "override");
+		rootDomain.merge(tmpRoot, "merge");
 
 		refreshTree();
 

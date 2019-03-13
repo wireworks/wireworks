@@ -60,9 +60,13 @@ define(["require", "exports"], function (require, exports) {
             }
         }
         /**
-         * Merges two domains (combines )
+         * Merges two domains (combines their subdomains) given the original two have the same label. It has options for what to do when domains with the same labels and different addresses are found:
+         * "ignore" - Nothing happens. The original address is kept.
+         * "override" - The new address replaces the old one, no matter what.
+         * "merge" - The new address replaces the old one only if the new one exists.
+         * "error" - Throws an error when this happens.
          * @param  {Domain} other The domain to be merged with this.
-         * @param  {string} overrideAddresses What to do when domains with the same labels and different addresses are found. May be "ignore", "override" or "error".
+         * @param  {string} overrideAddresses What to do when domains with the same labels and different addresses are found. May be "ignore", "override", "merge" or "error".
          */
         Domain.prototype.merge = function (other, overrideAddresses) {
             if (overrideAddresses === void 0) { overrideAddresses = "ignore"; }
@@ -74,6 +78,11 @@ define(["require", "exports"], function (require, exports) {
             if (this.address !== other.address && ((this.address && !this.address.compare(other.address)) || !other.address.compare(this.address))) {
                 if (overrideAddresses === "override") {
                     this.address = other.address;
+                }
+                if (overrideAddresses === "merge") {
+                    if (other.address) {
+                        this.address = other.address;
+                    }
                 }
                 if (overrideAddresses === "error") {
                     var err = new Error("Overlapping Domain addresses");
