@@ -25,28 +25,28 @@
 			
 			<main>
 
-				<div class="browser">
+				<div class="browser" id="browser">
 					<div class="top-bar">
 						<div class="previous disabled" id="button_previous"><i class="fas fa-arrow-left fa-lg"></i></div>
 						<div class="next disabled" id="button_next"><i class="fas fa-arrow-right fa-lg"></i></div>
-						<div class="reload" id="button_reload"><i class="fas fa-redo-alt fa-lg"></i></div>
+						<div class="reload" id="button_refresh"><i class="fas fa-redo-alt fa-lg"></i></div>
 						<input type="text" name="address_bar" id="address_bar" class="address-bar">
 					</div>
 					<div class="browser-content">
 						
-						<div class="page hidden" id="loaded">
-							<h1 class="style-0" id="loaded-header">www.example.com</h1>
+						<div class="page hidden" id="page_loaded">
+							<h1 class="style-0" id="loaded_header">www.example.com</h1>
 							<div class="separator"></div>
 							<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae expedita dolorem eligendi perferendis voluptatem doloribus illo labore culpa.</p>
 						</div>
 
-						<div class="page hidden" id="nxdomain">
+						<div class="page hidden" id="page_nxdomain">
 							<img src="../../../images/layers/5/unreachable.png">
 							<h2 class="font-bold">Não é possível acessar esse site</h2>
 							<h3 class="text-light">Domínio inexistente</h3>
 						</div>
 
-						<div class="page hidden" id="timedout">
+						<div class="page hidden" id="page_timedout">
 							<img src="../../../images/layers/5/unreachable.png">
 							<h2 class="font-bold">Não é possível acessar esse site</h2>
 							<h3 class="text-light">O host demorou muito tempo para responder</h3>

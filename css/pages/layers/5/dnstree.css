@@ -577,6 +577,9 @@ h3, h4, h5, h6, p {
 .browser .top-bar .address-bar:focus {
   border-color: #a2d2d4;
 }
+.browser .top-bar .address-bar.address-error {
+  border-color: #df9c9c;
+}
 .browser .browser-content {
   font-size: 20px;
   min-height: 10em;
@@ -621,7 +624,7 @@ h3, h4, h5, h6, p {
   color: #8a3a3a;
 }
 .browser .browser-content .page img {
-  margin-bottom: 40px;
+  margin-bottom: 1.5rem;
 }
 
 .hidden {

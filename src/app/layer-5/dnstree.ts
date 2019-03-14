@@ -12,6 +12,98 @@ import { make } from "../../core/utils/dom";
 const errorWrapper = id("error_wrapper");
 const rootTree = id("root_tree");
 let rootDomain = new Domain(".", undefined);
+let browser = id("browser");
+let pageLoaded = id("page_loaded");
+let pageNxdomain = id("page_nxdomain");
+let pageTimedout = id("page_timedout");
+let header = id("loaded_header");
+let addressBar = id("address_bar");
+
+function refreshPage() {
+
+	try {
+		
+		addressBar.classList.remove("address-error");
+
+		let tmpRoot = new Domain(".", undefined);
+		let domain = extractDomain(tmpRoot, (<HTMLInputElement>id('address_bar')).value);
+
+		let tmpCurr: Domain = tmpRoot;
+		let curr: Domain = rootDomain;
+
+		let exit = false;
+
+		while (!exit) {
+			
+			tmpCurr = tmpCurr.getSubdomains()[0];
+			curr = curr.getSubdomain(tmpCurr.getLabel());
+
+			if (!curr || curr.getLabel() == domain.getLabel()) {
+				exit = true;
+			}
+
+		}
+
+		pageLoaded.classList.add("hidden");
+		pageNxdomain.classList.add("hidden");
+		pageTimedout.classList.add("hidden");
+
+		if (curr) {
+			
+			browser.style.cursor = "progress";
+			addressBar.style.cursor = "progress";
+
+			setTimeout(() => {
+				
+				// "hashes" a string to a "random" number
+
+				let seed = 0;
+				let fullName = curr.getFullName();
+
+				for (let i = 0; i < fullName.length; i++) {
+					seed += fullName.charCodeAt(i) * Math.pow(10, i);
+				}
+
+				let fakeRandom = Math.sin(seed) * 10000;
+				fakeRandom -= Math.floor(fakeRandom);
+
+				header.className = "style-" + Math.floor(fakeRandom * 6);
+				header.textContent = fullName;
+
+				pageLoaded.classList.remove("hidden");
+
+				browser.style.cursor = "initial";
+				addressBar.style.cursor = "initial";
+
+			}, 500);
+
+		}
+
+		else {
+
+			browser.style.cursor = "progress";
+			addressBar.style.cursor = "progress";
+
+			setTimeout(() => {
+
+				pageNxdomain.classList.remove("hidden");
+				browser.style.cursor = "initial";
+				addressBar.style.cursor = "initial";
+
+			}, 1000);
+
+		}
+
+
+	} catch (error) {
+
+		console.error(error);
+		
+		addressBar.classList.add("address-error");
+
+	}		
+
+}
 
 /**
  * Refreshes the whole tree.
@@ -46,6 +138,30 @@ function refreshTree(): void {
 
 }
 
+function extractDomain(tmpRoot: Domain, fullName: string): Domain {
+
+	let parts = fullName.trim().split(".");
+
+	let curr: Domain = tmpRoot;
+
+	for (let i = parts.length - 1; i >= 0; i--) {
+
+		if (parts[i].length === 0) {
+			let err = new Error();
+			err.name = ERROR_INVALID_LABEL;
+			throw err;
+		}
+
+		let next = new Domain(parts[i], curr);
+		curr.getSubdomains().push(next);
+		curr = next;
+
+	}
+
+	return curr;
+
+}
+
 /**
  * Registers a domain.
  */
@@ -61,28 +177,13 @@ function register(): void {
 
 	try {
 
-		let parts = (<HTMLInputElement>id('domain')).value.trim().split(".");
-
 		let tmpRoot = new Domain(".", undefined);
-		let curr: Domain = tmpRoot;
 
-		for (let i = parts.length-1; i >= 0; i--) {
-
-			if (parts[i].length === 0) {
-				let err = new Error();
-				err.name = ERROR_INVALID_LABEL;
-				throw err;
-			}
-
-			let next = new Domain(parts[i], curr);
-			curr.getSubdomains().push(next);
-			curr = next;
-
-		}
+		let domain = extractDomain(tmpRoot, (<HTMLInputElement>id('domain')).value);
 
 		let address = new Address((<HTMLInputElement>id('address')).value);
 
-		curr.setAddress(address);
+		domain.setAddress(address);
 
 		rootDomain.merge(tmpRoot, "merge");
 
@@ -142,4 +243,15 @@ id("domain").addEventListener("keydown", function (ev: KeyboardEvent): void {
 
 id("button_add").addEventListener("click", function (ev: MouseEvent): void {
 	register();
+});
+
+addressBar.addEventListener("keydown", function (ev: KeyboardEvent): void {
+	if (ev.key === "Enter"){
+		refreshPage();
+		addressBar.blur();
+	}
+});
+
+id("button_refresh").addEventListener("click", function (ev: MouseEvent): void {
+	refreshPage();
 });

@@ -149,6 +149,10 @@
 				border-color: #a2d2d4;
 			}
 
+			&.address-error {
+				border-color: #df9c9c;
+			}
+
 		}
 
 	}
@@ -203,7 +207,7 @@
 			}
 
 			img {
-				margin-bottom: 40px;
+				margin-bottom: 1.5rem;
 			}
 
 		}
