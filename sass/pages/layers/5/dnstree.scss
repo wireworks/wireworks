@@ -3,6 +3,7 @@
 #root_tree {
 
 	margin-top: 10px;
+	overflow-x: auto;
 
 }
 
@@ -214,6 +215,15 @@
 
 	}
 
+}
+
+.site-name {
+	margin-right: 1em;
+}
+
+.site-delete {
+	color: #a84545;
+	cursor: pointer;
 }
 
 .hidden {

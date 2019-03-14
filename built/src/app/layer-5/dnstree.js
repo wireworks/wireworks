@@ -5,7 +5,8 @@
 define(["require", "exports", "../../core/utils/dom", "../../core/networking/layers/layer-3/address", "../../core/networking/byte", "../../core/networking/layers/layer-5/domain", "../../core/utils/dom"], function (require, exports, dom_1, address_1, byte_1, domain_1, dom_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var errorWrapper = dom_1.id("error_wrapper");
+    var domainErrorWrapper = dom_1.id("domain_error_wrapper");
+    var siteErrorWrapper = dom_1.id("site_error_wrapper");
     var rootTree = dom_1.id("root_tree");
     var rootDomain = new domain_1.Domain(".", undefined);
     var browser = dom_1.id("browser");
@@ -14,11 +15,17 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     var pageTimedout = dom_1.id("page_timedout");
     var header = dom_1.id("loaded_header");
     var addressBar = dom_1.id("address_bar");
+    var domainName = dom_1.id("domain_name");
+    var domainAddress = dom_1.id("domain_address");
+    var siteTitle = dom_1.id("site_title");
+    var siteAddress = dom_1.id("site_address");
+    var sitesWrapper = dom_1.id("sites_wrapper");
+    var sites = [];
     function refreshPage() {
         try {
             addressBar.classList.remove("address-error");
             var tmpRoot = new domain_1.Domain(".", undefined);
-            var domain = extractDomain(tmpRoot, dom_1.id('address_bar').value);
+            var domain = extractDomain(tmpRoot, addressBar.value);
             var tmpCurr = tmpRoot;
             var curr_1 = rootDomain;
             var exit = false;
@@ -104,26 +111,89 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         }
         return curr;
     }
+    function createSite() {
+        var oldTable = dom_1.id('site_error');
+        if (oldTable !== null) {
+            oldTable.remove();
+        }
+        var errStr = undefined;
+        try {
+            var address = new address_1.Address(siteAddress.value);
+            for (var i = 0; i < sites.length; i++) {
+                if (sites[i].address.compare(address)) {
+                    errStr = "Já existe um site com esse endereço.";
+                    throw Error();
+                }
+            }
+            var name_1 = siteTitle.value.trim();
+            if (name_1 === "") {
+                errStr = "Insira o nome do site.";
+                throw Error();
+            }
+            var site_1 = {
+                name: name_1,
+                address: address,
+                color: "style-" + Math.floor(Math.random() * 6)
+            };
+            sites.push(site_1);
+            var liDOM_1 = dom_2.make("li");
+            var spacerDOM = dom_2.make("div", "spacer");
+            var contentDOM = dom_2.make("div");
+            var siteTitleDOM = dom_2.make("span", "font-medium font-bold site-name", name_1);
+            var siteAddressDOM = dom_2.make("span", "font-medium font-light", address.toString(true));
+            var deleteDOM = dom_2.make("i", "fas fa-trash fa-lg site-delete");
+            deleteDOM.addEventListener("click", function (ev) {
+                sites.splice(sites.indexOf(site_1), 1);
+                liDOM_1.remove();
+            });
+            contentDOM.appendChild(siteTitleDOM);
+            contentDOM.appendChild(siteAddressDOM);
+            spacerDOM.appendChild(contentDOM);
+            spacerDOM.appendChild(deleteDOM);
+            liDOM_1.appendChild(spacerDOM);
+            sitesWrapper.appendChild(liDOM_1);
+        }
+        catch (error) {
+            var table = document.createElement('table');
+            table.id = "site_error";
+            if (!errStr) {
+                switch (error.name) {
+                    case address_1.ERROR_ADDRESS_PARSE:
+                        errStr = "O endereço deve possuir o formato 0.0.0.0.";
+                        break;
+                    case byte_1.ERROR_BYTE_RANGE:
+                        errStr = "Um ou mais octetos do endereço possui um valor alto demais (deve estar entre 0-255).";
+                        break;
+                    default:
+                        errStr = "Erro desconhecido (" + error.name + ").";
+                        console.error(error);
+                        break;
+                }
+            }
+            table.innerHTML = "\n\t\t\t\t<td>\n\t\t\t\t\t<h2 class=\"font-mono text-danger\">Entrada inv\u00E1lida. " + errStr + "</h2>\n\t\t\t\t</td>\n\t\t\t";
+            siteErrorWrapper.appendChild(table);
+        }
+    }
     /**
      * Registers a domain.
      */
-    function register() {
-        var oldTable = dom_1.id('error');
+    function registerDomain() {
+        var oldTable = dom_1.id('domain_error');
         if (oldTable !== null) {
             oldTable.remove();
         }
         var errStr = undefined;
         try {
             var tmpRoot = new domain_1.Domain(".", undefined);
-            var domain = extractDomain(tmpRoot, dom_1.id('domain').value);
-            var address = new address_1.Address(dom_1.id('address').value);
+            var domain = extractDomain(tmpRoot, domainName.value);
+            var address = new address_1.Address(domainAddress.value);
             domain.setAddress(address);
             rootDomain.merge(tmpRoot, "merge");
             refreshTree();
         }
         catch (error) {
             var table = document.createElement('table');
-            table.id = "error";
+            table.id = "domain_error";
             if (!errStr) {
                 switch (error.name) {
                     case address_1.ERROR_ADDRESS_PARSE:
@@ -145,20 +215,31 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 }
             }
             table.innerHTML = "\n\t\t\t\t<td>\n\t\t\t\t\t<h2 class=\"font-mono text-danger\">Entrada inv\u00E1lida. " + errStr + "</h2>\n\t\t\t\t</td>\n\t\t\t";
-            errorWrapper.appendChild(table);
+            domainErrorWrapper.appendChild(table);
         }
     }
     // +==============================================+
-    dom_1.id("address").addEventListener("keydown", function (ev) {
+    dom_1.id("domain_address").addEventListener("keydown", function (ev) {
         if (ev.key === "Enter")
-            register();
+            registerDomain();
     });
-    dom_1.id("domain").addEventListener("keydown", function (ev) {
+    dom_1.id("domain_name").addEventListener("keydown", function (ev) {
         if (ev.key === "Enter")
-            register();
+            registerDomain();
     });
-    dom_1.id("button_add").addEventListener("click", function (ev) {
-        register();
+    dom_1.id("button_add_domain").addEventListener("click", function (ev) {
+        registerDomain();
+    });
+    dom_1.id("site_title").addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter")
+            createSite();
+    });
+    dom_1.id("site_address").addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter")
+            createSite();
+    });
+    dom_1.id("button_add_site").addEventListener("click", function (ev) {
+        createSite();
     });
     addressBar.addEventListener("keydown", function (ev) {
         if (ev.key === "Enter") {

@@ -34,7 +34,7 @@ define(["require", "exports"], function (require, exports) {
     /**
      * Creates an HTML element.
      * @param  {string} tagName The tag of the element, such as "div", "span", "p" etc.
-     * @param  {string|string[]} classes The classes of the element. Optional. Can be either a string or an array of strings.
+     * @param  {string} classes The classes of the element. Optional.
      * @param  {string} text The text content of this element.
      * @param  {string} id The ID of this element.
      */
@@ -44,13 +44,8 @@ define(["require", "exports"], function (require, exports) {
         if (id === void 0) { id = undefined; }
         var dom = document.createElement(tagName);
         if (classes !== undefined) {
-            if (typeof classes === "string" && classes.length > 0) {
-                classes = classes.trim().split(" ");
-            }
-            if (typeof classes === "object") {
-                for (var i = 0; i < classes.length; i++) {
-                    dom.classList.add(classes[i]);
-                }
+            if (classes.length > 0) {
+                dom.className = classes;
             }
         }
         if (text !== undefined) {

@@ -465,6 +465,7 @@ h3, h4, h5, h6, p {
 
 #root_tree {
   margin-top: 10px;
+  overflow-x: auto;
 }
 
 .domain-tree,
@@ -625,6 +626,15 @@ h3, h4, h5, h6, p {
 }
 .browser .browser-content .page img {
   margin-bottom: 1.5rem;
+}
+
+.site-name {
+  margin-right: 1em;
+}
+
+.site-delete {
+  color: #a84545;
+  cursor: pointer;
 }
 
 .hidden {
