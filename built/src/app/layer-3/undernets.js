@@ -51,10 +51,8 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                         tooltip.style.transform = "scaleY(0)";
                     });
                 }
-                while (rootBlock.lastChild)
-                    rootBlock.removeChild(rootBlock.lastChild);
-                while (rootTree.lastChild)
-                    rootTree.removeChild(rootTree.lastChild);
+                dom_1.clearChildren(rootBlock);
+                dom_1.clearChildren(rootTree);
                 rootNet = new VisualNetwork(rootAddress, undefined, "ss-0");
                 rootNet.prepElements();
                 rootBlock.appendChild(rootNet.block);
@@ -62,8 +60,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 firstTime = false;
             }
             catch (error) {
-                var table = document.createElement('table');
-                table.id = "error";
+                var table = dom_1.make("table", "", "", "error");
                 if (!errStr) {
                     switch (error.name) {
                         case address_1.ERROR_ADDRESS_PARSE:
@@ -114,9 +111,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
          */
         VisualNetwork.prototype.prepElements = function () {
             if (this.block === undefined)
-                this.block = document.createElement("div");
+                this.block = dom_1.make("div");
             if (this.treeText === undefined)
-                this.treeText = document.createElement("span");
+                this.treeText = dom_1.make("span");
             this.block.className = "subnet-block " + this.color;
             var desc = this.address.toString() + " (" + (this.address.numberOfHosts()).toLocaleString() + " host" + (this.address.numberOfHosts() == 1 ? '' : 's') + ")";
             this.block.addEventListener("mouseover", function () {
@@ -231,9 +228,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 this.subnets[1] = sub2;
                 this.block.appendChild(sub1.block);
                 this.block.appendChild(sub2.block);
-                var ul = document.createElement("ul");
-                var li1 = document.createElement("li");
-                var li2 = document.createElement("li");
+                var ul = dom_1.make("ul");
+                var li1 = dom_1.make("li");
+                var li2 = dom_1.make("li");
                 li1.appendChild(sub1.treeText);
                 li2.appendChild(sub2.treeText);
                 ul.appendChild(li1);
@@ -253,12 +250,10 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 COLOR_QUEUE.push(COLOR_QUEUE[0]);
                 COLOR_QUEUE.shift();
                 this.subnets = [undefined, undefined];
-                while (this.block.lastChild)
-                    this.block.removeChild(this.block.lastChild);
+                dom_1.clearChildren(this.block);
                 var uls = this.treeText.parentNode.getElementsByTagName('ul');
                 for (var i = 0; i < uls.length; i++) {
-                    while (uls[i].lastChild)
-                        uls[i].removeChild(uls[i].lastChild);
+                    dom_1.clearChildren(uls[i]);
                     uls[i].remove();
                 }
                 var tmpBlock = this.block.cloneNode(true);

@@ -3,7 +3,7 @@
 // Author: Henrique Colini
 // Version: 2.0 (2019-03-03)
 
-import { id } from "../../core/utils/dom";
+import { id, clearChildren, make } from "../../core/utils/dom";
 import { Address, ERROR_NOT_NETWORK, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE } from "../../core/networking/layers/layer-3/address";
 import { removeItem } from "../../core/utils/array";
 import { ERROR_BYTE_RANGE } from "../../core/networking/byte";
@@ -18,10 +18,10 @@ for (let i = 0; i < 10; i++) COLORS[i] = 'ss-'+i;
  */
 const COLOR_QUEUE = COLORS.slice();
 
-let errorWrapper = id("error_wrapper");
-let rootBlock = id("root_block");
-let rootTree = id("root_tree");
-let tooltip = id("tooltip");
+const errorWrapper = id("error_wrapper");
+const rootBlock = id("root_block");
+const rootTree = id("root_tree");
+const tooltip = id("tooltip");
 let rootNet: VisualNetwork = undefined;
 let firstTime = true;
 
@@ -68,10 +68,8 @@ function reset() {
 				});
 			}
 
-			while (rootBlock.lastChild)
-				rootBlock.removeChild(rootBlock.lastChild);
-			while (rootTree.lastChild)
-				rootTree.removeChild(rootTree.lastChild);
+			clearChildren(rootBlock);
+			clearChildren(rootTree);
 
 			rootNet = new VisualNetwork(rootAddress, undefined, "ss-0");
 
@@ -84,8 +82,7 @@ function reset() {
 
 		} catch (error) {
 			
-			let table = document.createElement('table');
-			table.id = "error";
+			let table = make("table", "", "", "error");
 
 			if (!errStr) {
 
@@ -155,10 +152,10 @@ class VisualNetwork {
 	public prepElements(): void {
 
 		if (this.block === undefined)
-			this.block = document.createElement("div");
+			this.block = make("div");
 
 		if (this.treeText === undefined)
-			this.treeText = document.createElement("span");
+			this.treeText = make("span");
 
 		this.block.className = "subnet-block " + this.color;
 
@@ -305,9 +302,9 @@ class VisualNetwork {
 			this.block.appendChild(sub1.block);
 			this.block.appendChild(sub2.block);
 
-			let ul = document.createElement("ul");
-			let li1 = document.createElement("li");
-			let li2 = document.createElement("li");
+			let ul = make("ul");
+			let li1 = make("li");
+			let li2 = make("li");
 
 			li1.appendChild(sub1.treeText);
 			li2.appendChild(sub2.treeText);
@@ -338,15 +335,12 @@ class VisualNetwork {
 
 			this.subnets = [undefined, undefined];
 
-			while (this.block.lastChild)
-				this.block.removeChild(this.block.lastChild);
+			clearChildren(this.block);
 
 			let uls = (this.treeText.parentNode as HTMLElement).getElementsByTagName('ul');
 
 			for (let i = 0; i < uls.length; i++) {
-				while (uls[i].lastChild)
-					uls[i].removeChild(uls[i].lastChild);
-
+				clearChildren(uls[i]);
 				uls[i].remove();
 			}
 

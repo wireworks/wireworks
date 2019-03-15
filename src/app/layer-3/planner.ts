@@ -3,9 +3,12 @@
 // Author: Henrique Colini
 // Version: 2.0 (2019-03-03)
 
-import { id } from "../../core/utils/dom";
+import { id, make } from "../../core/utils/dom";
 import { Address, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE, ERROR_NOT_NETWORK } from "../../core/networking/layers/layer-3/address";
 import { ERROR_BYTE_RANGE } from "../../core/networking/byte";
+
+const planWrapper = id('plan-wrapper');
+const addressDOM = (<HTMLInputElement>id('address'));
 
 /**
  * Creates the network plan table.
@@ -18,18 +21,17 @@ function createPlan() {
 		oldPlan.remove();
 	}
 
-	let table = document.createElement('table');
-	table.id = "plan";
+	let table = make("table", "", "", "plan");
 
 	let errStr: string = undefined;
 
 	try {
 		
-		let address = new Address((<HTMLInputElement>id('address')).value);
+		let address = new Address(addressDOM.value);
 
 		try {
 
-			address = new Address((<HTMLInputElement>id("address")).value, undefined, true, true);
+			address = new Address(addressDOM.value, undefined, true, true);
 
 		} catch (error) {
 
@@ -101,7 +103,7 @@ function createPlan() {
 
 	}	
 
-	id('plan-wrapper').appendChild(table);
+	planWrapper.appendChild(table);
 	
 }
 

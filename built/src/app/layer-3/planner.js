@@ -5,6 +5,8 @@
 define(["require", "exports", "../../core/utils/dom", "../../core/networking/layers/layer-3/address", "../../core/networking/byte"], function (require, exports, dom_1, address_1, byte_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var planWrapper = dom_1.id('plan-wrapper');
+    var addressDOM = dom_1.id('address');
     /**
      * Creates the network plan table.
      */
@@ -13,13 +15,12 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         if (oldPlan !== null) {
             oldPlan.remove();
         }
-        var table = document.createElement('table');
-        table.id = "plan";
+        var table = dom_1.make("table", "", "", "plan");
         var errStr = undefined;
         try {
-            var address = new address_1.Address(dom_1.id('address').value);
+            var address = new address_1.Address(addressDOM.value);
             try {
-                address = new address_1.Address(dom_1.id("address").value, undefined, true, true);
+                address = new address_1.Address(addressDOM.value, undefined, true, true);
             }
             catch (error) {
                 if (error.name === address_1.ERROR_NOT_NETWORK) {
@@ -57,7 +58,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             }
             table.innerHTML = "\n\t\t\t\t<td>\n\t\t\t\t\t<h2 class=\"font-mono text-danger\">Entrada inv\u00E1lida. " + errStr + "</h2>\n\t\t\t\t</td>\n\t\t\t";
         }
-        dom_1.id('plan-wrapper').appendChild(table);
+        planWrapper.appendChild(table);
     }
     // +==============================================+
     dom_1.id("address").addEventListener("keydown", function (ev) {
