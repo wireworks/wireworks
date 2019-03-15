@@ -61,7 +61,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 while (!exit) {
                     tmpCurr = tmpCurr.getSubdomains()[0];
                     curr = curr.getSubdomain(tmpCurr.getLabel());
-                    if (!curr || curr.getLabel() == domain_2.getLabel()) {
+                    if (!curr || curr.getFullName() == domain_2.getFullName()) {
                         exit = true;
                     }
                 }

@@ -88,11 +88,11 @@ function refreshBrowser(): void {
 			let exit = false;
 
 			while (!exit) {
-
+				
 				tmpCurr = tmpCurr.getSubdomains()[0];
 				curr = curr.getSubdomain(tmpCurr.getLabel());
 
-				if (!curr || curr.getLabel() == domain.getLabel()) {
+				if (!curr || curr.getFullName() == domain.getFullName()) {
 					exit = true;
 				}
 
