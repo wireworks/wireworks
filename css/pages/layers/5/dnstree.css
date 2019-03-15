@@ -1,0 +1,662 @@
+@charset "UTF-8";
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+  box-sizing: border-box;
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+body {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: "";
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  font-family: "Montserrat", sans-serif;
+  color: #505050;
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  font-size: 30px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3, h4, h5, h6, p {
+  font-size: 16px;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-medium {
+  font-size: 20px;
+}
+
+.font-big {
+  font-size: 30px;
+}
+
+.font-mono {
+  font-family: "Roboto Mono", monospace;
+}
+
+.text-light {
+  color: #747474;
+}
+
+.text-extralight {
+  color: #b3b3b3;
+}
+
+.text-danger {
+  color: #b01c1c;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  font-family: "Montserrat", sans-serif;
+  color: #505050;
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  font-size: 30px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3, h4, h5, h6, p {
+  font-size: 16px;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-medium {
+  font-size: 20px;
+}
+
+.font-big {
+  font-size: 30px;
+}
+
+.font-mono {
+  font-family: "Roboto Mono", monospace;
+}
+
+.container {
+  margin: 40px auto;
+  background: white;
+  width: 1200px;
+  border-radius: 15px 15px 10px 10px;
+  box-shadow: 0px 2px 6px 1px rgba(0, 0, 0, 0.2);
+}
+.container header {
+  color: white;
+  background: #4cc7b7;
+  font-size: 30px;
+  padding: 0.5em;
+  border-radius: 10px 10px 0 0;
+  user-select: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.container header a {
+  color: white;
+  text-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
+  transition: text-shadow 0.5s;
+}
+.container header a:hover {
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+.container main {
+  padding: 25px;
+}
+.container main > *:last-child {
+  margin-bottom: 0;
+}
+
+.spacer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  font-family: "Montserrat", sans-serif;
+  color: #505050;
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  font-size: 30px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3, h4, h5, h6, p {
+  font-size: 16px;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-medium {
+  font-size: 20px;
+}
+
+.font-big {
+  font-size: 30px;
+}
+
+.font-mono {
+  font-family: "Roboto Mono", monospace;
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+  background: #eff7f6;
+}
+
+ul.collection {
+  border-radius: 10px;
+  border: 1px solid #d9d8d8;
+  margin-bottom: 1.5rem;
+}
+ul.collection h1, ul.collection h2, ul.collection h3, ul.collection h4, ul.collection h5, ul.collection h6, ul.collection p {
+  margin-bottom: 1rem;
+}
+ul.collection li {
+  padding: 20px;
+  border-bottom: 1px solid #d9d8d8;
+}
+ul.collection li:last-child {
+  border-bottom: none;
+}
+ul.collection li *:last-child {
+  margin-bottom: 0;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  font-family: "Montserrat", sans-serif;
+  color: #505050;
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  font-size: 30px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3, h4, h5, h6, p {
+  font-size: 16px;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-medium {
+  font-size: 20px;
+}
+
+.font-big {
+  font-size: 30px;
+}
+
+.font-mono {
+  font-family: "Roboto Mono", monospace;
+}
+
+input, button {
+  border: none;
+  outline: none;
+  background: none;
+  font-family: inherit;
+  font-size: 20px;
+}
+
+input[type=text] {
+  padding: 0.25em;
+  border: 2px solid #54BCDB;
+  border-radius: 5px;
+  font-family: "Roboto Mono", monospace;
+  font-weight: 300;
+  color: #505050;
+  margin-right: 0.5em;
+}
+input[type=text]::placeholder {
+  color: #b3b3b3;
+}
+
+button {
+  color: white;
+  background: #54BCDB;
+  border-radius: 5px;
+  padding: 0.4em 0.8em;
+  cursor: pointer;
+}
+button:hover {
+  background: #8ED0E4;
+}
+
+label {
+  font-size: 20px;
+  margin-bottom: 0.6em;
+  display: block;
+}
+
+a {
+  color: #54BCDB;
+  text-decoration: none;
+}
+a:hover {
+  color: #8ED0E4;
+}
+
+.logo {
+  display: inline-flex;
+  align-content: center;
+}
+.logo::before {
+  display: inline-block;
+  font-size: inherit;
+  width: 1em;
+  height: 1em;
+  background: url("../../../../images/logo_small_transparent.png") center center no-repeat;
+  background-size: contain;
+  margin-right: 0.5em;
+  content: "";
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  font-family: "Montserrat", sans-serif;
+  color: #505050;
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  font-size: 30px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3, h4, h5, h6, p {
+  font-size: 16px;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-medium {
+  font-size: 20px;
+}
+
+.font-big {
+  font-size: 30px;
+}
+
+.font-mono {
+  font-family: "Roboto Mono", monospace;
+}
+
+table {
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid #d9d8d8;
+  margin-bottom: 1.5rem;
+  border-collapse: separate;
+  overflow: hidden;
+}
+table tr {
+  border-bottom: 1px solid #d9d8d8;
+}
+table tr:last-child {
+  border-bottom: none;
+}
+table td, table th {
+  text-align: center;
+  padding: 1em;
+}
+table td {
+  font-family: "Roboto Mono", monospace;
+  font-weight: 300;
+  color: #505050;
+}
+table th {
+  color: #505050;
+  border-bottom: 1px solid #d9d8d8;
+}
+table h1:last-child, table h2:last-child, table h3:last-child {
+  margin-bottom: 0;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  font-family: "Montserrat", sans-serif;
+  color: #505050;
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  font-size: 30px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3, h4, h5, h6, p {
+  font-size: 16px;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-medium {
+  font-size: 20px;
+}
+
+.font-big {
+  font-size: 30px;
+}
+
+.font-mono {
+  font-family: "Roboto Mono", monospace;
+}
+
+.breadcrumb {
+  display: inline-block;
+}
+.breadcrumb::before {
+  font-size: 25px;
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0 0.25em;
+  content: "";
+}
+
+#root_tree {
+  margin-top: 10px;
+  overflow-x: auto;
+}
+
+.domain-tree,
+.domain-tree ul,
+.domain-tree li {
+  position: relative;
+}
+
+.domain-tree .domain {
+  margin: 10px 0;
+  height: 32px;
+  display: inline-flex;
+  width: 100%;
+  align-items: center;
+}
+.domain-tree .domain .label {
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  background: #ffaa2b;
+  color: white;
+  padding: 0 1em;
+  border-radius: 16px;
+  user-select: none;
+}
+.domain-tree .domain .address {
+  color: #747474;
+  margin-left: 1em;
+}
+.domain-tree .domain .domain-delete,
+.domain-tree .domain .domain-address-delete {
+  margin-left: 1em;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.domain-tree .domain .domain-delete {
+  color: rgba(255, 170, 43, 0);
+}
+.domain-tree .domain .domain-address-delete {
+  color: rgba(116, 116, 116, 0);
+}
+.domain-tree .domain:hover .domain-delete {
+  color: #ffaa2b;
+}
+.domain-tree .domain:hover .domain-address-delete {
+  color: #747474;
+}
+.domain-tree ul {
+  list-style: none;
+  padding-left: 32px;
+}
+.domain-tree ul > li:last-child::after {
+  height: 38px;
+}
+.domain-tree li::before, .domain-tree li::after {
+  content: "";
+  position: absolute;
+  left: -18px;
+}
+.domain-tree li::before {
+  border-top: 4px solid #b9afa9;
+  top: 24px;
+  width: 18px;
+  height: 0;
+}
+.domain-tree li::after {
+  border-left: 4px solid #b9afa9;
+  height: 100%;
+  width: 0px;
+  top: -10px;
+}
+
+.browser {
+  border: 2px solid #cfcfcf;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+.browser .top-bar {
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid #cfcfcf;
+  padding: 10px;
+  background: #f4f4f4;
+}
+.browser .top-bar .previous,
+.browser .top-bar .next,
+.browser .top-bar .reload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  margin-right: 5px;
+  color: #808080;
+  transition: background 0.4s;
+}
+.browser .top-bar .previous:hover,
+.browser .top-bar .next:hover,
+.browser .top-bar .reload:hover {
+  background: #e5e5e5;
+}
+.browser .top-bar .previous.disabled,
+.browser .top-bar .next.disabled,
+.browser .top-bar .reload.disabled {
+  color: #c7c7c7;
+}
+.browser .top-bar .previous.disabled:hover,
+.browser .top-bar .next.disabled:hover,
+.browser .top-bar .reload.disabled:hover {
+  background: transparent;
+}
+.browser .top-bar .address-bar {
+  flex: 1;
+  margin: 0;
+  height: 1.5em;
+  border: 2px solid #cfcfcf;
+  border-radius: 1.5em;
+  background: white;
+  padding: 0.2em 1em;
+  text-overflow: ellipsis;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-weight: unset;
+}
+.browser .top-bar .address-bar:focus {
+  border-color: #a2d2d4;
+}
+.browser .top-bar .address-bar.address-error {
+  border-color: #df9c9c;
+}
+.browser .browser-content {
+  font-size: 20px;
+  min-height: 10em;
+  overflow-y: auto;
+}
+.browser .browser-content .page {
+  padding: 20px;
+}
+.browser .browser-content .page h1, .browser .browser-content .page h2, .browser .browser-content .page h3, .browser .browser-content .page p {
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+.browser .browser-content .page .font-bold {
+  font-weight: 500;
+}
+.browser .browser-content .page .separator {
+  height: 1px;
+  background: #cfcfcf;
+  margin: 20px 0;
+}
+.browser .browser-content .page .style-0 {
+  font-family: "Lobster", cursive;
+  color: #b98639;
+}
+.browser .browser-content .page .style-1 {
+  font-family: "Lobster", cursive;
+  color: #af2867;
+}
+.browser .browser-content .page .style-2 {
+  font-family: "Boogaloo", cursive;
+  color: #2f408f;
+}
+.browser .browser-content .page .style-3 {
+  font-family: "Boogaloo", cursive;
+  color: #206b5f;
+}
+.browser .browser-content .page .style-4 {
+  font-family: "Kelly Slab", cursive;
+  color: #95aa20;
+}
+.browser .browser-content .page .style-5 {
+  font-family: "Kelly Slab", cursive;
+  color: #8a3a3a;
+}
+.browser .browser-content .page img {
+  margin-bottom: 1.5rem;
+}
+
+.site-name {
+  margin-right: 1em;
+}
+
+.site-delete {
+  color: #a84545;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/*# sourceMappingURL=dnstree.css.map */
