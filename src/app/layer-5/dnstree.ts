@@ -9,67 +9,76 @@ import { ERROR_BYTE_RANGE } from "../../core/networking/byte";
 import { ERROR_INVALID_LABEL, ERROR_FULL_NAME_RANGE, Domain } from "../../core/networking/layers/layer-5/domain";
 import { make } from "../../core/utils/dom";
 
-const domainErrorWrapper = id("domain_error_wrapper");
-const siteErrorWrapper = id("site_error_wrapper");
-const rootTree = id("root_tree");
 let rootDomain = new Domain(".", undefined);
-let browser = id("browser");
-let pageLoaded = id("page_loaded");
-let pageNxdomain = id("page_nxdomain");
-let nxdomainDescription = id("nxdomain_description");
-let pageTimedout = id("page_timedout");
-let timedoutDescription = id("timedout_description");
-let header = id("loaded_header");
-let addressBar = id("address_bar");
-let domainName = id("domain_name");
-let domainAddress = id("domain_address");
-let siteTitle = id("site_title");
-let siteAddress = id("site_address");
-let sitesWrapper = id("sites_wrapper");
 
-type Site = { name: string, address: Address, color: string };
+const domainErrorWrapperDOM = id("domain_error_wrapper");
+const siteErrorWrapperDOM = id("site_error_wrapper");
+const rootTreeDOM = id("root_tree");
+const browserDOM = id("browser");
+const pageLoadedDOM = id("page_loaded");
+const pageNxdomainDOM = id("page_nxdomain");
+const nxdomainDescriptionDOM = id("nxdomain_description");
+const pageTimedoutDOM = id("page_timedout");
+const timedoutDescriptionDOM = id("timedout_description");
+const headerDOM = id("loaded_header");
+const addressBarDOM = id("address_bar");
+const domainNameDOM = id("domain_name");
+const domainAddressDOM = id("domain_address");
+const siteTitleDOM = id("site_title");
+const siteAddressDOM = id("site_address");
+const sitesWrapperDOM = id("sites_wrapper");
+
+/**
+ * An alias that represents a fake website. Used only for DNSTree.
+ */
+type Site = {
+	name: string,
+	address: Address,
+	color: string
+};
 
 let sites: Site[] = [];
 
-function refreshPage() {
+/**
+ * Refreshes the fake browser window.
+ */
+function refreshBrowser(): void {
 
 	try {
 
 		let foundAddress: Address = undefined;
 		let domain: Domain = undefined;
-		
-		pageLoaded.classList.add("hidden");
-		pageNxdomain.classList.add("hidden");
-		pageTimedout.classList.add("hidden");
-		
-		browser.style.cursor = "progress";
-		addressBar.style.cursor = "progress";
+
+		pageLoadedDOM.classList.add("hidden");
+		pageNxdomainDOM.classList.add("hidden");
+		pageTimedoutDOM.classList.add("hidden");
+
+		browserDOM.style.cursor = "progress";
+		addressBarDOM.style.cursor = "progress";
 
 		try {
 
-			let str = (<HTMLInputElement>addressBar).value;
+			let str = ( < HTMLInputElement > addressBarDOM).value;
 
 			if (str === "localhost") {
 				setTimeout(() => {
 
-					timedoutDescription.innerHTML = `<span class="font-bold">localhost</span> demorou muito para responder.`;
+					timedoutDescriptionDOM.innerHTML = `<span class="font-bold">localhost</span> demorou muito para responder.`;
 
-					pageTimedout.classList.remove("hidden");
-					browser.style.cursor = "initial";
-					addressBar.style.cursor = "initial";
+					pageTimedoutDOM.classList.remove("hidden");
+					browserDOM.style.cursor = "initial";
+					addressBarDOM.style.cursor = "initial";
 
 				}, 2000);
-			}
-			else {
+			} else {
 				foundAddress = new Address(str);
 			}
 
-		}
-		catch (error) {
-			addressBar.classList.remove("address-error");
+		} catch (error) {
+			addressBarDOM.classList.remove("address-error");
 
 			let tmpRoot = new Domain(".", undefined);
-			domain = extractDomain(tmpRoot, (<HTMLInputElement>addressBar).value);
+			domain = extractDomain(tmpRoot, ( < HTMLInputElement > addressBarDOM).value);
 
 			let tmpCurr: Domain = tmpRoot;
 			let curr: Domain = rootDomain;
@@ -87,10 +96,10 @@ function refreshPage() {
 
 			}
 
-			if(curr) {
+			if (curr) {
 				foundAddress = curr.getAddress();
 			}
-			
+
 		}
 
 		if (foundAddress) {
@@ -109,51 +118,47 @@ function refreshPage() {
 
 				setTimeout(() => {
 
-					header.className = site.color;
-					header.textContent = site.name;
+					headerDOM.className = site.color;
+					headerDOM.textContent = site.name;
 
-					pageLoaded.classList.remove("hidden");
+					pageLoadedDOM.classList.remove("hidden");
 
-					browser.style.cursor = "initial";
-					addressBar.style.cursor = "initial";
+					browserDOM.style.cursor = "initial";
+					addressBarDOM.style.cursor = "initial";
 
 				}, 500);
 
-			}
-			else {
+			} else {
 
 				setTimeout(() => {
 
 					if (domain) {
-						timedoutDescription.innerHTML = `<span class="font-bold">${domain.getFullName()}</span> demorou muito para responder.`;
-					}
-					else {
-						timedoutDescription.innerHTML = `<span class="font-bold">${foundAddress.toString(true)}</span> demorou muito para responder.`;
+						timedoutDescriptionDOM.innerHTML = `<span class="font-bold">${domain.getFullName()}</span> demorou muito para responder.`;
+					} else {
+						timedoutDescriptionDOM.innerHTML = `<span class="font-bold">${foundAddress.toString(true)}</span> demorou muito para responder.`;
 					}
 
-					pageTimedout.classList.remove("hidden");
-					browser.style.cursor = "initial";
-					addressBar.style.cursor = "initial";
+					pageTimedoutDOM.classList.remove("hidden");
+					browserDOM.style.cursor = "initial";
+					addressBarDOM.style.cursor = "initial";
 
 				}, 2000);
 
 			}
 
-		}
-		else {
+		} else {
 
 			setTimeout(() => {
 
 				if (domain) {
-					nxdomainDescription.innerHTML = `Não foi possível encontrar o endereço IP do servidor de <span class="font-bold">${domain.getFullName()}</span>.`;
-				}
-				else {
-					nxdomainDescription.innerHTML = `Não foi possível encontrar o endereço IP do servidor.</span>.`;
+					nxdomainDescriptionDOM.innerHTML = `Não foi possível encontrar o endereço IP do servidor de <span class="font-bold">${domain.getFullName()}</span>.`;
+				} else {
+					nxdomainDescriptionDOM.innerHTML = `Não foi possível encontrar o endereço IP do servidor.</span>.`;
 				}
 
-				pageNxdomain.classList.remove("hidden");
-				browser.style.cursor = "initial";
-				addressBar.style.cursor = "initial";
+				pageNxdomainDOM.classList.remove("hidden");
+				browserDOM.style.cursor = "initial";
+				addressBarDOM.style.cursor = "initial";
 
 			}, 1000);
 
@@ -162,10 +167,10 @@ function refreshPage() {
 	} catch (error) {
 
 		console.error(error);
-		
-		addressBar.classList.add("address-error");
 
-	}		
+		addressBarDOM.classList.add("address-error");
+
+	}
 
 }
 
@@ -178,7 +183,7 @@ function refreshTree(): void {
 
 		let domainDOM = make("div", "domain");
 		domainDOM.appendChild(make("span", "label", domain.toString()));
-		
+
 		if (domain.getAddress()) {
 			domainDOM.appendChild(make("span", "address", domain.getAddress().toString(true)));
 		}
@@ -197,11 +202,11 @@ function refreshTree(): void {
 
 		if (domain.getAddress()) {
 			let btn = make("i", "fas fa-trash fa-lg domain-address-delete");
-			btn.addEventListener("click", function(ev: MouseEvent) {
+			btn.addEventListener("click", function (ev: MouseEvent) {
 				domain.setAddress(undefined);
 				refreshTree();
 			});
-			domainDOM.appendChild(btn);		
+			domainDOM.appendChild(btn);
 		}
 
 		element.appendChild(domainDOM);
@@ -217,21 +222,26 @@ function refreshTree(): void {
 
 		element.appendChild(list);
 
-	}	
+	}
 
-	clearChildren(rootTree);
-	
+	clearChildren(rootTreeDOM);
+
 	if (rootDomain.getSubdomains().length > 0) {
-		loadTree(rootDomain, rootTree);
+		loadTree(rootDomain, rootTreeDOM);
 	}
 
 }
 
-function extractDomain(tmpRoot: Domain, fullName: string): Domain {
+/**
+ * Extracts a Domain from a string, in the format abc.def.ghi. Returns the last subdomain.
+ * @param  {Domain} root The root domain to be used.
+ * @param  {string} fullName The full name of the domain, in the format abc.def.ghi.
+ */
+function extractDomain(root: Domain, fullName: string): Domain {
 
 	let parts = fullName.trim().split(".");
 
-	let curr: Domain = tmpRoot;
+	let curr: Domain = root;
 
 	for (let i = parts.length - 1; i >= 0; i--) {
 
@@ -251,7 +261,10 @@ function extractDomain(tmpRoot: Domain, fullName: string): Domain {
 
 }
 
-function createSite() {
+/**
+ * Creates a fake website from user input.
+ */
+function createSite(): void {
 
 	let oldTable = id('site_error');
 
@@ -263,7 +276,7 @@ function createSite() {
 
 	try {
 
-		let address = new Address((<HTMLInputElement>siteAddress).value);
+		let address = new Address(( < HTMLInputElement > siteAddressDOM).value);
 
 		for (let i = 0; i < sites.length; i++) {
 			if (sites[i].address.compare(address)) {
@@ -272,12 +285,12 @@ function createSite() {
 			}
 		}
 
-		let name = (<HTMLInputElement>siteTitle).value.trim();
+		let name = ( < HTMLInputElement > siteTitleDOM).value.trim();
 
 		if (name === "") {
 			errStr = "Insira o nome do site.";
 			throw Error();
-		}		
+		}
 
 		let site = {
 			name: name,
@@ -290,24 +303,24 @@ function createSite() {
 		let liDOM = make("li");
 		let spacerDOM = make("div", "spacer");
 		let contentDOM = make("div");
-		let siteTitleDOM = make("span", "font-medium font-bold site-name", name);
-		let siteAddressDOM = make("span", "font-medium font-light", address.toString(true));
+		let titleDOM = make("span", "font-medium font-bold site-name", name);
+		let addressDOM = make("span", "font-medium font-light", address.toString(true));
 		let deleteDOM = make("i", "fas fa-trash fa-lg site-delete");
 
-		deleteDOM.addEventListener("click", function(ev: MouseEvent) {
+		deleteDOM.addEventListener("click", function (ev: MouseEvent) {
 			sites.splice(sites.indexOf(site), 1);
 			liDOM.remove();
 		});
 
-		contentDOM.appendChild(siteTitleDOM);
-		contentDOM.appendChild(siteAddressDOM);
+		contentDOM.appendChild(titleDOM);
+		contentDOM.appendChild(addressDOM);
 
 		spacerDOM.appendChild(contentDOM);
 		spacerDOM.appendChild(deleteDOM);
 
 		liDOM.appendChild(spacerDOM);
 
-		sitesWrapper.appendChild(liDOM);
+		sitesWrapperDOM.appendChild(liDOM);
 
 	} catch (error) {
 
@@ -337,14 +350,14 @@ function createSite() {
 				</td>
 			`;
 
-		siteErrorWrapper.appendChild(table);
+		siteErrorWrapperDOM.appendChild(table);
 
 	}
 
 }
 
 /**
- * Registers a domain.
+ * Registers a domain, from user input.
  */
 function registerDomain(): void {
 
@@ -360,21 +373,19 @@ function registerDomain(): void {
 
 		let tmpRoot = new Domain(".", undefined);
 
-		let fullName = (<HTMLInputElement>domainName).value;
+		let fullName = ( < HTMLInputElement > domainNameDOM).value;
 
 		if (fullName === "localhost") {
 			errStr = "Você não pode usar esse nome.";
 			throw Error();
-		}
-		else {
+		} else {
 			let domain = extractDomain(tmpRoot, fullName);
-			let addressStr = (<HTMLInputElement>domainAddress).value.trim();
+			let addressStr = ( < HTMLInputElement > domainAddressDOM).value.trim();
 
 			if (addressStr !== "") {
 				let address = new Address(addressStr);
 				domain.setAddress(address);
-			}
-			else {
+			} else {
 				domain.setAddress(undefined);
 			}
 
@@ -419,10 +430,10 @@ function registerDomain(): void {
 				</td>
 			`;
 
-		domainErrorWrapper.appendChild(table);
+		domainErrorWrapperDOM.appendChild(table);
 
 	}
-	
+
 }
 
 // +==============================================+
@@ -455,13 +466,13 @@ id("button_add_site").addEventListener("click", function (ev: MouseEvent): void 
 	createSite();
 });
 
-addressBar.addEventListener("keydown", function (ev: KeyboardEvent): void {
-	if (ev.key === "Enter"){
-		refreshPage();
-		addressBar.blur();
+addressBarDOM.addEventListener("keydown", function (ev: KeyboardEvent): void {
+	if (ev.key === "Enter") {
+		refreshBrowser();
+		addressBarDOM.blur();
 	}
 });
 
 id("button_refresh").addEventListener("click", function (ev: MouseEvent): void {
-	refreshPage();
+	refreshBrowser();
 });

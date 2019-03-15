@@ -5,41 +5,44 @@
 define(["require", "exports", "../../core/utils/dom", "../../core/networking/layers/layer-3/address", "../../core/networking/byte", "../../core/networking/layers/layer-5/domain", "../../core/utils/dom"], function (require, exports, dom_1, address_1, byte_1, domain_1, dom_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var domainErrorWrapper = dom_1.id("domain_error_wrapper");
-    var siteErrorWrapper = dom_1.id("site_error_wrapper");
-    var rootTree = dom_1.id("root_tree");
     var rootDomain = new domain_1.Domain(".", undefined);
-    var browser = dom_1.id("browser");
-    var pageLoaded = dom_1.id("page_loaded");
-    var pageNxdomain = dom_1.id("page_nxdomain");
-    var nxdomainDescription = dom_1.id("nxdomain_description");
-    var pageTimedout = dom_1.id("page_timedout");
-    var timedoutDescription = dom_1.id("timedout_description");
-    var header = dom_1.id("loaded_header");
-    var addressBar = dom_1.id("address_bar");
-    var domainName = dom_1.id("domain_name");
-    var domainAddress = dom_1.id("domain_address");
-    var siteTitle = dom_1.id("site_title");
-    var siteAddress = dom_1.id("site_address");
-    var sitesWrapper = dom_1.id("sites_wrapper");
+    var domainErrorWrapperDOM = dom_1.id("domain_error_wrapper");
+    var siteErrorWrapperDOM = dom_1.id("site_error_wrapper");
+    var rootTreeDOM = dom_1.id("root_tree");
+    var browserDOM = dom_1.id("browser");
+    var pageLoadedDOM = dom_1.id("page_loaded");
+    var pageNxdomainDOM = dom_1.id("page_nxdomain");
+    var nxdomainDescriptionDOM = dom_1.id("nxdomain_description");
+    var pageTimedoutDOM = dom_1.id("page_timedout");
+    var timedoutDescriptionDOM = dom_1.id("timedout_description");
+    var headerDOM = dom_1.id("loaded_header");
+    var addressBarDOM = dom_1.id("address_bar");
+    var domainNameDOM = dom_1.id("domain_name");
+    var domainAddressDOM = dom_1.id("domain_address");
+    var siteTitleDOM = dom_1.id("site_title");
+    var siteAddressDOM = dom_1.id("site_address");
+    var sitesWrapperDOM = dom_1.id("sites_wrapper");
     var sites = [];
-    function refreshPage() {
+    /**
+     * Refreshes the fake browser window.
+     */
+    function refreshBrowser() {
         try {
             var foundAddress_1 = undefined;
             var domain_2 = undefined;
-            pageLoaded.classList.add("hidden");
-            pageNxdomain.classList.add("hidden");
-            pageTimedout.classList.add("hidden");
-            browser.style.cursor = "progress";
-            addressBar.style.cursor = "progress";
+            pageLoadedDOM.classList.add("hidden");
+            pageNxdomainDOM.classList.add("hidden");
+            pageTimedoutDOM.classList.add("hidden");
+            browserDOM.style.cursor = "progress";
+            addressBarDOM.style.cursor = "progress";
             try {
-                var str = addressBar.value;
+                var str = addressBarDOM.value;
                 if (str === "localhost") {
                     setTimeout(function () {
-                        timedoutDescription.innerHTML = "<span class=\"font-bold\">localhost</span> demorou muito para responder.";
-                        pageTimedout.classList.remove("hidden");
-                        browser.style.cursor = "initial";
-                        addressBar.style.cursor = "initial";
+                        timedoutDescriptionDOM.innerHTML = "<span class=\"font-bold\">localhost</span> demorou muito para responder.";
+                        pageTimedoutDOM.classList.remove("hidden");
+                        browserDOM.style.cursor = "initial";
+                        addressBarDOM.style.cursor = "initial";
                     }, 2000);
                 }
                 else {
@@ -47,9 +50,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 }
             }
             catch (error) {
-                addressBar.classList.remove("address-error");
+                addressBarDOM.classList.remove("address-error");
                 var tmpRoot = new domain_1.Domain(".", undefined);
-                domain_2 = extractDomain(tmpRoot, addressBar.value);
+                domain_2 = extractDomain(tmpRoot, addressBarDOM.value);
                 var tmpCurr = tmpRoot;
                 var curr = rootDomain;
                 var exit = false;
@@ -75,44 +78,44 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 }
                 if (exists) {
                     setTimeout(function () {
-                        header.className = site_1.color;
-                        header.textContent = site_1.name;
-                        pageLoaded.classList.remove("hidden");
-                        browser.style.cursor = "initial";
-                        addressBar.style.cursor = "initial";
+                        headerDOM.className = site_1.color;
+                        headerDOM.textContent = site_1.name;
+                        pageLoadedDOM.classList.remove("hidden");
+                        browserDOM.style.cursor = "initial";
+                        addressBarDOM.style.cursor = "initial";
                     }, 500);
                 }
                 else {
                     setTimeout(function () {
                         if (domain_2) {
-                            timedoutDescription.innerHTML = "<span class=\"font-bold\">" + domain_2.getFullName() + "</span> demorou muito para responder.";
+                            timedoutDescriptionDOM.innerHTML = "<span class=\"font-bold\">" + domain_2.getFullName() + "</span> demorou muito para responder.";
                         }
                         else {
-                            timedoutDescription.innerHTML = "<span class=\"font-bold\">" + foundAddress_1.toString(true) + "</span> demorou muito para responder.";
+                            timedoutDescriptionDOM.innerHTML = "<span class=\"font-bold\">" + foundAddress_1.toString(true) + "</span> demorou muito para responder.";
                         }
-                        pageTimedout.classList.remove("hidden");
-                        browser.style.cursor = "initial";
-                        addressBar.style.cursor = "initial";
+                        pageTimedoutDOM.classList.remove("hidden");
+                        browserDOM.style.cursor = "initial";
+                        addressBarDOM.style.cursor = "initial";
                     }, 2000);
                 }
             }
             else {
                 setTimeout(function () {
                     if (domain_2) {
-                        nxdomainDescription.innerHTML = "N\u00E3o foi poss\u00EDvel encontrar o endere\u00E7o IP do servidor de <span class=\"font-bold\">" + domain_2.getFullName() + "</span>.";
+                        nxdomainDescriptionDOM.innerHTML = "N\u00E3o foi poss\u00EDvel encontrar o endere\u00E7o IP do servidor de <span class=\"font-bold\">" + domain_2.getFullName() + "</span>.";
                     }
                     else {
-                        nxdomainDescription.innerHTML = "N\u00E3o foi poss\u00EDvel encontrar o endere\u00E7o IP do servidor.</span>.";
+                        nxdomainDescriptionDOM.innerHTML = "N\u00E3o foi poss\u00EDvel encontrar o endere\u00E7o IP do servidor.</span>.";
                     }
-                    pageNxdomain.classList.remove("hidden");
-                    browser.style.cursor = "initial";
-                    addressBar.style.cursor = "initial";
+                    pageNxdomainDOM.classList.remove("hidden");
+                    browserDOM.style.cursor = "initial";
+                    addressBarDOM.style.cursor = "initial";
                 }, 1000);
             }
         }
         catch (error) {
             console.error(error);
-            addressBar.classList.add("address-error");
+            addressBarDOM.classList.add("address-error");
         }
     }
     /**
@@ -154,14 +157,19 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             }
             element.appendChild(list);
         }
-        dom_1.clearChildren(rootTree);
+        dom_1.clearChildren(rootTreeDOM);
         if (rootDomain.getSubdomains().length > 0) {
-            loadTree(rootDomain, rootTree);
+            loadTree(rootDomain, rootTreeDOM);
         }
     }
-    function extractDomain(tmpRoot, fullName) {
+    /**
+     * Extracts a Domain from a string, in the format abc.def.ghi. Returns the last subdomain.
+     * @param  {Domain} root The root domain to be used.
+     * @param  {string} fullName The full name of the domain, in the format abc.def.ghi.
+     */
+    function extractDomain(root, fullName) {
         var parts = fullName.trim().split(".");
-        var curr = tmpRoot;
+        var curr = root;
         for (var i = parts.length - 1; i >= 0; i--) {
             if (parts[i].length === 0) {
                 var err = new Error();
@@ -174,6 +182,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         }
         return curr;
     }
+    /**
+     * Creates a fake website from user input.
+     */
     function createSite() {
         var oldTable = dom_1.id('site_error');
         if (oldTable !== null) {
@@ -181,14 +192,14 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         }
         var errStr = undefined;
         try {
-            var address = new address_1.Address(siteAddress.value);
+            var address = new address_1.Address(siteAddressDOM.value);
             for (var i = 0; i < sites.length; i++) {
                 if (sites[i].address.compare(address)) {
                     errStr = "Já existe um site com esse endereço.";
                     throw Error();
                 }
             }
-            var name_1 = siteTitle.value.trim();
+            var name_1 = siteTitleDOM.value.trim();
             if (name_1 === "") {
                 errStr = "Insira o nome do site.";
                 throw Error();
@@ -202,19 +213,19 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             var liDOM_1 = dom_2.make("li");
             var spacerDOM = dom_2.make("div", "spacer");
             var contentDOM = dom_2.make("div");
-            var siteTitleDOM = dom_2.make("span", "font-medium font-bold site-name", name_1);
-            var siteAddressDOM = dom_2.make("span", "font-medium font-light", address.toString(true));
+            var titleDOM = dom_2.make("span", "font-medium font-bold site-name", name_1);
+            var addressDOM = dom_2.make("span", "font-medium font-light", address.toString(true));
             var deleteDOM = dom_2.make("i", "fas fa-trash fa-lg site-delete");
             deleteDOM.addEventListener("click", function (ev) {
                 sites.splice(sites.indexOf(site_2), 1);
                 liDOM_1.remove();
             });
-            contentDOM.appendChild(siteTitleDOM);
-            contentDOM.appendChild(siteAddressDOM);
+            contentDOM.appendChild(titleDOM);
+            contentDOM.appendChild(addressDOM);
             spacerDOM.appendChild(contentDOM);
             spacerDOM.appendChild(deleteDOM);
             liDOM_1.appendChild(spacerDOM);
-            sitesWrapper.appendChild(liDOM_1);
+            sitesWrapperDOM.appendChild(liDOM_1);
         }
         catch (error) {
             var table = document.createElement('table');
@@ -234,11 +245,11 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 }
             }
             table.innerHTML = "\n\t\t\t\t<td>\n\t\t\t\t\t<h2 class=\"font-mono text-danger\">Entrada inv\u00E1lida. " + errStr + "</h2>\n\t\t\t\t</td>\n\t\t\t";
-            siteErrorWrapper.appendChild(table);
+            siteErrorWrapperDOM.appendChild(table);
         }
     }
     /**
-     * Registers a domain.
+     * Registers a domain, from user input.
      */
     function registerDomain() {
         var oldTable = dom_1.id('domain_error');
@@ -248,14 +259,14 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         var errStr = undefined;
         try {
             var tmpRoot = new domain_1.Domain(".", undefined);
-            var fullName = domainName.value;
+            var fullName = domainNameDOM.value;
             if (fullName === "localhost") {
                 errStr = "Você não pode usar esse nome.";
                 throw Error();
             }
             else {
                 var domain = extractDomain(tmpRoot, fullName);
-                var addressStr = domainAddress.value.trim();
+                var addressStr = domainAddressDOM.value.trim();
                 if (addressStr !== "") {
                     var address = new address_1.Address(addressStr);
                     domain.setAddress(address);
@@ -292,7 +303,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 }
             }
             table.innerHTML = "\n\t\t\t\t<td>\n\t\t\t\t\t<h2 class=\"font-mono text-danger\">Entrada inv\u00E1lida. " + errStr + "</h2>\n\t\t\t\t</td>\n\t\t\t";
-            domainErrorWrapper.appendChild(table);
+            domainErrorWrapperDOM.appendChild(table);
         }
     }
     // +==============================================+
@@ -318,13 +329,13 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     dom_1.id("button_add_site").addEventListener("click", function (ev) {
         createSite();
     });
-    addressBar.addEventListener("keydown", function (ev) {
+    addressBarDOM.addEventListener("keydown", function (ev) {
         if (ev.key === "Enter") {
-            refreshPage();
-            addressBar.blur();
+            refreshBrowser();
+            addressBarDOM.blur();
         }
     });
     dom_1.id("button_refresh").addEventListener("click", function (ev) {
-        refreshPage();
+        refreshBrowser();
     });
 });
