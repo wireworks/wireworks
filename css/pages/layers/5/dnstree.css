@@ -151,7 +151,7 @@ h3, h4, h5, h6, p {
 }
 .container header {
   color: white;
-  background: #4cc7b7;
+  background: #4cc7c7;
   font-size: 30px;
   padding: 0.5em;
   border-radius: 10px 10px 0 0;
@@ -695,7 +695,7 @@ input, button {
 
 input[type=text] {
   padding: 0.25em;
-  border: 2px solid #54BCDB;
+  border: 2px solid #e68c9f;
   border-radius: 5px;
   font-family: "Roboto Mono", monospace;
   font-weight: 300;
@@ -708,13 +708,13 @@ input[type=text]::placeholder {
 
 button {
   color: white;
-  background: #54BCDB;
+  background: #e68c9f;
   border-radius: 5px;
   padding: 0.4em 0.8em;
   cursor: pointer;
 }
 button:hover {
-  background: #8ED0E4;
+  background: #eb9bac;
 }
 
 label {
@@ -724,11 +724,11 @@ label {
 }
 
 a {
-  color: #54BCDB;
+  color: #e68c9f;
   text-decoration: none;
 }
 a:hover {
-  color: #8ED0E4;
+  color: #eb9bac;
 }
 
 .logo {
@@ -889,7 +889,7 @@ h3, h4, h5, h6, p {
   align-items: center;
   justify-content: center;
   min-width: 32px;
-  background: #ffaa2b;
+  background: #fd8f46;
   color: white;
   padding: 0 1em;
   border-radius: 16px;
@@ -906,13 +906,13 @@ h3, h4, h5, h6, p {
   transition: color 0.3s;
 }
 .domain-tree .domain .domain-delete {
-  color: rgba(255, 170, 43, 0);
+  color: rgba(253, 143, 70, 0);
 }
 .domain-tree .domain .domain-address-delete {
   color: rgba(116, 116, 116, 0);
 }
 .domain-tree .domain:hover .domain-delete {
-  color: #ffaa2b;
+  color: #fd8f46;
 }
 .domain-tree .domain:hover .domain-address-delete {
   color: #747474;
@@ -1022,27 +1022,33 @@ h3, h4, h5, h6, p {
 }
 .browser .browser-content .page .style-0 {
   font-family: "Lobster", cursive;
-  color: #b98639;
+  font-weight: 700;
+  color: #eea02b;
 }
 .browser .browser-content .page .style-1 {
   font-family: "Lobster", cursive;
-  color: #af2867;
+  font-weight: 700;
+  color: #d42c7b;
 }
 .browser .browser-content .page .style-2 {
   font-family: "Boogaloo", cursive;
-  color: #2f408f;
+  font-weight: 700;
+  color: #4864df;
 }
 .browser .browser-content .page .style-3 {
   font-family: "Boogaloo", cursive;
-  color: #206b5f;
+  font-weight: 700;
+  color: #2c9c8a;
 }
 .browser .browser-content .page .style-4 {
   font-family: "Kelly Slab", cursive;
-  color: #95aa20;
+  font-weight: 700;
+  color: #aec529;
 }
 .browser .browser-content .page .style-5 {
   font-family: "Kelly Slab", cursive;
-  color: #8a3a3a;
+  font-weight: 700;
+  color: #c54545;
 }
 .browser .browser-content .page img {
   margin-bottom: 1.5rem;

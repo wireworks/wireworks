@@ -151,7 +151,7 @@ h3, h4, h5, h6, p {
 }
 .container header {
   color: white;
-  background: #4cc7b7;
+  background: #4cc7c7;
   font-size: 30px;
   padding: 0.5em;
   border-radius: 10px 10px 0 0;
@@ -695,7 +695,7 @@ input, button {
 
 input[type=text] {
   padding: 0.25em;
-  border: 2px solid #54BCDB;
+  border: 2px solid #e68c9f;
   border-radius: 5px;
   font-family: "Roboto Mono", monospace;
   font-weight: 300;
@@ -708,13 +708,13 @@ input[type=text]::placeholder {
 
 button {
   color: white;
-  background: #54BCDB;
+  background: #e68c9f;
   border-radius: 5px;
   padding: 0.4em 0.8em;
   cursor: pointer;
 }
 button:hover {
-  background: #8ED0E4;
+  background: #eb9bac;
 }
 
 label {
@@ -724,11 +724,11 @@ label {
 }
 
 a {
-  color: #54BCDB;
+  color: #e68c9f;
   text-decoration: none;
 }
 a:hover {
-  color: #8ED0E4;
+  color: #eb9bac;
 }
 
 .logo {

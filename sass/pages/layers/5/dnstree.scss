@@ -23,6 +23,8 @@
 		width: 100%;
 		align-items: center;
 
+		$domain-color: #fd8f46;
+
 		.label {
 
 			height: 32px;
@@ -30,7 +32,7 @@
 			align-items: center;
 			justify-content: center;
 			min-width: 32px;
-			background: #ffaa2b;
+			background: $domain-color;
 			color: white;
 			padding: 0 1em;
 			border-radius: 16px;
@@ -53,7 +55,7 @@
 		}
 
 		.domain-delete {
-			color: transparentize(#ffaa2b, 1);
+			color: transparentize($domain-color, 1);
 		}
 
 		.domain-address-delete {
@@ -63,7 +65,7 @@
 		&:hover {
 
 			.domain-delete {
-				color: #ffaa2b;
+				color: $domain-color;
 			}
 
 			.domain-address-delete {
@@ -211,27 +213,33 @@
 
 			.style-0 {
 				font-family: 'Lobster', cursive;
-				color: #b98639;
+				font-weight: $font-weight-bold;
+				color: #eea02b;
 			}
 			.style-1 {
 				font-family: 'Lobster', cursive;
-				color: #af2867;
+				font-weight: $font-weight-bold;
+				color: #d42c7b;
 			}
 			.style-2 {
 				font-family: 'Boogaloo', cursive;
-				color: #2f408f;
+				font-weight: $font-weight-bold;
+				color: #4864df;
 			}
 			.style-3 {
 				font-family: 'Boogaloo', cursive;
-				color: #206b5f;
+				font-weight: $font-weight-bold;
+				color: #2c9c8a;
 			}
 			.style-4 {
 				font-family: 'Kelly Slab', cursive;
-				color: #95aa20;
+				font-weight: $font-weight-bold;
+				color: #aec529;
 			}
 			.style-5 {
 				font-family: 'Kelly Slab', cursive;
-				color: #8a3a3a;
+				font-weight: $font-weight-bold;
+				color: #c54545;
 			}
 
 			img {
