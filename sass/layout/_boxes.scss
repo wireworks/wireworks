@@ -1,7 +1,67 @@
 .spacer {
+	
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;	
-    width: 100%;
+	width: 100%;
+	
+}
+
+.vbox, .hbox {
+
+	display: flex;
+
+	&.align-center {
+		align-items: center;
+	}
+
+	&.align-start {
+		align-items: flex-start;
+	}
+
+	&.align-end {
+		align-items: flex-end;
+	}
+
+	&.align-stretch {
+		align-items: stretch;
+	}
+
+	&.align-baseline {
+		align-items: baseline;
+	}
+
+	&.justify-center {
+		justify-content: center;
+	}
+
+	&.justify-start {
+		justify-content: flex-start;
+	}
+
+	&.justify-end {
+		justify-content: flex-end;
+	}
+
+}
+
+.vbox {
+
+	flex-direction: column;
+	
+	&.reverse {
+		flex-direction: column-reverse;
+	}
+
+}
+
+.hbox {
+
+	flex-direction: row;
+	
+	&.reverse {
+		flex-direction: row-reverse;
+	}
+
 }
