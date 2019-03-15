@@ -50,7 +50,7 @@ define(["require", "exports"], function (require, exports) {
              * The IP address this Domain refers to. Undefined if this is not a hostname.
              */
             this.address = undefined;
-            this.setParent(parent);
+            this.setParent(parent, false);
             this.setAddress(address);
             this.setLabel(label);
             if (this.getFullName().length > 253) {
@@ -98,12 +98,13 @@ define(["require", "exports"], function (require, exports) {
                 }
                 else {
                     this.subdomains.push(sub);
+                    sub.setParent(this);
                 }
             }
         };
         /**
          * Sets the label of this Domain.
-         * @param  {string} label The label to be set. Must follow naming conventions.
+         * @param  {string} label The label to be set. Must follow naming conventions. If empty, the parent should be undefined.
          */
         Domain.prototype.setLabel = function (label) {
             if ((label === '.' || label === undefined || label === "") && !this.parent) {
@@ -127,20 +128,30 @@ define(["require", "exports"], function (require, exports) {
                     err.name = exports.ERROR_INVALID_LABEL;
                     throw err;
                 }
+                this.label = label;
             }
-            this.label = label;
         };
         /**
          * Sets the parent of this Domain.
          * @param  {Domain} parent The parent domain to be set. If undefined, the address must also be undefined.
+         * @param  {boolean} revalidateLabel Optional. Whether the label should also be revalidated. Defaults to true.
+         * @param  {boolean} detach Optional. Whether this should be removed from the old parent's subdomains list. Defaults to false.
          */
-        Domain.prototype.setParent = function (parent) {
+        Domain.prototype.setParent = function (parent, revalidateLabel, detach) {
+            if (revalidateLabel === void 0) { revalidateLabel = true; }
+            if (detach === void 0) { detach = false; }
             if (this.address && !parent) {
                 var err = new Error("The root domain must not have an Address.");
                 err.name = exports.ERROR_ROOT_ADDRESS;
                 throw err;
             }
+            if (detach) {
+                this.parent.subdomains.splice(this.parent.subdomains.indexOf(this), 1);
+            }
             this.parent = parent;
+            if (revalidateLabel) {
+                this.setLabel(this.label);
+            }
         };
         /**
          * Sets the address of this Domain, making it a hostname.

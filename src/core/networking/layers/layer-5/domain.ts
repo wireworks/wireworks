@@ -35,7 +35,7 @@ export const ERROR_MERGE_WRONG_ROOT = "MergeWrongRootError";
  * @author Henrique Colini
  */
 export class Domain {
-
+	
 	/**
 	 * The parent Domain. Undefined if this is a root domain.
 	 */
@@ -64,7 +64,7 @@ export class Domain {
 	 */
 	constructor(label: string, parent: Domain, address: Address = undefined) {
 
-		this.setParent(parent);
+		this.setParent(parent, false);
 		this.setAddress(address);
 		this.setLabel(label);
 
@@ -124,6 +124,7 @@ export class Domain {
 			}
 			else {
 				this.subdomains.push(sub);
+				sub.setParent(this);
 			}
 
 		}
@@ -132,7 +133,7 @@ export class Domain {
 
 	/**
 	 * Sets the label of this Domain.
-	 * @param  {string} label The label to be set. Must follow naming conventions.
+	 * @param  {string} label The label to be set. Must follow naming conventions. If empty, the parent should be undefined.
 	 */
 	public setLabel(label: string): void {
 
@@ -161,23 +162,37 @@ export class Domain {
 				throw err;
 			}
 
+			this.label = label;
+			
 		}
-		this.label = label;
 	}
 	
 	/**
 	 * Sets the parent of this Domain.
 	 * @param  {Domain} parent The parent domain to be set. If undefined, the address must also be undefined.
+	 * @param  {boolean} revalidateLabel Optional. Whether the label should also be revalidated. Defaults to true.
+	 * @param  {boolean} detach Optional. Whether this should be removed from the old parent's subdomains list. Defaults to false.
 	 */
-	public setParent(parent: Domain): void {
+	public setParent(parent: Domain, revalidateLabel: boolean = true, detach: boolean = false): void {
+		
 		if (this.address && !parent) {
 			let err = new Error("The root domain must not have an Address.");
 			err.name = ERROR_ROOT_ADDRESS;
 			throw err;
 		}
+		
+		if (detach) {
+			this.parent.subdomains.splice(this.parent.subdomains.indexOf(this), 1);
+		}
+
 		this.parent = parent;
+
+		if (revalidateLabel) {
+			this.setLabel(this.label);
+		}
+
 	}
-	
+		
 	/**
 	 * Sets the address of this Domain, making it a hostname.
 	 * @param  {Address} address The address to be set. If the parent is undefined, this must be undefined as well.

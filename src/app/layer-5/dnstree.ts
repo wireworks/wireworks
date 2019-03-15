@@ -1,7 +1,7 @@
 // DNSTree
 // +=========================+
 // Author: Henrique Colini
-// Version: 1.0 (2019-03-11)
+// Version: 1.0 (2019-03-13)
 
 import { id, clearChildren } from "../../core/utils/dom";
 import { ERROR_ADDRESS_PARSE, Address } from "../../core/networking/layers/layer-3/address";
@@ -16,7 +16,9 @@ let rootDomain = new Domain(".", undefined);
 let browser = id("browser");
 let pageLoaded = id("page_loaded");
 let pageNxdomain = id("page_nxdomain");
+let nxdomainDescription = id("nxdomain_description");
 let pageTimedout = id("page_timedout");
+let timedoutDescription = id("timedout_description");
 let header = id("loaded_header");
 let addressBar = id("address_bar");
 let domainName = id("domain_name");
@@ -24,74 +26,130 @@ let domainAddress = id("domain_address");
 let siteTitle = id("site_title");
 let siteAddress = id("site_address");
 let sitesWrapper = id("sites_wrapper");
-let sites: {name: string, address: Address, color: string}[] = [];
+
+type Site = { name: string, address: Address, color: string };
+
+let sites: Site[] = [];
 
 function refreshPage() {
 
 	try {
+
+		let foundAddress: Address = undefined;
+		let domain: Domain = undefined;
 		
-		addressBar.classList.remove("address-error");
-
-		let tmpRoot = new Domain(".", undefined);
-		let domain = extractDomain(tmpRoot, (<HTMLInputElement>addressBar).value);
-
-		let tmpCurr: Domain = tmpRoot;
-		let curr: Domain = rootDomain;
-
-		let exit = false;
-
-		while (!exit) {
-			
-			tmpCurr = tmpCurr.getSubdomains()[0];
-			curr = curr.getSubdomain(tmpCurr.getLabel());
-
-			if (!curr || curr.getLabel() == domain.getLabel()) {
-				exit = true;
-			}
-
-		}
-
 		pageLoaded.classList.add("hidden");
 		pageNxdomain.classList.add("hidden");
 		pageTimedout.classList.add("hidden");
+		
+		browser.style.cursor = "progress";
+		addressBar.style.cursor = "progress";
 
-		if (curr) {
-			
-			browser.style.cursor = "progress";
-			addressBar.style.cursor = "progress";
+		try {
 
-			setTimeout(() => {
-				
-				// "hashes" a string to a "random" number
+			let str = (<HTMLInputElement>addressBar).value;
 
-				let seed = 0;
-				let fullName = curr.getFullName();
+			if (str === "localhost") {
+				setTimeout(() => {
 
-				for (let i = 0; i < fullName.length; i++) {
-					seed += fullName.charCodeAt(i) * Math.pow(10, i);
-				}
+					timedoutDescription.innerHTML = `<span class="font-bold">localhost</span> demorou muito para responder.`;
 
-				let fakeRandom = Math.sin(seed) * 10000;
-				fakeRandom -= Math.floor(fakeRandom);
+					pageTimedout.classList.remove("hidden");
+					browser.style.cursor = "initial";
+					addressBar.style.cursor = "initial";
 
-				header.className = "style-" + Math.floor(fakeRandom * 6);
-				header.textContent = fullName;
-
-				pageLoaded.classList.remove("hidden");
-
-				browser.style.cursor = "initial";
-				addressBar.style.cursor = "initial";
-
-			}, 500);
+				}, 2000);
+			}
+			else {
+				foundAddress = new Address(str);
+			}
 
 		}
+		catch (error) {
+			addressBar.classList.remove("address-error");
 
+			let tmpRoot = new Domain(".", undefined);
+			domain = extractDomain(tmpRoot, (<HTMLInputElement>addressBar).value);
+
+			let tmpCurr: Domain = tmpRoot;
+			let curr: Domain = rootDomain;
+
+			let exit = false;
+
+			while (!exit) {
+
+				tmpCurr = tmpCurr.getSubdomains()[0];
+				curr = curr.getSubdomain(tmpCurr.getLabel());
+
+				if (!curr || curr.getLabel() == domain.getLabel()) {
+					exit = true;
+				}
+
+			}
+
+			if(curr) {
+				foundAddress = curr.getAddress();
+			}
+			
+		}
+
+		if (foundAddress) {
+
+			let exists = false;
+			let site: Site = undefined;
+
+			for (let i = 0; !exists && i < sites.length; i++) {
+				site = sites[i];
+				if (site.address.compare(foundAddress)) {
+					exists = true;
+				}
+			}
+
+			if (exists) {
+
+				setTimeout(() => {
+
+					header.className = site.color;
+					header.textContent = site.name;
+
+					pageLoaded.classList.remove("hidden");
+
+					browser.style.cursor = "initial";
+					addressBar.style.cursor = "initial";
+
+				}, 500);
+
+			}
+			else {
+
+				setTimeout(() => {
+
+					if (domain) {
+						timedoutDescription.innerHTML = `<span class="font-bold">${domain.getFullName()}</span> demorou muito para responder.`;
+					}
+					else {
+						timedoutDescription.innerHTML = `<span class="font-bold">${foundAddress.toString(true)}</span> demorou muito para responder.`;
+					}
+
+					pageTimedout.classList.remove("hidden");
+					browser.style.cursor = "initial";
+					addressBar.style.cursor = "initial";
+
+				}, 2000);
+
+			}
+
+		}
 		else {
 
-			browser.style.cursor = "progress";
-			addressBar.style.cursor = "progress";
-
 			setTimeout(() => {
+
+				if (domain) {
+					nxdomainDescription.innerHTML = `Não foi possível encontrar o endereço IP do servidor de <span class="font-bold">${domain.getFullName()}</span>.`;
+				}
+				else {
+					nxdomainDescription.innerHTML = `Não foi possível encontrar o endereço IP do servidor.</span>.`;
+				}
 
 				pageNxdomain.classList.remove("hidden");
 				browser.style.cursor = "initial";
@@ -100,7 +158,6 @@ function refreshPage() {
 			}, 1000);
 
 		}
-
 
 	} catch (error) {
 
@@ -121,8 +178,30 @@ function refreshTree(): void {
 
 		let domainDOM = make("div", "domain");
 		domainDOM.appendChild(make("span", "label", domain.toString()));
+		
 		if (domain.getAddress()) {
 			domainDOM.appendChild(make("span", "address", domain.getAddress().toString(true)));
+		}
+
+		if (domain.getParent()) {
+			let btn = make("i", "fas fa-trash fa-lg domain-delete");
+			btn.addEventListener("click", function (ev: MouseEvent) {
+				if (domain.getSubdomains().length === 0 || confirm("Tem certeza de quer remover esse domínio?\nTodos os seus subdomínios também serão removidos.")) {
+					domain.setAddress(undefined);
+					domain.setParent(undefined, false, true);
+					refreshTree();
+				}
+			});
+			domainDOM.appendChild(btn);
+		}
+
+		if (domain.getAddress()) {
+			let btn = make("i", "fas fa-trash fa-lg domain-address-delete");
+			btn.addEventListener("click", function(ev: MouseEvent) {
+				domain.setAddress(undefined);
+				refreshTree();
+			});
+			domainDOM.appendChild(btn);		
 		}
 
 		element.appendChild(domainDOM);
@@ -141,7 +220,10 @@ function refreshTree(): void {
 	}	
 
 	clearChildren(rootTree);
-	loadTree(rootDomain, rootTree);
+	
+	if (rootDomain.getSubdomains().length > 0) {
+		loadTree(rootDomain, rootTree);
+	}
 
 }
 
@@ -261,7 +343,6 @@ function createSite() {
 
 }
 
-
 /**
  * Registers a domain.
  */
@@ -279,20 +360,35 @@ function registerDomain(): void {
 
 		let tmpRoot = new Domain(".", undefined);
 
-		let domain = extractDomain(tmpRoot, (<HTMLInputElement>domainName).value);
+		let fullName = (<HTMLInputElement>domainName).value;
 
-		let address = new Address((<HTMLInputElement>domainAddress).value);
+		if (fullName === "localhost") {
+			errStr = "Você não pode usar esse nome.";
+			throw Error();
+		}
+		else {
+			let domain = extractDomain(tmpRoot, fullName);
+			let addressStr = (<HTMLInputElement>domainAddress).value.trim();
 
-		domain.setAddress(address);
+			if (addressStr !== "") {
+				let address = new Address(addressStr);
+				domain.setAddress(address);
+			}
+			else {
+				domain.setAddress(undefined);
+			}
 
-		rootDomain.merge(tmpRoot, "merge");
+			rootDomain.merge(tmpRoot, "merge");
 
-		refreshTree();
+			refreshTree();
+		}
 
 	} catch (error) {
 
 		let table = document.createElement('table');
 		table.id = "domain_error";
+
+		console.error(error);
 
 		if (!errStr) {
 

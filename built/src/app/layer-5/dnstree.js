@@ -1,7 +1,7 @@
 // DNSTree
 // +=========================+
 // Author: Henrique Colini
-// Version: 1.0 (2019-03-11)
+// Version: 1.0 (2019-03-13)
 define(["require", "exports", "../../core/utils/dom", "../../core/networking/layers/layer-3/address", "../../core/networking/byte", "../../core/networking/layers/layer-5/domain", "../../core/utils/dom"], function (require, exports, dom_1, address_1, byte_1, domain_1, dom_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -12,7 +12,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     var browser = dom_1.id("browser");
     var pageLoaded = dom_1.id("page_loaded");
     var pageNxdomain = dom_1.id("page_nxdomain");
+    var nxdomainDescription = dom_1.id("nxdomain_description");
     var pageTimedout = dom_1.id("page_timedout");
+    var timedoutDescription = dom_1.id("timedout_description");
     var header = dom_1.id("loaded_header");
     var addressBar = dom_1.id("address_bar");
     var domainName = dom_1.id("domain_name");
@@ -23,45 +25,85 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     var sites = [];
     function refreshPage() {
         try {
-            addressBar.classList.remove("address-error");
-            var tmpRoot = new domain_1.Domain(".", undefined);
-            var domain = extractDomain(tmpRoot, addressBar.value);
-            var tmpCurr = tmpRoot;
-            var curr_1 = rootDomain;
-            var exit = false;
-            while (!exit) {
-                tmpCurr = tmpCurr.getSubdomains()[0];
-                curr_1 = curr_1.getSubdomain(tmpCurr.getLabel());
-                if (!curr_1 || curr_1.getLabel() == domain.getLabel()) {
-                    exit = true;
-                }
-            }
+            var foundAddress_1 = undefined;
+            var domain_2 = undefined;
             pageLoaded.classList.add("hidden");
             pageNxdomain.classList.add("hidden");
             pageTimedout.classList.add("hidden");
-            if (curr_1) {
-                browser.style.cursor = "progress";
-                addressBar.style.cursor = "progress";
-                setTimeout(function () {
-                    // "hashes" a string to a "random" number
-                    var seed = 0;
-                    var fullName = curr_1.getFullName();
-                    for (var i = 0; i < fullName.length; i++) {
-                        seed += fullName.charCodeAt(i) * Math.pow(10, i);
+            browser.style.cursor = "progress";
+            addressBar.style.cursor = "progress";
+            try {
+                var str = addressBar.value;
+                if (str === "localhost") {
+                    setTimeout(function () {
+                        timedoutDescription.innerHTML = "<span class=\"font-bold\">localhost</span> demorou muito para responder.";
+                        pageTimedout.classList.remove("hidden");
+                        browser.style.cursor = "initial";
+                        addressBar.style.cursor = "initial";
+                    }, 2000);
+                }
+                else {
+                    foundAddress_1 = new address_1.Address(str);
+                }
+            }
+            catch (error) {
+                addressBar.classList.remove("address-error");
+                var tmpRoot = new domain_1.Domain(".", undefined);
+                domain_2 = extractDomain(tmpRoot, addressBar.value);
+                var tmpCurr = tmpRoot;
+                var curr = rootDomain;
+                var exit = false;
+                while (!exit) {
+                    tmpCurr = tmpCurr.getSubdomains()[0];
+                    curr = curr.getSubdomain(tmpCurr.getLabel());
+                    if (!curr || curr.getLabel() == domain_2.getLabel()) {
+                        exit = true;
                     }
-                    var fakeRandom = Math.sin(seed) * 10000;
-                    fakeRandom -= Math.floor(fakeRandom);
-                    header.className = "style-" + Math.floor(fakeRandom * 6);
-                    header.textContent = fullName;
-                    pageLoaded.classList.remove("hidden");
-                    browser.style.cursor = "initial";
-                    addressBar.style.cursor = "initial";
-                }, 500);
+                }
+                if (curr) {
+                    foundAddress_1 = curr.getAddress();
+                }
+            }
+            if (foundAddress_1) {
+                var exists = false;
+                var site_1 = undefined;
+                for (var i = 0; !exists && i < sites.length; i++) {
+                    site_1 = sites[i];
+                    if (site_1.address.compare(foundAddress_1)) {
+                        exists = true;
+                    }
+                }
+                if (exists) {
+                    setTimeout(function () {
+                        header.className = site_1.color;
+                        header.textContent = site_1.name;
+                        pageLoaded.classList.remove("hidden");
+                        browser.style.cursor = "initial";
+                        addressBar.style.cursor = "initial";
+                    }, 500);
+                }
+                else {
+                    setTimeout(function () {
+                        if (domain_2) {
+                            timedoutDescription.innerHTML = "<span class=\"font-bold\">" + domain_2.getFullName() + "</span> demorou muito para responder.";
+                        }
+                        else {
+                            timedoutDescription.innerHTML = "<span class=\"font-bold\">" + foundAddress_1.toString(true) + "</span> demorou muito para responder.";
+                        }
+                        pageTimedout.classList.remove("hidden");
+                        browser.style.cursor = "initial";
+                        addressBar.style.cursor = "initial";
+                    }, 2000);
+                }
             }
             else {
-                browser.style.cursor = "progress";
-                addressBar.style.cursor = "progress";
                 setTimeout(function () {
+                    if (domain_2) {
+                        nxdomainDescription.innerHTML = "N\u00E3o foi poss\u00EDvel encontrar o endere\u00E7o IP do servidor de <span class=\"font-bold\">" + domain_2.getFullName() + "</span>.";
+                    }
+                    else {
+                        nxdomainDescription.innerHTML = "N\u00E3o foi poss\u00EDvel encontrar o endere\u00E7o IP do servidor.</span>.";
+                    }
                     pageNxdomain.classList.remove("hidden");
                     browser.style.cursor = "initial";
                     addressBar.style.cursor = "initial";
@@ -83,6 +125,25 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             if (domain.getAddress()) {
                 domainDOM.appendChild(dom_2.make("span", "address", domain.getAddress().toString(true)));
             }
+            if (domain.getParent()) {
+                var btn = dom_2.make("i", "fas fa-trash fa-lg domain-delete");
+                btn.addEventListener("click", function (ev) {
+                    if (domain.getSubdomains().length === 0 || confirm("Tem certeza de quer remover esse domínio?\nTodos os seus subdomínios também serão removidos.")) {
+                        domain.setAddress(undefined);
+                        domain.setParent(undefined, false, true);
+                        refreshTree();
+                    }
+                });
+                domainDOM.appendChild(btn);
+            }
+            if (domain.getAddress()) {
+                var btn = dom_2.make("i", "fas fa-trash fa-lg domain-address-delete");
+                btn.addEventListener("click", function (ev) {
+                    domain.setAddress(undefined);
+                    refreshTree();
+                });
+                domainDOM.appendChild(btn);
+            }
             element.appendChild(domainDOM);
             var list = dom_2.make("ul");
             for (var i = 0; i < domain.getSubdomains().length; i++) {
@@ -94,7 +155,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             element.appendChild(list);
         }
         dom_1.clearChildren(rootTree);
-        loadTree(rootDomain, rootTree);
+        if (rootDomain.getSubdomains().length > 0) {
+            loadTree(rootDomain, rootTree);
+        }
     }
     function extractDomain(tmpRoot, fullName) {
         var parts = fullName.trim().split(".");
@@ -130,12 +193,12 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 errStr = "Insira o nome do site.";
                 throw Error();
             }
-            var site_1 = {
+            var site_2 = {
                 name: name_1,
                 address: address,
                 color: "style-" + Math.floor(Math.random() * 6)
             };
-            sites.push(site_1);
+            sites.push(site_2);
             var liDOM_1 = dom_2.make("li");
             var spacerDOM = dom_2.make("div", "spacer");
             var contentDOM = dom_2.make("div");
@@ -143,7 +206,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             var siteAddressDOM = dom_2.make("span", "font-medium font-light", address.toString(true));
             var deleteDOM = dom_2.make("i", "fas fa-trash fa-lg site-delete");
             deleteDOM.addEventListener("click", function (ev) {
-                sites.splice(sites.indexOf(site_1), 1);
+                sites.splice(sites.indexOf(site_2), 1);
                 liDOM_1.remove();
             });
             contentDOM.appendChild(siteTitleDOM);
@@ -185,15 +248,29 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         var errStr = undefined;
         try {
             var tmpRoot = new domain_1.Domain(".", undefined);
-            var domain = extractDomain(tmpRoot, domainName.value);
-            var address = new address_1.Address(domainAddress.value);
-            domain.setAddress(address);
-            rootDomain.merge(tmpRoot, "merge");
-            refreshTree();
+            var fullName = domainName.value;
+            if (fullName === "localhost") {
+                errStr = "Você não pode usar esse nome.";
+                throw Error();
+            }
+            else {
+                var domain = extractDomain(tmpRoot, fullName);
+                var addressStr = domainAddress.value.trim();
+                if (addressStr !== "") {
+                    var address = new address_1.Address(addressStr);
+                    domain.setAddress(address);
+                }
+                else {
+                    domain.setAddress(undefined);
+                }
+                rootDomain.merge(tmpRoot, "merge");
+                refreshTree();
+            }
         }
         catch (error) {
             var table = document.createElement('table');
             table.id = "domain_error";
+            console.error(error);
             if (!errStr) {
                 switch (error.name) {
                     case address_1.ERROR_ADDRESS_PARSE:

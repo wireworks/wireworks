@@ -478,8 +478,8 @@ h3, h4, h5, h6, p {
   margin: 10px 0;
   height: 32px;
   display: inline-flex;
+  width: 100%;
   align-items: center;
-  justify-content: center;
 }
 .domain-tree .domain .label {
   height: 32px;
@@ -496,6 +496,24 @@ h3, h4, h5, h6, p {
 .domain-tree .domain .address {
   color: #747474;
   margin-left: 1em;
+}
+.domain-tree .domain .domain-delete,
+.domain-tree .domain .domain-address-delete {
+  margin-left: 1em;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.domain-tree .domain .domain-delete {
+  color: rgba(255, 170, 43, 0);
+}
+.domain-tree .domain .domain-address-delete {
+  color: rgba(116, 116, 116, 0);
+}
+.domain-tree .domain:hover .domain-delete {
+  color: #ffaa2b;
+}
+.domain-tree .domain:hover .domain-address-delete {
+  color: #747474;
 }
 .domain-tree ul {
   list-style: none;
