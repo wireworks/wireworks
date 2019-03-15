@@ -137,6 +137,8 @@ export class Domain {
 	 */
 	public setLabel(label: string): void {
 
+		label = label.toLowerCase();
+
 		if ((label === '.' || label === undefined || label === "") && !this.parent) {
 			this.label = '';
 		}

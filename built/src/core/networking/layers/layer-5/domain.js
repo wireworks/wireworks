@@ -107,6 +107,7 @@ define(["require", "exports"], function (require, exports) {
          * @param  {string} label The label to be set. Must follow naming conventions. If empty, the parent should be undefined.
          */
         Domain.prototype.setLabel = function (label) {
+            label = label.toLowerCase();
             if ((label === '.' || label === undefined || label === "") && !this.parent) {
                 this.label = '';
             }
