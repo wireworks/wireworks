@@ -30,6 +30,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         try {
             var foundAddress_1 = undefined;
             var domain_2 = undefined;
+            var alreadyLoaded = false;
             pageLoadedDOM.classList.add("hidden");
             pageNxdomainDOM.classList.add("hidden");
             pageTimedoutDOM.classList.add("hidden");
@@ -38,6 +39,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             try {
                 var str = addressBarDOM.value;
                 if (str === "localhost") {
+                    alreadyLoaded = true;
                     setTimeout(function () {
                         timedoutDescriptionDOM.innerHTML = "<span class=\"font-bold\">localhost</span> demorou muito para responder.";
                         pageTimedoutDOM.classList.remove("hidden");
@@ -67,55 +69,59 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                     foundAddress_1 = curr.getAddress();
                 }
             }
-            if (foundAddress_1) {
-                var exists = false;
-                var site_1 = undefined;
-                for (var i = 0; !exists && i < sites.length; i++) {
-                    site_1 = sites[i];
-                    if (site_1.address.compare(foundAddress_1)) {
-                        exists = true;
+            if (!alreadyLoaded) {
+                if (foundAddress_1) {
+                    var exists = false;
+                    var site_1 = undefined;
+                    for (var i = 0; !exists && i < sites.length; i++) {
+                        site_1 = sites[i];
+                        if (site_1.address.compare(foundAddress_1)) {
+                            exists = true;
+                        }
                     }
-                }
-                if (exists) {
-                    setTimeout(function () {
-                        headerDOM.className = site_1.color;
-                        headerDOM.textContent = site_1.name;
-                        pageLoadedDOM.classList.remove("hidden");
-                        browserDOM.style.cursor = "initial";
-                        addressBarDOM.style.cursor = "initial";
-                    }, 500);
+                    if (exists) {
+                        setTimeout(function () {
+                            headerDOM.className = site_1.color;
+                            headerDOM.textContent = site_1.name;
+                            pageLoadedDOM.classList.remove("hidden");
+                            browserDOM.style.cursor = "initial";
+                            addressBarDOM.style.cursor = "initial";
+                        }, 500);
+                    }
+                    else {
+                        setTimeout(function () {
+                            if (domain_2) {
+                                timedoutDescriptionDOM.innerHTML = "<span class=\"font-bold\">" + domain_2.getFullName() + "</span> demorou muito para responder.";
+                            }
+                            else {
+                                timedoutDescriptionDOM.innerHTML = "<span class=\"font-bold\">" + foundAddress_1.toString(true) + "</span> demorou muito para responder.";
+                            }
+                            pageTimedoutDOM.classList.remove("hidden");
+                            browserDOM.style.cursor = "initial";
+                            addressBarDOM.style.cursor = "initial";
+                        }, 2000);
+                    }
                 }
                 else {
                     setTimeout(function () {
                         if (domain_2) {
-                            timedoutDescriptionDOM.innerHTML = "<span class=\"font-bold\">" + domain_2.getFullName() + "</span> demorou muito para responder.";
+                            nxdomainDescriptionDOM.innerHTML = "N\u00E3o foi poss\u00EDvel encontrar o endere\u00E7o IP do servidor de <span class=\"font-bold\">" + domain_2.getFullName() + "</span>.";
                         }
                         else {
-                            timedoutDescriptionDOM.innerHTML = "<span class=\"font-bold\">" + foundAddress_1.toString(true) + "</span> demorou muito para responder.";
+                            nxdomainDescriptionDOM.innerHTML = "N\u00E3o foi poss\u00EDvel encontrar o endere\u00E7o IP do servidor.";
                         }
-                        pageTimedoutDOM.classList.remove("hidden");
+                        pageNxdomainDOM.classList.remove("hidden");
                         browserDOM.style.cursor = "initial";
                         addressBarDOM.style.cursor = "initial";
-                    }, 2000);
+                    }, 1000);
                 }
-            }
-            else {
-                setTimeout(function () {
-                    if (domain_2) {
-                        nxdomainDescriptionDOM.innerHTML = "N\u00E3o foi poss\u00EDvel encontrar o endere\u00E7o IP do servidor de <span class=\"font-bold\">" + domain_2.getFullName() + "</span>.";
-                    }
-                    else {
-                        nxdomainDescriptionDOM.innerHTML = "N\u00E3o foi poss\u00EDvel encontrar o endere\u00E7o IP do servidor.</span>.";
-                    }
-                    pageNxdomainDOM.classList.remove("hidden");
-                    browserDOM.style.cursor = "initial";
-                    addressBarDOM.style.cursor = "initial";
-                }, 1000);
             }
         }
         catch (error) {
             console.error(error);
             addressBarDOM.classList.add("address-error");
+            browserDOM.style.cursor = "initial";
+            addressBarDOM.style.cursor = "initial";
         }
     }
     /**
@@ -192,17 +198,17 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         }
         var errStr = undefined;
         try {
+            var name_1 = siteTitleDOM.value.trim();
+            if (name_1 === "") {
+                errStr = "Insira o nome do site.";
+                throw Error();
+            }
             var address = new address_1.Address(siteAddressDOM.value);
             for (var i = 0; i < sites.length; i++) {
                 if (sites[i].address.compare(address)) {
                     errStr = "Já existe um site com esse endereço.";
                     throw Error();
                 }
-            }
-            var name_1 = siteTitleDOM.value.trim();
-            if (name_1 === "") {
-                errStr = "Insira o nome do site.";
-                throw Error();
             }
             var site_2 = {
                 name: name_1,

@@ -48,6 +48,7 @@ function refreshBrowser(): void {
 
 		let foundAddress: Address = undefined;
 		let domain: Domain = undefined;
+		let alreadyLoaded: boolean = false;
 
 		pageLoadedDOM.classList.add("hidden");
 		pageNxdomainDOM.classList.add("hidden");
@@ -61,6 +62,7 @@ function refreshBrowser(): void {
 			let str = ( < HTMLInputElement > addressBarDOM).value;
 
 			if (str === "localhost") {
+				alreadyLoaded = true;
 				setTimeout(() => {
 
 					timedoutDescriptionDOM.innerHTML = `<span class="font-bold">localhost</span> demorou muito para responder.`;
@@ -102,65 +104,69 @@ function refreshBrowser(): void {
 
 		}
 
-		if (foundAddress) {
+		if (!alreadyLoaded) {
+			
+			if (foundAddress) {
 
-			let exists = false;
-			let site: Site = undefined;
+				let exists = false;
+				let site: Site = undefined;
 
-			for (let i = 0; !exists && i < sites.length; i++) {
-				site = sites[i];
-				if (site.address.compare(foundAddress)) {
-					exists = true;
+				for (let i = 0; !exists && i < sites.length; i++) {
+					site = sites[i];
+					if (site.address.compare(foundAddress)) {
+						exists = true;
+					}
 				}
-			}
 
-			if (exists) {
+				if (exists) {
 
-				setTimeout(() => {
+					setTimeout(() => {
 
-					headerDOM.className = site.color;
-					headerDOM.textContent = site.name;
+						headerDOM.className = site.color;
+						headerDOM.textContent = site.name;
 
-					pageLoadedDOM.classList.remove("hidden");
+						pageLoadedDOM.classList.remove("hidden");
 
-					browserDOM.style.cursor = "initial";
-					addressBarDOM.style.cursor = "initial";
+						browserDOM.style.cursor = "initial";
+						addressBarDOM.style.cursor = "initial";
 
-				}, 500);
+					}, 500);
+
+				} else {
+
+					setTimeout(() => {
+
+						if (domain) {
+							timedoutDescriptionDOM.innerHTML = `<span class="font-bold">${domain.getFullName()}</span> demorou muito para responder.`;
+						} else {
+							timedoutDescriptionDOM.innerHTML = `<span class="font-bold">${foundAddress.toString(true)}</span> demorou muito para responder.`;
+						}
+
+						pageTimedoutDOM.classList.remove("hidden");
+						browserDOM.style.cursor = "initial";
+						addressBarDOM.style.cursor = "initial";
+
+					}, 2000);
+
+				}
 
 			} else {
 
 				setTimeout(() => {
 
 					if (domain) {
-						timedoutDescriptionDOM.innerHTML = `<span class="font-bold">${domain.getFullName()}</span> demorou muito para responder.`;
+						nxdomainDescriptionDOM.innerHTML = `Não foi possível encontrar o endereço IP do servidor de <span class="font-bold">${domain.getFullName()}</span>.`;
 					} else {
-						timedoutDescriptionDOM.innerHTML = `<span class="font-bold">${foundAddress.toString(true)}</span> demorou muito para responder.`;
+						nxdomainDescriptionDOM.innerHTML = `Não foi possível encontrar o endereço IP do servidor.`;
 					}
 
-					pageTimedoutDOM.classList.remove("hidden");
+					pageNxdomainDOM.classList.remove("hidden");
 					browserDOM.style.cursor = "initial";
 					addressBarDOM.style.cursor = "initial";
 
-				}, 2000);
+				}, 1000);
 
 			}
-
-		} else {
-
-			setTimeout(() => {
-
-				if (domain) {
-					nxdomainDescriptionDOM.innerHTML = `Não foi possível encontrar o endereço IP do servidor de <span class="font-bold">${domain.getFullName()}</span>.`;
-				} else {
-					nxdomainDescriptionDOM.innerHTML = `Não foi possível encontrar o endereço IP do servidor.</span>.`;
-				}
-
-				pageNxdomainDOM.classList.remove("hidden");
-				browserDOM.style.cursor = "initial";
-				addressBarDOM.style.cursor = "initial";
-
-			}, 1000);
 
 		}
 
@@ -169,6 +175,8 @@ function refreshBrowser(): void {
 		console.error(error);
 
 		addressBarDOM.classList.add("address-error");
+		browserDOM.style.cursor = "initial";
+		addressBarDOM.style.cursor = "initial";
 
 	}
 
@@ -276,6 +284,13 @@ function createSite(): void {
 
 	try {
 
+		let name = (<HTMLInputElement>siteTitleDOM).value.trim();
+
+		if (name === "") {
+			errStr = "Insira o nome do site.";
+			throw Error();
+		}
+
 		let address = new Address(( < HTMLInputElement > siteAddressDOM).value);
 
 		for (let i = 0; i < sites.length; i++) {
@@ -284,14 +299,7 @@ function createSite(): void {
 				throw Error();
 			}
 		}
-
-		let name = ( < HTMLInputElement > siteTitleDOM).value.trim();
-
-		if (name === "") {
-			errStr = "Insira o nome do site.";
-			throw Error();
-		}
-
+		
 		let site = {
 			name: name,
 			address: address,
