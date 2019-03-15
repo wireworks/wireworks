@@ -1,7 +1,7 @@
 // DNSTree
 // +=========================+
 // Author: Henrique Colini
-// Version: 1.0 (2019-03-13)
+// Version: 1.0 (2019-03-14)
 
 import { id, clearChildren } from "../../core/utils/dom";
 import { ERROR_ADDRESS_PARSE, Address } from "../../core/networking/layers/layer-3/address";

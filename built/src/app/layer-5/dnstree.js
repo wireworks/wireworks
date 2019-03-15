@@ -1,7 +1,7 @@
 // DNSTree
 // +=========================+
 // Author: Henrique Colini
-// Version: 1.0 (2019-03-13)
+// Version: 1.0 (2019-03-14)
 define(["require", "exports", "../../core/utils/dom", "../../core/networking/layers/layer-3/address", "../../core/networking/byte", "../../core/networking/layers/layer-5/domain", "../../core/utils/dom"], function (require, exports, dom_1, address_1, byte_1, domain_1, dom_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
