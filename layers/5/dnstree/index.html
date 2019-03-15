@@ -57,17 +57,21 @@
 				
 				<h1 class="text-light">Criação de Websites</h1>
 
-				<label for="site_title">Título</label>
-				<h1>
-					<input type="text" name="site_title" id="site_title" placeholder="Nome do Website">
-				</h1>
-				<label for="site_address">Endereço</label>
-				<h1>
-					<input type="text" name="site_address" id="site_address" placeholder="0.0.0.0">
-				</h1>
-				<h1>
-					<button type="button" id="button_add_site">Criar</button>
-				</h1>
+				<div class="hbox align-end">
+					<div>
+						<label for="site_title">Título</label>
+						<h1>
+							<input type="text" name="site_title" id="site_title" placeholder="Nome do Website">
+						</h1>
+					</div>
+					<div>
+						<label for="site_address">Endereço</label>
+						<h1>
+							<input type="text" name="site_address" id="site_address" placeholder="0.0.0.0">
+						</h1>
+					</div>
+					<button type="button" class="mb-3" id="button_add_site">Criar</button>
+				</div>
 
 				<div id="site_error_wrapper"></div>
 
@@ -75,17 +79,21 @@
 
 				<h1 class="text-light">Registro de Domínios</h1>
 
-				<label for="domain_name">Domínio</label>
-				<h1>
-					<input type="text" name="domain_name" id="domain_name" placeholder="www.exemplo.com.br">
-				</h1>
-				<label for="domain_address">Endereço</label>
-				<h1>
-					<input type="text" name="domain_address" id="domain_address" placeholder="0.0.0.0">
-				</h1>
-				<h1>
-					<button type="button" id="button_add_domain">Registrar</button>
-				</h1>
+				<div class="hbox align-end">
+					<div>
+						<label for="domain_name">Domínio</label>
+						<h1>
+							<input type="text" name="domain_name" id="domain_name" placeholder="www.exemplo.com.br">
+						</h1>
+					</div>
+					<div>
+						<label for="domain_address">Endereço</label>
+						<h1>
+							<input type="text" name="domain_address" id="domain_address" placeholder="0.0.0.0">
+						</h1>
+					</div>
+					<button type="button"  class="mb-3" id="button_add_domain">Registrar</button>
+				</div>
 
 				<div id="domain_error_wrapper"></div>
 
