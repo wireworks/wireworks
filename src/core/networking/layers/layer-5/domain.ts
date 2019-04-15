@@ -77,6 +77,35 @@ export class Domain {
 		}
 
 	}
+
+	/**
+	 * Extracts a Domain from a string, in the format abc.def.ghi. Returns the last subdomain.
+	 * @param  {Domain} root The root domain to be used.
+	 * @param  {string} fullName The full name of the domain, in the format abc.def.ghi.
+	 */
+	public static extractDomain(root: Domain, fullName: string): Domain {
+
+		let parts = fullName.trim().split(".");
+
+		let curr: Domain = root;
+
+		for (let i = parts.length - 1; i >= 0; i--) {
+
+			if (parts[i].length === 0) {
+				let err = new Error();
+				err.name = ERROR_INVALID_LABEL;
+				throw err;
+			}
+
+			let next = new Domain(parts[i], curr);
+			curr.getSubdomains().push(next);
+			curr = next;
+
+		}
+
+		return curr;
+
+	}
 	
 	/**
 	 * Merges two domains (combines their subdomains) given the original two have the same label. It has options for what to do when domains with the same labels and different addresses are found:

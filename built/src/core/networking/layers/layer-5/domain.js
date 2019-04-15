@@ -60,6 +60,26 @@ define(["require", "exports"], function (require, exports) {
             }
         }
         /**
+         * Extracts a Domain from a string, in the format abc.def.ghi. Returns the last subdomain.
+         * @param  {Domain} root The root domain to be used.
+         * @param  {string} fullName The full name of the domain, in the format abc.def.ghi.
+         */
+        Domain.extractDomain = function (root, fullName) {
+            var parts = fullName.trim().split(".");
+            var curr = root;
+            for (var i = parts.length - 1; i >= 0; i--) {
+                if (parts[i].length === 0) {
+                    var err = new Error();
+                    err.name = exports.ERROR_INVALID_LABEL;
+                    throw err;
+                }
+                var next = new Domain(parts[i], curr);
+                curr.getSubdomains().push(next);
+                curr = next;
+            }
+            return curr;
+        };
+        /**
          * Merges two domains (combines their subdomains) given the original two have the same label. It has options for what to do when domains with the same labels and different addresses are found:
          * "ignore" - Nothing happens. The original address is kept.
          * "override" - The new address replaces the old one, no matter what.

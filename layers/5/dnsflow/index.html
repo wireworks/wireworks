@@ -25,15 +25,47 @@
 			
 			<main>
 
-				<canvas id="canvas"></canvas>
+				<canvas id="canvas" width="800" height="400"></canvas>
 
 				<div class="hbox">
 
 					<div>
-						
+						<label>Local</label>
+						<h1>
+							<select id="local_mode">
+								<option value="recursive">Recursivo</option>
+								<option value="iterative">Iterativo</option>
+							</select>
+						</h1>
+					</div>
+					<div>
+						<label>Root</label>
+						<h1>
+							<select id="root_mode">
+								<option value="recursive">Recursivo</option>
+								<option value="iterative">Iterativo</option>
+							</select>
+						</h1>
+					</div>
+					<div>
+						<label>Intermediários</label>
+						<h1>
+							<select id="intermediate_mode">
+								<option value="recursive">Recursivo</option>
+								<option value="iterative">Iterativo</option>
+							</select>
+						</h1>
 					</div>
 
 				</div>
+
+				<label for="domain">Domínio</label>
+				<h1>
+					<input type="text" name="domain" id="domain" placeholder="www.exemplo.com.br">
+					<button id="run">Visualizar</button>
+				</h1>
+
+				<div id="error_wrapper"></div>
 
 			</main>
 
