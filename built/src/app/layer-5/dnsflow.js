@@ -24,7 +24,24 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         };
         return Node;
     }());
+    var Line = /** @class */ (function () {
+        function Line(from, to, time, strokeStyle) {
+            this.from = from;
+            this.to = to;
+            this.time = time;
+            this.strokeStyle = strokeStyle;
+        }
+        Line.prototype.draw = function () {
+        };
+        return Line;
+    }());
     var drawables = [];
+    var hostNode;
+    var localNode;
+    var rootNode;
+    var interNode;
+    var adminNode;
+    var destNode;
     function run() {
         var oldTable = dom_1.id('domain_error');
         if (oldTable !== null) {
@@ -74,12 +91,12 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         var py = 50;
         var w = canvasDOM.width;
         var h = canvasDOM.height;
-        var hostNode = new Node({ x: px, y: h - py }, 60, 60, "top", "#FF0000");
-        var localNode = new Node({ x: px, y: h / 2 }, 60, 60, "top", "#FFFF00");
-        var rootNode = new Node({ x: px, y: py }, 60, 60, "top", "#00FF00");
-        var interNode = new Node({ x: w / 2, y: h / 2 }, 60, 60, "top", "#FF00FF");
-        var adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, "top", "#00FFFF");
-        var destNode = new Node({ x: w - px, y: h - py }, 60, 60, "top", "#0000FF");
+        hostNode = new Node({ x: px, y: h - py }, 60, 60, "top", "#FF0000");
+        localNode = new Node({ x: px, y: h / 2 }, 60, 60, "top", "#FFFF00");
+        rootNode = new Node({ x: px, y: py }, 60, 60, "top", "#00FF00");
+        interNode = new Node({ x: w / 2, y: h / 2 }, 60, 60, "top", "#FF00FF");
+        adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, "top", "#00FFFF");
+        destNode = new Node({ x: w - px, y: h - py }, 60, 60, "top", "#0000FF");
         drawables.push(hostNode);
         drawables.push(localNode);
         drawables.push(rootNode);

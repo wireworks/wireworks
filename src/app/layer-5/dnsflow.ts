@@ -35,7 +35,7 @@ class Node implements Drawable {
 		this.fillStyle = fillStyle; // tmp!
 	}
 
-	draw(): void {
+	public draw(): void {
 		
 		console.log("fill = " + this.fillStyle);
 		ctx.fillStyle = this.fillStyle;
@@ -45,7 +45,36 @@ class Node implements Drawable {
 
 }
 
+class Line implements Drawable {
+
+	public from: Node;
+	public to: Node;
+	public time: number;
+	public strokeStyle: string;
+
+	constructor(from: Node, to: Node, time: number, strokeStyle: string) {
+
+		this.from = from;
+		this.to = to;
+		this.time = time;
+		this.strokeStyle = strokeStyle;
+
+	}
+
+	public draw(): void {
+
+	}
+
+}
+
 let drawables: Drawable[] = [];
+
+let hostNode: Node;
+let localNode: Node;
+let rootNode: Node;
+let interNode: Node;
+let adminNode: Node;
+let destNode: Node;
 
 function run() {
 
@@ -122,12 +151,12 @@ function setupCanvas() {
 	let w = canvasDOM.width;
 	let h = canvasDOM.height;
 	
-	let hostNode = new Node({x: px, y: h - py},60,60,"top", "#FF0000");
-	let localNode = new Node({ x: px, y: h / 2 }, 60, 60, "top", "#FFFF00");
-	let rootNode = new Node({ x: px, y: py }, 60, 60, "top", "#00FF00");
-	let interNode = new Node({ x: w / 2, y: h / 2 }, 60, 60, "top", "#FF00FF");
-	let adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, "top", "#00FFFF");
-	let destNode = new Node({ x: w - px, y: h - py }, 60, 60, "top", "#0000FF");
+	hostNode = new Node({x: px, y: h - py},60,60,"top", "#FF0000");
+	localNode = new Node({ x: px, y: h / 2 }, 60, 60, "top", "#FFFF00");
+	rootNode = new Node({ x: px, y: py }, 60, 60, "top", "#00FF00");
+	interNode = new Node({ x: w / 2, y: h / 2 }, 60, 60, "top", "#FF00FF");
+	adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, "top", "#00FFFF");
+	destNode = new Node({ x: w - px, y: h - py }, 60, 60, "top", "#0000FF");
 
 	drawables.push(hostNode);
 	drawables.push(localNode);
