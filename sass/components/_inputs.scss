@@ -1,7 +1,7 @@
 @import "../base/typography";
 @import "../utils/colors/base";
 
-input, button {
+input, button, select {
 
 	border: none;
 	outline: none;
@@ -11,7 +11,7 @@ input, button {
 
 }
 
-input[type="text"] {
+input[type="text"], select {
 	
 	padding: 0.25em;
 	border: 2px solid $color-secondary;
