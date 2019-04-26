@@ -113,6 +113,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         return Line;
     }());
     var drawables = [];
+    var lineIntervals = [];
     var hostNode;
     var localNode;
     var rootNode;
@@ -120,6 +121,15 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     var adminNode;
     var destNode;
     function run() {
+        var drawIndex = drawables.length;
+        while (drawIndex--) {
+            if (drawables[drawIndex] instanceof Line) {
+                drawables.splice(drawIndex, 1);
+            }
+        }
+        for (var i = 0; i < lineIntervals.length; i++) {
+            clearInterval(lineIntervals[i]);
+        }
         var oldTable = dom_1.id('domain_error');
         if (oldTable !== null) {
             oldTable.remove();
@@ -181,6 +191,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 clearInterval(interval);
             }
         }, fixedDeltaTime);
+        lineIntervals.push(interval);
     }
     function render() {
         ctx.clearRect(0, 0, canvasDOM.width, canvasDOM.height);
@@ -208,12 +219,8 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         drawables.push(destNode);
     }
     resetCanvas();
-    serverImage.onload = function () {
-        render();
-    };
-    clientImage.onload = function () {
-        render();
-    };
+    serverImage.onload = render;
+    clientImage.onload = render;
     dom_1.id("run").addEventListener("click", function (ev) {
         run();
     });

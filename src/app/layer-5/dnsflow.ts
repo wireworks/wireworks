@@ -171,6 +171,7 @@ class Line implements Drawable {
 }
 
 let drawables: Drawable[] = [];
+let lineIntervals: number[] = [];
 
 let hostNode: Node;
 let localNode: Node;
@@ -180,6 +181,18 @@ let adminNode: Node;
 let destNode: Node;
 
 function run() {
+
+	let drawIndex = drawables.length;
+
+	while(drawIndex--) {
+		if(drawables[drawIndex] instanceof Line) {
+			drawables.splice(drawIndex,1);
+		}
+	}
+
+	for (let i = 0; i < lineIntervals.length; i++) {
+		clearInterval(lineIntervals[i]);
+	}
 
 	let oldTable = id('domain_error');
 
@@ -273,6 +286,8 @@ function connectNodes(from: Node, to: Node, strokeStyle: string, lineWidth: numb
 
 	}, fixedDeltaTime);
 
+	lineIntervals.push(interval);
+
 }
 
 function render() {
@@ -312,13 +327,8 @@ function resetCanvas() {
 
 resetCanvas();
 
-serverImage.onload = function() {
-	render();
-}
-
-clientImage.onload = function() {
-	render();
-}
+serverImage.onload = render;
+clientImage.onload = render;
 
 id("run").addEventListener("click", function(ev: MouseEvent) {
 
