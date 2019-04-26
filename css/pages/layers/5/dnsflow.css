@@ -865,4 +865,10 @@ h3, h4, h5, h6, p {
   content: "";
 }
 
+#canvas {
+  border: 2px solid #d9d8d8;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+}
+
 /*# sourceMappingURL=dnsflow.css.map */

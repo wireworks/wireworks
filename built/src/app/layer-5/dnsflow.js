@@ -1,26 +1,28 @@
+// DNSFlow
+// +=========================+
+// Author: Henrique Colini
+// Version: 1.0 (2019-04-14)
 define(["require", "exports", "../../core/utils/dom", "../../core/networking/layers/layer-5/domain", "../../core/utils/math"], function (require, exports, dom_1, domain_1, math_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    // DNSFlow
-    // +=========================+
-    // Author: Henrique Colini
-    // Version: 1.0 (2019-04-14)
+    var serverImage = new Image();
+    serverImage.src = "../../../images/layers/5/server.png";
+    var clientImage = new Image();
+    clientImage.src = "../../../images/layers/5/client.png";
     var errorWrapperDOM = dom_1.id("error_wrapper");
     var domainDOM = dom_1.id("domain");
     var canvasDOM = dom_1.id("canvas");
     var ctx = canvasDOM.getContext("2d");
     var fixedDeltaTime = 20;
     var Node = /** @class */ (function () {
-        function Node(pos, width, heigth, fillStyle) {
+        function Node(pos, width, heigth, image) {
             this.pos = pos;
             this.width = width;
             this.height = heigth;
-            this.fillStyle = fillStyle; // tmp!
+            this.image = image;
         }
         Node.prototype.draw = function () {
-            console.log("fill = " + this.fillStyle);
-            ctx.fillStyle = this.fillStyle;
-            ctx.fillRect(this.pos.x - (this.width / 2), this.pos.y - (this.height / 2), this.width, this.height);
+            ctx.drawImage(this.image, this.pos.x - (this.width / 2), this.pos.y - (this.height / 2), this.width, this.height);
         };
         Node.prototype.getVertices = function () {
             var x = this.pos.x;
@@ -191,12 +193,12 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         var py = 50;
         var w = canvasDOM.width;
         var h = canvasDOM.height;
-        hostNode = new Node({ x: px, y: h - py }, 60, 60, "#FF0000");
-        localNode = new Node({ x: px, y: h / 2 }, 60, 60, "#FFFF00");
-        rootNode = new Node({ x: px, y: py }, 60, 60, "#00FF00");
-        interNode = new Node({ x: w / 2, y: h / 2 }, 60, 60, "#FF00FF");
-        adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, "#00FFFF");
-        destNode = new Node({ x: w - px, y: h - py }, 60, 60, "#0000FF");
+        hostNode = new Node({ x: px, y: h - py }, 60, 60, clientImage);
+        localNode = new Node({ x: px, y: h / 2 }, 60, 60, serverImage);
+        rootNode = new Node({ x: px, y: py }, 60, 60, serverImage);
+        interNode = new Node({ x: w / 2, y: h / 2 }, 60, 60, serverImage);
+        adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, serverImage);
+        destNode = new Node({ x: w - px, y: h - py }, 60, 60, clientImage);
         drawables = [];
         drawables.push(hostNode);
         drawables.push(localNode);
@@ -206,7 +208,12 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         drawables.push(destNode);
     }
     resetCanvas();
-    render();
+    serverImage.onload = function () {
+        render();
+    };
+    clientImage.onload = function () {
+        render();
+    };
     dom_1.id("run").addEventListener("click", function (ev) {
         run();
     });

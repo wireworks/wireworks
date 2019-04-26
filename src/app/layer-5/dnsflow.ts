@@ -1,11 +1,17 @@
-import { id } from "../../core/utils/dom";
-import { Domain, ERROR_INVALID_LABEL, ERROR_FULL_NAME_RANGE } from "../../core/networking/layers/layer-5/domain";
-import { clamp } from "../../core/utils/math";
-
 // DNSFlow
 // +=========================+
 // Author: Henrique Colini
 // Version: 1.0 (2019-04-14)
+
+import { id } from "../../core/utils/dom";
+import { Domain, ERROR_INVALID_LABEL, ERROR_FULL_NAME_RANGE } from "../../core/networking/layers/layer-5/domain";
+import { clamp } from "../../core/utils/math";
+
+const serverImage = new Image();
+serverImage.src = "../../../images/layers/5/server.png";
+
+const clientImage = new Image();
+clientImage.src = "../../../images/layers/5/client.png";
 
 const errorWrapperDOM = id("error_wrapper");
 const domainDOM = id("domain");
@@ -26,20 +32,18 @@ class Node implements Drawable {
 	public pos: Point;
 	public width: number;
 	public height: number;
-	public fillStyle: string;
+	public image: HTMLImageElement;
 
-	constructor(pos: Point, width: number, heigth: number, fillStyle: string) {
+	constructor(pos: Point, width: number, heigth: number, image: HTMLImageElement) {
 		this.pos = pos;
 		this.width = width;
 		this.height = heigth;
-		this.fillStyle = fillStyle; // tmp!
+		this.image = image;
 	}
 
 	public draw(): void {
 		
-		console.log("fill = " + this.fillStyle);
-		ctx.fillStyle = this.fillStyle;
-		ctx.fillRect(this.pos.x - (this.width / 2), this.pos.y - (this.height / 2), this.width, this.height);
+		ctx.drawImage(this.image, this.pos.x - (this.width / 2), this.pos.y - (this.height / 2), this.width, this.height);
 
 	}
 
@@ -288,12 +292,12 @@ function resetCanvas() {
 	let w = canvasDOM.width;
 	let h = canvasDOM.height;
 	
-	hostNode = new Node({x: px, y: h - py},60,60,"#FF0000");
-	localNode = new Node({ x: px, y: h / 2 }, 60, 60, "#FFFF00");
-	rootNode = new Node({ x: px, y: py }, 60, 60, "#00FF00");
-	interNode = new Node({ x: w / 2, y: h / 2 }, 60, 60, "#FF00FF");
-	adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, "#00FFFF");
-	destNode = new Node({ x: w - px, y: h - py }, 60, 60, "#0000FF");
+	hostNode = new Node({x: px, y: h - py},60,60, clientImage);
+	localNode = new Node({ x: px, y: h / 2 }, 60, 60, serverImage);
+	rootNode = new Node({ x: px, y: py }, 60, 60, serverImage);
+	interNode = new Node({ x: w / 2, y: h / 2 }, 60, 60, serverImage);
+	adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, serverImage);
+	destNode = new Node({ x: w - px, y: h - py }, 60, 60, clientImage);
 
 	drawables = [];
 
@@ -307,7 +311,14 @@ function resetCanvas() {
 }
 
 resetCanvas();
-render();
+
+serverImage.onload = function() {
+	render();
+}
+
+clientImage.onload = function() {
+	render();
+}
 
 id("run").addEventListener("click", function(ev: MouseEvent) {
 
