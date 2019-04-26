@@ -127,34 +127,62 @@ class Line implements Drawable {
 
 	}
 
-	public draw(): void {
+	public getStartPoint(): Point {
 
 		let offX = this.from.pos.x - this.to.pos.x;
 		let offY = this.from.pos.y - this.to.pos.y;
 
-		let fromPoint: Point;
-		let toPoint: Point;
-
 		if (Math.abs(offX) > Math.abs(offY)) {
 			if (offX > 0) {
-				fromPoint = this.from.getOutput("left");
-				toPoint = this.to.getInput("right");
+				return this.from.getOutput("left");
 			}
 			else {
-				fromPoint = this.from.getOutput("right");
-				toPoint = this.to.getInput("left");
+				return this.from.getOutput("right");
 			}
 		}
 		else {
 			if (offY > 0) {
-				fromPoint = this.from.getOutput("top");
-				toPoint = this.to.getInput("bottom");
+				return this.from.getOutput("top");
 			}
 			else {
-				fromPoint = this.from.getOutput("bottom");
-				toPoint = this.to.getInput("top");
+				return this.from.getOutput("bottom");
 			}
 		}
+
+	}
+
+	public getEndPoint(): Point {
+
+		let offX = this.from.pos.x - this.to.pos.x;
+		let offY = this.from.pos.y - this.to.pos.y;
+
+		if (Math.abs(offX) > Math.abs(offY)) {
+			if (offX > 0) {
+				return this.to.getInput("right");
+			}
+			else {
+				return this.to.getInput("left");
+			}
+		}
+		else {
+			if (offY > 0) {
+				return this.to.getInput("bottom");
+			}
+			else {
+				return this.to.getInput("top");
+			}
+		}
+
+	}
+
+	public getCurrentEndPoint(fromPoint = this.getStartPoint(), toPoint = this.getEndPoint()): Point {
+		return {x: fromPoint.x + (this.time * (toPoint.x - fromPoint.x)), y: fromPoint.y + (this.time * (toPoint.y - fromPoint.y))};
+	}
+
+	public draw(): void {
+
+		let fromPoint = this.getStartPoint();
+		let currEnd = this.getCurrentEndPoint(fromPoint);
 
 		ctx.beginPath();
 		ctx.strokeStyle = this.strokeStyle;
@@ -162,7 +190,7 @@ class Line implements Drawable {
 		ctx.lineCap = "round";
 
 		ctx.moveTo(fromPoint.x, fromPoint.y);
-		ctx.lineTo(fromPoint.x + (this.time * (toPoint.x - fromPoint.x)), fromPoint.y + (this.time * (toPoint.y - fromPoint.y)));
+		ctx.lineTo(currEnd.x, currEnd.y);
 
 		ctx.stroke();
 
@@ -214,9 +242,12 @@ function run() {
 			let tmpRoot = new Domain(".", undefined);
 			let domain = Domain.extractDomain(tmpRoot, fullName);
 
-			connectNodes(hostNode, localNode, "#b0db8a", 10, 500, function() {
-				connectNodes(localNode, rootNode, "#b0db8a", 10, 500, function () {
-					connectNodes(rootNode, localNode, "#db938a", 10, 500);
+			connectNodes(hostNode, destNode, "#9ac9ed", 10, 600);
+			connectNodes(destNode, hostNode, "#9ac9ed", 10, 600);
+
+			connectNodes(hostNode, localNode, "#b0db8a", 10, 100, function() {
+				connectNodes(localNode, rootNode, "#b0db8a", 10, 100, function () {
+					connectNodes(rootNode, localNode, "#db938a", 10, 100);
 				});
 			});
 			
@@ -258,21 +289,23 @@ function run() {
 
 }
 
-function connectNodes(from: Node, to: Node, strokeStyle: string, lineWidth: number, delay: number, callback: Function = undefined) {
+function connectNodes(from: Node, to: Node, strokeStyle: string, lineWidth: number, speed: number, callback: Function = undefined) {
 
-	let spent = 0;
 	let line = new Line(from, to, 0, strokeStyle, lineWidth);
 	drawables.push(line);
 
 	let interval = setInterval(function(){
 
-		line.time = clamp(spent / delay, 0, 1);
+		let startPoint = line.getStartPoint();
+		let endPoint = line.getEndPoint();
+
+		let distance = Math.sqrt(((startPoint.x - endPoint.x)*(startPoint.x - endPoint.x)) + ((startPoint.y - endPoint.y)*(startPoint.y - endPoint.y)));
+
+		line.time = clamp(line.time + ((fixedDeltaTime/1000) * (speed/distance)), 0, 1);
 
 		render();
-
-		spent += fixedDeltaTime;
 		
-		if (spent >= delay) {
+		if (line.time >= 1) {
 
 			line.time = 1;
 			render();

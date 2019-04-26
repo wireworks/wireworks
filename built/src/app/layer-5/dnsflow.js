@@ -77,37 +77,60 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             this.strokeStyle = strokeStyle;
             this.lineWidth = strokeWidth;
         }
-        Line.prototype.draw = function () {
+        Line.prototype.getStartPoint = function () {
             var offX = this.from.pos.x - this.to.pos.x;
             var offY = this.from.pos.y - this.to.pos.y;
-            var fromPoint;
-            var toPoint;
             if (Math.abs(offX) > Math.abs(offY)) {
                 if (offX > 0) {
-                    fromPoint = this.from.getOutput("left");
-                    toPoint = this.to.getInput("right");
+                    return this.from.getOutput("left");
                 }
                 else {
-                    fromPoint = this.from.getOutput("right");
-                    toPoint = this.to.getInput("left");
+                    return this.from.getOutput("right");
                 }
             }
             else {
                 if (offY > 0) {
-                    fromPoint = this.from.getOutput("top");
-                    toPoint = this.to.getInput("bottom");
+                    return this.from.getOutput("top");
                 }
                 else {
-                    fromPoint = this.from.getOutput("bottom");
-                    toPoint = this.to.getInput("top");
+                    return this.from.getOutput("bottom");
                 }
             }
+        };
+        Line.prototype.getEndPoint = function () {
+            var offX = this.from.pos.x - this.to.pos.x;
+            var offY = this.from.pos.y - this.to.pos.y;
+            if (Math.abs(offX) > Math.abs(offY)) {
+                if (offX > 0) {
+                    return this.to.getInput("right");
+                }
+                else {
+                    return this.to.getInput("left");
+                }
+            }
+            else {
+                if (offY > 0) {
+                    return this.to.getInput("bottom");
+                }
+                else {
+                    return this.to.getInput("top");
+                }
+            }
+        };
+        Line.prototype.getCurrentEndPoint = function (fromPoint, toPoint) {
+            if (fromPoint === void 0) { fromPoint = this.getStartPoint(); }
+            if (toPoint === void 0) { toPoint = this.getEndPoint(); }
+            return { x: fromPoint.x + (this.time * (toPoint.x - fromPoint.x)), y: fromPoint.y + (this.time * (toPoint.y - fromPoint.y)) };
+        };
+        Line.prototype.draw = function () {
+            var fromPoint = this.getStartPoint();
+            var currEnd = this.getCurrentEndPoint(fromPoint);
             ctx.beginPath();
             ctx.strokeStyle = this.strokeStyle;
             ctx.lineWidth = this.lineWidth;
             ctx.lineCap = "round";
             ctx.moveTo(fromPoint.x, fromPoint.y);
-            ctx.lineTo(fromPoint.x + (this.time * (toPoint.x - fromPoint.x)), fromPoint.y + (this.time * (toPoint.y - fromPoint.y)));
+            ctx.lineTo(currEnd.x, currEnd.y);
             ctx.stroke();
         };
         return Line;
@@ -144,9 +167,11 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             else {
                 var tmpRoot = new domain_1.Domain(".", undefined);
                 var domain = domain_1.Domain.extractDomain(tmpRoot, fullName);
-                connectNodes(hostNode, localNode, "#b0db8a", 10, 500, function () {
-                    connectNodes(localNode, rootNode, "#b0db8a", 10, 500, function () {
-                        connectNodes(rootNode, localNode, "#db938a", 10, 500);
+                connectNodes(hostNode, destNode, "#9ac9ed", 10, 600);
+                connectNodes(destNode, hostNode, "#9ac9ed", 10, 600);
+                connectNodes(hostNode, localNode, "#b0db8a", 10, 100, function () {
+                    connectNodes(localNode, rootNode, "#b0db8a", 10, 100, function () {
+                        connectNodes(rootNode, localNode, "#db938a", 10, 100);
                     });
                 });
             }
@@ -173,16 +198,17 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             errorWrapperDOM.appendChild(table);
         }
     }
-    function connectNodes(from, to, strokeStyle, lineWidth, delay, callback) {
+    function connectNodes(from, to, strokeStyle, lineWidth, speed, callback) {
         if (callback === void 0) { callback = undefined; }
-        var spent = 0;
         var line = new Line(from, to, 0, strokeStyle, lineWidth);
         drawables.push(line);
         var interval = setInterval(function () {
-            line.time = math_1.clamp(spent / delay, 0, 1);
+            var startPoint = line.getStartPoint();
+            var endPoint = line.getEndPoint();
+            var distance = Math.sqrt(((startPoint.x - endPoint.x) * (startPoint.x - endPoint.x)) + ((startPoint.y - endPoint.y) * (startPoint.y - endPoint.y)));
+            line.time = math_1.clamp(line.time + ((fixedDeltaTime / 1000) * (speed / distance)), 0, 1);
             render();
-            spent += fixedDeltaTime;
-            if (spent >= delay) {
+            if (line.time >= 1) {
                 line.time = 1;
                 render();
                 if (callback) {
