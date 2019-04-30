@@ -19,6 +19,9 @@ const canvasDOM = <HTMLCanvasElement>id("canvas");
 const ctx = canvasDOM.getContext("2d");
 const fixedDeltaTime = 20;
 
+let drawables: Drawable[] = [];
+let lineIntervals: number[] = [];
+
 type Point = {	x: number, y: number }
 
 interface Drawable {
@@ -198,15 +201,25 @@ class Line implements Drawable {
 
 }
 
-let drawables: Drawable[] = [];
-let lineIntervals: number[] = [];
+class Walker {
 
-let hostNode: Node;
-let localNode: Node;
-let rootNode: Node;
-let interNode: Node;
-let adminNode: Node;
-let destNode: Node;
+	private requesterNode: Node;
+	private localNode: Node;
+	private rootNode: Node;
+	private interNode: Node;
+	private adminNode: Node;
+	private destNode: Node;
+
+	public setNodes(requester: Node, local: Node, root: Node, inter: Node, admin: Node, dest: Node)	{
+		this.requesterNode = requester;
+		this.localNode = local;
+		this.rootNode = root;
+		this.interNode = inter;
+		this.adminNode = admin;
+		this.destNode = dest;
+	}
+
+}
 
 function run() {
 
@@ -242,14 +255,14 @@ function run() {
 			let tmpRoot = new Domain(".", undefined);
 			let domain = Domain.extractDomain(tmpRoot, fullName);
 
-			connectNodes(hostNode, destNode, "#9ac9ed", 10, 600);
-			connectNodes(destNode, hostNode, "#9ac9ed", 10, 600);
+			//connectNodes(requesterNode, destNode, "#9ac9ed", 10, 600);
+			//connectNodes(destNode, requesterNode, "#9ac9ed", 10, 600);
 
-			connectNodes(hostNode, localNode, "#b0db8a", 10, 100, function() {
-				connectNodes(localNode, rootNode, "#b0db8a", 10, 100, function () {
-					connectNodes(rootNode, localNode, "#db938a", 10, 100);
-				});
-			});
+			//connectNodes(requesterNode, localNode, "#b0db8a", 10, 100, function() {
+			//	connectNodes(localNode, rootNode, "#b0db8a", 10, 100, function () {
+			//		connectNodes(rootNode, localNode, "#db938a", 10, 100);
+			//	});
+			//});
 			
 		}
 
@@ -289,7 +302,7 @@ function run() {
 
 }
 
-function connectNodes(from: Node, to: Node, strokeStyle: string, lineWidth: number, speed: number, callback: Function = undefined) {
+function connectNodes(from: Node, to: Node, strokeStyle: string, lineWidth: number, speed: number, callback: Function = undefined): Line {
 
 	let line = new Line(from, to, 0, strokeStyle, lineWidth);
 	drawables.push(line);
@@ -321,6 +334,8 @@ function connectNodes(from: Node, to: Node, strokeStyle: string, lineWidth: numb
 
 	lineIntervals.push(interval);
 
+	return line;
+
 }
 
 function render() {
@@ -340,16 +355,17 @@ function resetCanvas() {
 	let w = canvasDOM.width;
 	let h = canvasDOM.height;
 	
-	hostNode = new Node({x: px, y: h - py},60,60, clientImage);
-	localNode = new Node({ x: px, y: h / 2 }, 60, 60, serverImage);
-	rootNode = new Node({ x: px, y: py }, 60, 60, serverImage);
-	interNode = new Node({ x: w / 2, y: h / 2 }, 60, 60, serverImage);
-	adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, serverImage);
-	destNode = new Node({ x: w - px, y: h - py }, 60, 60, clientImage);
+	let requesterNode = new Node({x: px, y: h - py},60,60, clientImage);
+	let localNode = new Node({ x: px, y: h / 2 }, 60, 60, serverImage);
+	let rootNode = new Node({ x: px, y: py }, 60, 60, serverImage);
+	let interNode = new Node({ x: w / 2, y: h / 2 }, 60, 60, serverImage);
+	let adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, serverImage);
+	let destNode = new Node({ x: w - px, y: h - py }, 60, 60, clientImage);
+
 
 	drawables = [];
 
-	drawables.push(hostNode);
+	drawables.push(requesterNode);
 	drawables.push(localNode);
 	drawables.push(rootNode);
 	drawables.push(interNode);

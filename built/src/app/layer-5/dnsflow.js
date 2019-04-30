@@ -14,6 +14,8 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     var canvasDOM = dom_1.id("canvas");
     var ctx = canvasDOM.getContext("2d");
     var fixedDeltaTime = 20;
+    var drawables = [];
+    var lineIntervals = [];
     var Node = /** @class */ (function () {
         function Node(pos, width, heigth, image) {
             this.pos = pos;
@@ -135,14 +137,6 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         };
         return Line;
     }());
-    var drawables = [];
-    var lineIntervals = [];
-    var hostNode;
-    var localNode;
-    var rootNode;
-    var interNode;
-    var adminNode;
-    var destNode;
     function run() {
         var drawIndex = drawables.length;
         while (drawIndex--) {
@@ -167,13 +161,13 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             else {
                 var tmpRoot = new domain_1.Domain(".", undefined);
                 var domain = domain_1.Domain.extractDomain(tmpRoot, fullName);
-                connectNodes(hostNode, destNode, "#9ac9ed", 10, 600);
-                connectNodes(destNode, hostNode, "#9ac9ed", 10, 600);
-                connectNodes(hostNode, localNode, "#b0db8a", 10, 100, function () {
-                    connectNodes(localNode, rootNode, "#b0db8a", 10, 100, function () {
-                        connectNodes(rootNode, localNode, "#db938a", 10, 100);
-                    });
-                });
+                //connectNodes(requesterNode, destNode, "#9ac9ed", 10, 600);
+                //connectNodes(destNode, requesterNode, "#9ac9ed", 10, 600);
+                //connectNodes(requesterNode, localNode, "#b0db8a", 10, 100, function() {
+                //	connectNodes(localNode, rootNode, "#b0db8a", 10, 100, function () {
+                //		connectNodes(rootNode, localNode, "#db938a", 10, 100);
+                //	});
+                //});
             }
         }
         catch (error) {
@@ -218,6 +212,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             }
         }, fixedDeltaTime);
         lineIntervals.push(interval);
+        return line;
     }
     function render() {
         ctx.clearRect(0, 0, canvasDOM.width, canvasDOM.height);
@@ -230,14 +225,14 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         var py = 50;
         var w = canvasDOM.width;
         var h = canvasDOM.height;
-        hostNode = new Node({ x: px, y: h - py }, 60, 60, clientImage);
-        localNode = new Node({ x: px, y: h / 2 }, 60, 60, serverImage);
-        rootNode = new Node({ x: px, y: py }, 60, 60, serverImage);
-        interNode = new Node({ x: w / 2, y: h / 2 }, 60, 60, serverImage);
-        adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, serverImage);
-        destNode = new Node({ x: w - px, y: h - py }, 60, 60, clientImage);
+        var requesterNode = new Node({ x: px, y: h - py }, 60, 60, clientImage);
+        var localNode = new Node({ x: px, y: h / 2 }, 60, 60, serverImage);
+        var rootNode = new Node({ x: px, y: py }, 60, 60, serverImage);
+        var interNode = new Node({ x: w / 2, y: h / 2 }, 60, 60, serverImage);
+        var adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, serverImage);
+        var destNode = new Node({ x: w - px, y: h - py }, 60, 60, clientImage);
         drawables = [];
-        drawables.push(hostNode);
+        drawables.push(requesterNode);
         drawables.push(localNode);
         drawables.push(rootNode);
         drawables.push(interNode);
