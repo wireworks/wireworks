@@ -201,6 +201,14 @@ class Line implements Drawable {
 
 }
 
+type WalkerPath = {
+	condition: [boolean, boolean],
+	paths: {
+		node: 'o' | 'l' | 'r' | 'i' | 'a' | 'd' | '<',
+		carry: undefined | 'host' | 'inter' | 'top'
+	}	
+};
+
 class Walker {
 
 	private requesterNode: Node;
@@ -209,6 +217,28 @@ class Walker {
 	private interNode: Node;
 	private adminNode: Node;
 	private destNode: Node;
+	private paths: WalkerPath[];
+
+	public walk(condition: [boolean, boolean]): boolean {
+
+		let found: WalkerPath = undefined;
+
+		for (let i = 0; i < this.paths.length && !found; i++) {
+			const wpath = this.paths[i];
+			
+			if(wpath.condition[0] == condition[0] && wpath.condition[1] == condition[1]) {
+				found = wpath;
+			}
+
+		}
+
+		if(!found) {
+			return false;
+		}
+
+		
+
+	}
 
 	public setNodes(requester: Node, local: Node, root: Node, inter: Node, admin: Node, dest: Node)	{
 		this.requesterNode = requester;
@@ -218,6 +248,10 @@ class Walker {
 		this.adminNode = admin;
 		this.destNode = dest;
 	}
+
+	public addPath(path: WalkerPath) {
+		this.paths.push(path);
+	}	
 
 }
 
