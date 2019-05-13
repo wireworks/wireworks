@@ -203,10 +203,10 @@ class Line implements Drawable {
 
 type WalkerPath = {
 	condition: [boolean, boolean],
-	paths: {
+	paths: [{
 		node: 'o' | 'l' | 'r' | 'i' | 'a' | 'd' | '<',
 		carry: undefined | 'host' | 'inter' | 'top'
-	}	
+	}]	
 };
 
 class Walker {
@@ -235,8 +235,43 @@ class Walker {
 		if(!found) {
 			return false;
 		}
-
 		
+		let lastNode: Node = undefined;
+		let currNode: Node = undefined;
+
+		for (let i = 0; i < found.paths.length; i++) {
+			const path = found.paths[i];
+			if (i == 0) {
+				switch(path.node) {
+					case 'o': lastNode = this.requesterNode; break;
+					case 'l': lastNode = this.localNode; break;
+					case 'r': lastNode = this.rootNode; break;
+					case 'i': lastNode = this.interNode; break;
+					case 'a': lastNode = this.adminNode; break;
+					case 'd': lastNode = this.destNode; break;
+				}
+			}
+			else {
+
+				switch (path.node) {
+					case 'o': currNode = this.requesterNode; break;
+					case 'l': currNode = this.localNode; break;
+					case 'r': currNode = this.rootNode; break;
+					case 'i': currNode = this.interNode; break;
+					case 'a': currNode = this.adminNode; break;
+					case 'd': currNode = this.destNode; break;
+					case '<': currNode = lastNode; break;
+				}
+
+				if (path.node == '<') {
+
+				}
+				else {
+					
+				}
+
+			}
+		}
 
 	}
 
