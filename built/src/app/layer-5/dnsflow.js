@@ -12,19 +12,34 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     var errorWrapperDOM = dom_1.id("error_wrapper");
     var domainDOM = dom_1.id("domain");
     var canvasDOM = dom_1.id("canvas");
+    var localModeDOM = dom_1.id("local_mode");
+    var rootModeDOM = dom_1.id("root_mode");
+    var interModeDOM = dom_1.id("intermediate_mode");
     var ctx = canvasDOM.getContext("2d");
     var fixedDeltaTime = 20;
+    var requesterNode;
+    var localNode;
+    var rootNode;
+    var interNode;
+    var adminNode;
+    var destNode;
     var drawables = [];
     var lineIntervals = [];
+    var greenWire = "#b0db8a";
+    var redWire = "#db938a";
+    var blueWire = "#9ac9ed";
+    var yellowWire = "#e5c16e";
     var Node = /** @class */ (function () {
         function Node(pos, width, heigth, image) {
+            this.visible = true;
             this.pos = pos;
             this.width = width;
             this.height = heigth;
             this.image = image;
         }
         Node.prototype.draw = function () {
-            ctx.drawImage(this.image, this.pos.x - (this.width / 2), this.pos.y - (this.height / 2), this.width, this.height);
+            if (this.visible)
+                ctx.drawImage(this.image, this.pos.x - (this.width / 2), this.pos.y - (this.height / 2), this.width, this.height);
         };
         Node.prototype.getVertices = function () {
             var x = this.pos.x;
@@ -71,8 +86,37 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         };
         return Node;
     }());
+    var Label = /** @class */ (function () {
+        function Label(pos, text, textColor, backgroundColor, padding, font, textHeight) {
+            this.visible = true;
+            this.pos = pos;
+            this.text = text;
+            this.textColor = textColor;
+            this.backgroundColor = backgroundColor;
+            this.padding = padding;
+            this.font = font;
+            this.textHeight = textHeight;
+        }
+        Label.prototype.draw = function () {
+            var width = this.getRealWidth();
+            var height = this.getRealHeight();
+            ctx.fillStyle = this.backgroundColor;
+            ctx.fillRect(this.pos.x, this.pos.y, width, height);
+            ctx.fillStyle = this.textColor;
+            ctx.font = this.font;
+            ctx.fillText(this.text, this.pos.x + this.padding, this.pos.y + this.padding + this.textHeight);
+        };
+        Label.prototype.getRealWidth = function () {
+            return ctx.measureText(this.text).width + (2 * this.padding);
+        };
+        Label.prototype.getRealHeight = function () {
+            return this.textHeight + (2 * this.padding);
+        };
+        return Label;
+    }());
     var Line = /** @class */ (function () {
         function Line(from, to, time, strokeStyle, strokeWidth) {
+            this.visible = true;
             this.from = from;
             this.to = to;
             this.time = time;
@@ -125,15 +169,17 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             return { x: fromPoint.x + (this.time * (toPoint.x - fromPoint.x)), y: fromPoint.y + (this.time * (toPoint.y - fromPoint.y)) };
         };
         Line.prototype.draw = function () {
-            var fromPoint = this.getStartPoint();
-            var currEnd = this.getCurrentEndPoint(fromPoint);
-            ctx.beginPath();
-            ctx.strokeStyle = this.strokeStyle;
-            ctx.lineWidth = this.lineWidth;
-            ctx.lineCap = "round";
-            ctx.moveTo(fromPoint.x, fromPoint.y);
-            ctx.lineTo(currEnd.x, currEnd.y);
-            ctx.stroke();
+            if (this.visible) {
+                var fromPoint = this.getStartPoint();
+                var currEnd = this.getCurrentEndPoint(fromPoint);
+                ctx.beginPath();
+                ctx.strokeStyle = this.strokeStyle;
+                ctx.lineWidth = this.lineWidth;
+                ctx.lineCap = "round";
+                ctx.moveTo(fromPoint.x, fromPoint.y);
+                ctx.lineTo(currEnd.x, currEnd.y);
+                ctx.stroke();
+            }
         };
         return Line;
     }());
@@ -160,14 +206,63 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             }
             else {
                 var tmpRoot = new domain_1.Domain(".", undefined);
-                var domain = domain_1.Domain.extractDomain(tmpRoot, fullName);
-                //connectNodes(requesterNode, destNode, "#9ac9ed", 10, 600);
-                //connectNodes(destNode, requesterNode, "#9ac9ed", 10, 600);
-                //connectNodes(requesterNode, localNode, "#b0db8a", 10, 100, function() {
-                //	connectNodes(localNode, rootNode, "#b0db8a", 10, 100, function () {
-                //		connectNodes(rootNode, localNode, "#db938a", 10, 100);
-                //	});
-                //});
+                var domainParts = domain_1.Domain.extractDomain(tmpRoot, fullName).getFullName().split(".");
+                var hasInter = false;
+                if (domainParts.length < 2) {
+                    errStr = "Você deve inserir um domínio com mais partes.";
+                    throw Error();
+                }
+                if (domainParts.length == 2) {
+                    domainParts.unshift("www");
+                }
+                if (domainParts.length > 3) {
+                    var middle = "";
+                    for (var i = 2; i < domainParts.length - 1; i++)
+                        middle += domainParts[i] + ((i < domainParts.length - 2) ? "." : "");
+                    domainParts = [domainParts[0], domainParts[1], middle, domainParts[domainParts.length - 1]];
+                    hasInter = true;
+                }
+                console.log(domainParts);
+                var speed = 200;
+                var width = 10;
+                if (localModeDOM.value === "iterative") {
+                    connectMultipleNodes([
+                        { from: requesterNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+                        { from: localNode, to: rootNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+                        { from: rootNode, to: localNode, strokeStyle: redWire, lineWidth: width, speed: speed },
+                        { from: localNode, to: interNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+                        { from: interNode, to: localNode, strokeStyle: redWire, lineWidth: width, speed: speed },
+                        { from: localNode, to: adminNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+                        { from: adminNode, to: localNode, strokeStyle: greenWire, lineWidth: width, speed: speed },
+                        { from: localNode, to: requesterNode, strokeStyle: greenWire, lineWidth: width, speed: speed }
+                    ], onSuccess);
+                }
+                else if (localModeDOM.value === "recursive") {
+                    if (rootModeDOM.value === "iterative") {
+                        connectMultipleNodes([
+                            { from: requesterNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+                            { from: localNode, to: rootNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+                            { from: rootNode, to: interNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+                            { from: interNode, to: rootNode, strokeStyle: redWire, lineWidth: width, speed: speed },
+                            { from: rootNode, to: adminNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+                            { from: adminNode, to: rootNode, strokeStyle: greenWire, lineWidth: width, speed: speed },
+                            { from: rootNode, to: localNode, strokeStyle: greenWire, lineWidth: width, speed: speed },
+                            { from: localNode, to: requesterNode, strokeStyle: greenWire, lineWidth: width, speed: speed }
+                        ], onSuccess);
+                    }
+                    else if (rootModeDOM.value === "recursive") {
+                        connectMultipleNodes([
+                            { from: requesterNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+                            { from: localNode, to: rootNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+                            { from: rootNode, to: interNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+                            { from: interNode, to: adminNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+                            { from: adminNode, to: interNode, strokeStyle: greenWire, lineWidth: width, speed: speed },
+                            { from: interNode, to: rootNode, strokeStyle: greenWire, lineWidth: width, speed: speed },
+                            { from: rootNode, to: localNode, strokeStyle: greenWire, lineWidth: width, speed: speed },
+                            { from: localNode, to: requesterNode, strokeStyle: greenWire, lineWidth: width, speed: speed }
+                        ], onSuccess);
+                    }
+                }
             }
         }
         catch (error) {
@@ -192,6 +287,10 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             errorWrapperDOM.appendChild(table);
         }
     }
+    function onSuccess() {
+        connectNodes(requesterNode, destNode, blueWire, 10, 800);
+        connectNodes(destNode, requesterNode, blueWire, 10, 800);
+    }
     function connectNodes(from, to, strokeStyle, lineWidth, speed, callback) {
         if (callback === void 0) { callback = undefined; }
         var line = new Line(from, to, 0, strokeStyle, lineWidth);
@@ -214,6 +313,24 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         lineIntervals.push(interval);
         return line;
     }
+    function connectMultipleNodes(connections, callback) {
+        if (callback === void 0) { callback = undefined; }
+        function recursiveConnect(index) {
+            if (index < connections.length) {
+                var connection = connections[index];
+                index++;
+                connectNodes(connection.from, connection.to, connection.strokeStyle, connection.lineWidth, connection.speed, function () {
+                    recursiveConnect(index);
+                });
+            }
+            else {
+                if (callback) {
+                    callback();
+                }
+            }
+        }
+        recursiveConnect(0);
+    }
     function render() {
         ctx.clearRect(0, 0, canvasDOM.width, canvasDOM.height);
         for (var i = 0; i < drawables.length; i++) {
@@ -221,16 +338,16 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         }
     }
     function resetCanvas() {
-        var px = 50; // padding
-        var py = 50;
+        var px = 70; // padding
+        var py = 70;
         var w = canvasDOM.width;
         var h = canvasDOM.height;
-        var requesterNode = new Node({ x: px, y: h - py }, 60, 60, clientImage);
-        var localNode = new Node({ x: px, y: h / 2 }, 60, 60, serverImage);
-        var rootNode = new Node({ x: px, y: py }, 60, 60, serverImage);
-        var interNode = new Node({ x: w / 2, y: h / 2 }, 60, 60, serverImage);
-        var adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, serverImage);
-        var destNode = new Node({ x: w - px, y: h - py }, 60, 60, clientImage);
+        requesterNode = new Node({ x: px, y: h - py }, 60, 60, clientImage);
+        localNode = new Node({ x: px, y: h / 2 }, 60, 60, serverImage);
+        rootNode = new Node({ x: px, y: py }, 60, 60, serverImage);
+        interNode = new Node({ x: w - px, y: py }, 60, 60, serverImage);
+        adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, serverImage);
+        destNode = new Node({ x: w - px, y: h - py }, 60, 60, clientImage);
         drawables = [];
         drawables.push(requesterNode);
         drawables.push(localNode);

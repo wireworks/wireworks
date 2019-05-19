@@ -9,29 +9,46 @@ import { clamp } from "../../core/utils/math";
 
 const serverImage = new Image();
 serverImage.src = "../../../images/layers/5/server.png";
-
 const clientImage = new Image();
 clientImage.src = "../../../images/layers/5/client.png";
 
 const errorWrapperDOM = id("error_wrapper");
 const domainDOM = id("domain");
 const canvasDOM = <HTMLCanvasElement>id("canvas");
+const localModeDOM = <HTMLSelectElement>id("local_mode");
+const rootModeDOM = <HTMLSelectElement>id("root_mode");
+const interModeDOM = <HTMLSelectElement>id("intermediate_mode");
+
 const ctx = canvasDOM.getContext("2d");
 const fixedDeltaTime = 20;
 
+let requesterNode: Node;
+let localNode: Node;
+let rootNode: Node;
+let interNode: Node;
+let adminNode: Node;
+let destNode: Node;
+
 let drawables: Drawable[] = [];
 let lineIntervals: number[] = [];
+
+const greenWire = "#b0db8a";
+const redWire = "#db938a";
+const blueWire = "#9ac9ed";
+const yellowWire = "#e5c16e";
 
 type Point = {	x: number, y: number }
 
 interface Drawable {
 
+	visible: boolean;
 	draw(): void;
 
 }
 
 class Node implements Drawable {
 	
+	public visible = true;
 	public pos: Point;
 	public width: number;
 	public height: number;
@@ -46,7 +63,8 @@ class Node implements Drawable {
 
 	public draw(): void {
 		
-		ctx.drawImage(this.image, this.pos.x - (this.width / 2), this.pos.y - (this.height / 2), this.width, this.height);
+		if (this.visible)
+			ctx.drawImage(this.image, this.pos.x - (this.width / 2), this.pos.y - (this.height / 2), this.width, this.height);
 
 	}
 
@@ -112,8 +130,50 @@ class Node implements Drawable {
 
 }
 
+class Label implements Drawable {
+	
+	public visible = true;
+	public pos: Point;
+	public text: string;
+	public textColor: string;
+	public backgroundColor: string;
+	public padding: number;
+	public font: string;
+	public textHeight: number;
+
+	constructor(pos: Point, text: string, textColor: string, backgroundColor: string, padding: number, font: string, textHeight: number) {
+		this.pos = pos;
+		this.text = text;
+		this.textColor = textColor;
+		this.backgroundColor = backgroundColor;
+		this.padding = padding;
+		this.font = font;
+		this.textHeight = textHeight;
+	}
+
+	public draw(): void {
+		let width = this.getRealWidth();
+		let height = this.getRealHeight();
+		ctx.fillStyle = this.backgroundColor;
+		ctx.fillRect(this.pos.x, this.pos.y, width, height);
+		ctx.fillStyle = this.textColor;
+		ctx.font = this.font;
+		ctx.fillText(this.text, this.pos.x + this.padding, this.pos.y + this.padding + this.textHeight);
+	}	
+	
+	public getRealWidth(): number {
+		return ctx.measureText(this.text).width + (2*this.padding);
+	}
+
+	public getRealHeight(): number {
+		return this.textHeight + (2*this.padding);
+	}
+
+}
+
 class Line implements Drawable {
 
+	public visible = true;
 	public from: Node;
 	public to: Node;
 	public time: number;
@@ -184,109 +244,23 @@ class Line implements Drawable {
 
 	public draw(): void {
 
-		let fromPoint = this.getStartPoint();
-		let currEnd = this.getCurrentEndPoint(fromPoint);
+		if (this.visible){
 
-		ctx.beginPath();
-		ctx.strokeStyle = this.strokeStyle;
-		ctx.lineWidth = this.lineWidth;
-		ctx.lineCap = "round";
+			let fromPoint = this.getStartPoint();
+			let currEnd = this.getCurrentEndPoint(fromPoint);
 
-		ctx.moveTo(fromPoint.x, fromPoint.y);
-		ctx.lineTo(currEnd.x, currEnd.y);
+			ctx.beginPath();
+			ctx.strokeStyle = this.strokeStyle;
+			ctx.lineWidth = this.lineWidth;
+			ctx.lineCap = "round";
 
-		ctx.stroke();
+			ctx.moveTo(fromPoint.x, fromPoint.y);
+			ctx.lineTo(currEnd.x, currEnd.y);
 
-	}
-
-}
-
-type WalkerPath = {
-	condition: [boolean, boolean],
-	paths: [{
-		node: 'o' | 'l' | 'r' | 'i' | 'a' | 'd' | '<',
-		carry: undefined | 'host' | 'inter' | 'top'
-	}]	
-};
-
-class Walker {
-
-	private requesterNode: Node;
-	private localNode: Node;
-	private rootNode: Node;
-	private interNode: Node;
-	private adminNode: Node;
-	private destNode: Node;
-	private paths: WalkerPath[];
-
-	public walk(condition: [boolean, boolean]): boolean {
-
-		let found: WalkerPath = undefined;
-
-		for (let i = 0; i < this.paths.length && !found; i++) {
-			const wpath = this.paths[i];
-			
-			if(wpath.condition[0] == condition[0] && wpath.condition[1] == condition[1]) {
-				found = wpath;
-			}
-
-		}
-
-		if(!found) {
-			return false;
-		}
-		
-		let lastNode: Node = undefined;
-		let currNode: Node = undefined;
-
-		for (let i = 0; i < found.paths.length; i++) {
-			const path = found.paths[i];
-			if (i == 0) {
-				switch(path.node) {
-					case 'o': lastNode = this.requesterNode; break;
-					case 'l': lastNode = this.localNode; break;
-					case 'r': lastNode = this.rootNode; break;
-					case 'i': lastNode = this.interNode; break;
-					case 'a': lastNode = this.adminNode; break;
-					case 'd': lastNode = this.destNode; break;
-				}
-			}
-			else {
-
-				switch (path.node) {
-					case 'o': currNode = this.requesterNode; break;
-					case 'l': currNode = this.localNode; break;
-					case 'r': currNode = this.rootNode; break;
-					case 'i': currNode = this.interNode; break;
-					case 'a': currNode = this.adminNode; break;
-					case 'd': currNode = this.destNode; break;
-					case '<': currNode = lastNode; break;
-				}
-
-				if (path.node == '<') {
-
-				}
-				else {
-					
-				}
-
-			}
+			ctx.stroke();
 		}
 
 	}
-
-	public setNodes(requester: Node, local: Node, root: Node, inter: Node, admin: Node, dest: Node)	{
-		this.requesterNode = requester;
-		this.localNode = local;
-		this.rootNode = root;
-		this.interNode = inter;
-		this.adminNode = admin;
-		this.destNode = dest;
-	}
-
-	public addPath(path: WalkerPath) {
-		this.paths.push(path);
-	}	
 
 }
 
@@ -322,16 +296,74 @@ function run() {
 		} else {
 			
 			let tmpRoot = new Domain(".", undefined);
-			let domain = Domain.extractDomain(tmpRoot, fullName);
+			let domainParts = Domain.extractDomain(tmpRoot, fullName).getFullName().split(".");
+			let hasInter = false;
 
-			//connectNodes(requesterNode, destNode, "#9ac9ed", 10, 600);
-			//connectNodes(destNode, requesterNode, "#9ac9ed", 10, 600);
+			if (domainParts.length < 2) {
+				errStr = "Você deve inserir um domínio com mais partes.";
+				throw Error();
+			}
+			if (domainParts.length == 2) {
+				domainParts.unshift("www");
+			}
+			if (domainParts.length > 3) {
+				let middle = "";
+				for (let i = 2; i < domainParts.length - 1; i++) middle += domainParts[i] + ((i < domainParts.length - 2)?".":"");
+				domainParts = [domainParts[0],domainParts[1],middle,domainParts[domainParts.length-1]];
+				hasInter = true;
+			}			
+			
+			console.log(domainParts);
 
-			//connectNodes(requesterNode, localNode, "#b0db8a", 10, 100, function() {
-			//	connectNodes(localNode, rootNode, "#b0db8a", 10, 100, function () {
-			//		connectNodes(rootNode, localNode, "#db938a", 10, 100);
-			//	});
-			//});
+			let speed = 200;
+			let width = 10;
+
+			if (localModeDOM.value === "iterative") {
+
+				connectMultipleNodes([
+					{ from: requesterNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+					{ from: localNode, to: rootNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+					{ from: rootNode, to: localNode, strokeStyle: redWire, lineWidth: width, speed: speed },
+					{ from: localNode, to: interNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+					{ from: interNode, to: localNode, strokeStyle: redWire, lineWidth: width, speed: speed },
+					{ from: localNode, to: adminNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+					{ from: adminNode, to: localNode, strokeStyle: greenWire, lineWidth: width, speed: speed },
+					{ from: localNode, to: requesterNode, strokeStyle: greenWire, lineWidth: width, speed: speed }
+				], onSuccess);
+
+			}
+			else if (localModeDOM.value === "recursive") {
+
+				if (rootModeDOM.value === "iterative") {
+
+					connectMultipleNodes([
+						{ from: requesterNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+						{ from: localNode, to: rootNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+						{ from: rootNode, to: interNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+						{ from: interNode, to: rootNode, strokeStyle: redWire, lineWidth: width, speed: speed },
+						{ from: rootNode, to: adminNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+						{ from: adminNode, to: rootNode, strokeStyle: greenWire, lineWidth: width, speed: speed },
+						{ from: rootNode, to: localNode, strokeStyle: greenWire, lineWidth: width, speed: speed },
+						{ from: localNode, to: requesterNode, strokeStyle: greenWire, lineWidth: width, speed: speed }
+					], onSuccess);
+
+				}
+				else if (rootModeDOM.value === "recursive") {
+
+					connectMultipleNodes([
+						{ from: requesterNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+						{ from: localNode, to: rootNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+						{ from: rootNode, to: interNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+						{ from: interNode, to: adminNode, strokeStyle: yellowWire, lineWidth: width, speed: speed },
+						{ from: adminNode, to: interNode, strokeStyle: greenWire, lineWidth: width, speed: speed },
+						{ from: interNode, to: rootNode, strokeStyle: greenWire, lineWidth: width, speed: speed },
+						{ from: rootNode, to: localNode, strokeStyle: greenWire, lineWidth: width, speed: speed },
+						{ from: localNode, to: requesterNode, strokeStyle: greenWire, lineWidth: width, speed: speed }
+					], onSuccess);
+
+				}
+
+			}
 			
 		}
 
@@ -371,6 +403,11 @@ function run() {
 
 }
 
+function onSuccess() {
+	connectNodes(requesterNode, destNode, blueWire, 10, 800);
+	connectNodes(destNode, requesterNode, blueWire, 10, 800);
+}
+
 function connectNodes(from: Node, to: Node, strokeStyle: string, lineWidth: number, speed: number, callback: Function = undefined): Line {
 
 	let line = new Line(from, to, 0, strokeStyle, lineWidth);
@@ -381,7 +418,9 @@ function connectNodes(from: Node, to: Node, strokeStyle: string, lineWidth: numb
 		let startPoint = line.getStartPoint();
 		let endPoint = line.getEndPoint();
 
-		let distance = Math.sqrt(((startPoint.x - endPoint.x)*(startPoint.x - endPoint.x)) + ((startPoint.y - endPoint.y)*(startPoint.y - endPoint.y)));
+		let distance = Math.sqrt(
+			((startPoint.x - endPoint.x)*(startPoint.x - endPoint.x)) + ((startPoint.y - endPoint.y)*(startPoint.y - endPoint.y))
+		);
 
 		line.time = clamp(line.time + ((fixedDeltaTime/1000) * (speed/distance)), 0, 1);
 
@@ -407,6 +446,32 @@ function connectNodes(from: Node, to: Node, strokeStyle: string, lineWidth: numb
 
 }
 
+function connectMultipleNodes(
+	connections: { from: Node, to: Node, strokeStyle: string, lineWidth: number, speed: number }[],
+	callback: Function = undefined) {
+
+	function recursiveConnect(index: number) {
+
+		if(index < connections.length){
+			let connection = connections[index];
+			index++;
+					
+			connectNodes(connection.from, connection.to, connection.strokeStyle, connection.lineWidth, connection.speed, function () {
+				recursiveConnect(index);
+			});
+		}
+		else {
+			if (callback) {
+				callback();
+			}
+		}
+
+	}
+
+	recursiveConnect(0);
+
+}
+
 function render() {
 
 	ctx.clearRect(0, 0, canvasDOM.width, canvasDOM.height);
@@ -419,18 +484,17 @@ function render() {
 
 function resetCanvas() {
 
-	let px = 50; // padding
-	let py = 50;
+	let px = 70; // padding
+	let py = 70;
 	let w = canvasDOM.width;
 	let h = canvasDOM.height;
 	
-	let requesterNode = new Node({x: px, y: h - py},60,60, clientImage);
-	let localNode = new Node({ x: px, y: h / 2 }, 60, 60, serverImage);
-	let rootNode = new Node({ x: px, y: py }, 60, 60, serverImage);
-	let interNode = new Node({ x: w / 2, y: h / 2 }, 60, 60, serverImage);
-	let adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, serverImage);
-	let destNode = new Node({ x: w - px, y: h - py }, 60, 60, clientImage);
-
+	requesterNode = new Node({x: px, y: h - py},60,60, clientImage);
+	localNode = new Node({ x: px, y: h / 2 }, 60, 60, serverImage);
+	rootNode = new Node({ x: px, y: py }, 60, 60, serverImage);
+	interNode = new Node({ x: w - px, y: py }, 60, 60, serverImage);
+	adminNode = new Node({ x: w - px, y: h / 2 }, 60, 60, serverImage);
+	destNode = new Node({ x: w - px, y: h - py }, 60, 60, clientImage);
 
 	drawables = [];
 
