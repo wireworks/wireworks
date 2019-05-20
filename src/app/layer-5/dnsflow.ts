@@ -378,7 +378,7 @@ function run() {
 			interNode.visible = hasInter;
 			interLabel.visible = hasInter;
 
-			if (localModeDOM.value === "iterative") {
+			if (localModeDOM.value === "recursive") {
 
 				if (hasInter) {
 					
@@ -408,9 +408,9 @@ function run() {
 				}
 
 			}
-			else if (localModeDOM.value === "recursive") {
+			else if (localModeDOM.value === "iterative") {
 
-				if (rootModeDOM.value === "iterative") {
+				if (rootModeDOM.value === "recursive") {
 
 					if (hasInter) {
 						connectMultipleNodes([
@@ -436,7 +436,7 @@ function run() {
 					}
 
 				}
-				else if (rootModeDOM.value === "recursive") {
+				else if (rootModeDOM.value === "iterative") {
 
 					if (hasInter) {
 						
@@ -560,14 +560,14 @@ function connectMultipleNodes(
 	connections: { from: Node, to: Node, strokeStyle: string, lineWidth: number, speed: number, labelText: string|undefined }[],
 	callback: Function = undefined) {
 
-	function recursiveConnect(index: number) {
+	function iterativeConnect(index: number) {
 
 		if(index < connections.length){
 			let connection = connections[index];
 			index++;
 					
 			connectNodes(connection.from, connection.to, connection.strokeStyle, connection.lineWidth, connection.speed, connection.labelText, function () {
-				recursiveConnect(index);
+				iterativeConnect(index);
 			});
 		}
 		else {
@@ -578,7 +578,7 @@ function connectMultipleNodes(
 
 	}
 
-	recursiveConnect(0);
+	iterativeConnect(0);
 
 }
 
@@ -659,7 +659,7 @@ function resetCanvas() {
 	localLabel = new Label({x: 0, y: 0}, "Local", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
 	rootLabel = new Label({x: 0, y: 0}, "Root", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
 	interLabel = new Label({x: 0, y: 0}, "Intermediários", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-	adminLabel = new Label({x: 0, y: 0}, "Administrativo", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+	adminLabel = new Label({x: 0, y: 0}, "Autoritativo", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
 	destLabel = new Label({x: 0, y: 0}, "Host Destino", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
 	
 	clientLabel.pos = getAlignedPoint(clientNode, clientLabel, "bottom", "center");

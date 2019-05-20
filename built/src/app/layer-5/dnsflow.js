@@ -287,7 +287,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 }
                 interNode.visible = hasInter;
                 interLabel.visible = hasInter;
-                if (localModeDOM.value === "iterative") {
+                if (localModeDOM.value === "recursive") {
                     if (hasInter) {
                         connectMultipleNodes([
                             { from: clientNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
@@ -311,8 +311,8 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                         ], onSuccess);
                     }
                 }
-                else if (localModeDOM.value === "recursive") {
-                    if (rootModeDOM.value === "iterative") {
+                else if (localModeDOM.value === "iterative") {
+                    if (rootModeDOM.value === "recursive") {
                         if (hasInter) {
                             connectMultipleNodes([
                                 { from: clientNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
@@ -336,7 +336,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                             ], onSuccess);
                         }
                     }
-                    else if (rootModeDOM.value === "recursive") {
+                    else if (rootModeDOM.value === "iterative") {
                         if (hasInter) {
                             connectMultipleNodes([
                                 { from: clientNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
@@ -417,12 +417,12 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     }
     function connectMultipleNodes(connections, callback) {
         if (callback === void 0) { callback = undefined; }
-        function recursiveConnect(index) {
+        function iterativeConnect(index) {
             if (index < connections.length) {
                 var connection = connections[index];
                 index++;
                 connectNodes(connection.from, connection.to, connection.strokeStyle, connection.lineWidth, connection.speed, connection.labelText, function () {
-                    recursiveConnect(index);
+                    iterativeConnect(index);
                 });
             }
             else {
@@ -431,7 +431,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 }
             }
         }
-        recursiveConnect(0);
+        iterativeConnect(0);
     }
     function render() {
         ctx.clearRect(0, 0, canvasDOM.width, canvasDOM.height);
@@ -506,7 +506,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         localLabel = new Label({ x: 0, y: 0 }, "Local", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
         rootLabel = new Label({ x: 0, y: 0 }, "Root", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
         interLabel = new Label({ x: 0, y: 0 }, "Intermediários", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-        adminLabel = new Label({ x: 0, y: 0 }, "Administrativo", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+        adminLabel = new Label({ x: 0, y: 0 }, "Autoritativo", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
         destLabel = new Label({ x: 0, y: 0 }, "Host Destino", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
         clientLabel.pos = getAlignedPoint(clientNode, clientLabel, "bottom", "center");
         localLabel.pos = getAlignedPoint(localNode, localLabel, "center", "left");
