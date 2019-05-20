@@ -25,7 +25,7 @@
 			
 			<main>
 
-				<canvas id="canvas" width="500" height="500"></canvas>
+				<canvas id="canvas" width="700" height="500"></canvas>
 
 				<div class="hbox">
 
@@ -34,7 +34,7 @@
 						<h1>
 							<select id="local_mode">
 								<option value="recursive">Recursivo</option>
-								<option value="iterative">Iterativo</option>
+								<option value="iterative" selected>Iterativo</option>
 							</select>
 						</h1>
 					</div>
@@ -42,7 +42,7 @@
 						<label>Root</label>
 						<h1>
 							<select id="root_mode">
-								<option value="recursive">Recursivo</option>
+								<option value="recursive" selected>Recursivo</option>
 								<option value="iterative">Iterativo</option>
 							</select>
 						</h1>
@@ -51,7 +51,7 @@
 						<label>Intermediários</label>
 						<h1>
 							<select id="intermediate_mode">
-								<option value="recursive">Recursivo</option>
+								<option value="recursive" selected>Recursivo</option>
 								<option value="iterative">Iterativo</option>
 							</select>
 						</h1>
@@ -59,9 +59,20 @@
 
 				</div>
 
+				<label for="speed">Velocidade</label>
+				<h1>
+					<select name="speed" id="speed">
+						<option value="veryslow">Muito Lento</option>
+						<option value="slow">Lento</option>
+						<option value="normal" selected>Normal</option>
+						<option value="fast">Rápido</option>
+						<option value="veryfast">Muito Rápido</option>
+					</select>
+				</h1>
+
 				<label for="domain">Domínio</label>
 				<h1>
-					<input type="text" name="domain" id="domain" placeholder="www.exemplo.com.br">
+					<input type="text" name="domain" id="domain" placeholder="www.exemplo.com.br" value="www.ifpr.edu.br">
 					<button id="run">Visualizar</button>
 				</h1>
 
