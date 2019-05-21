@@ -15,9 +15,6 @@ clientImage.src = "../../../images/layers/5/client.png";
 const errorWrapperDOM = id("error_wrapper");
 const domainDOM = id("domain");
 const canvasDOM = <HTMLCanvasElement>id("canvas");
-const localModeDOM = <HTMLSelectElement>id("local_mode");
-const rootModeDOM = <HTMLSelectElement>id("root_mode");
-const interModeDOM = <HTMLSelectElement>id("intermediate_mode");
 const speedDOM = <HTMLSelectElement>id("speed");
 
 const ctx = canvasDOM.getContext("2d");
@@ -29,19 +26,12 @@ const normalSpeed = 100;
 const fastSpeed = 400;
 const veryFastSpeed = 600;
 
-let clientNode: Node;
-let localNode: Node;
-let rootNode: Node;
-let interNode: Node;
-let adminNode: Node;
-let destNode: Node;
-
-let clientLabel: Label;
-let localLabel: Label;
-let rootLabel: Label;
-let interLabel: Label;
-let adminLabel: Label;
-let destLabel: Label;
+const client: Machine = {node: undefined, label: undefined, modeDOM: undefined};
+const local: Machine = { node: undefined, label: undefined, modeDOM: <HTMLSelectElement> id("local_mode")};
+const root: Machine = { node: undefined, label: undefined, modeDOM: <HTMLSelectElement> id("root_mode")};
+const inter: Machine = {node: undefined, label: undefined, modeDOM: undefined};
+const admin: Machine = {node: undefined, label: undefined, modeDOM: undefined};
+const dest: Machine = {node: undefined, label: undefined, modeDOM: undefined};
 
 let drawables: Drawable[] = [];
 let lineIntervals: number[] = [];
@@ -290,6 +280,34 @@ class Line implements Drawable {
 
 }
 
+type Machine = {
+	node: Node,
+	label: Label,
+	modeDOM: HTMLSelectElement|undefined
+}
+
+type NodeConnection = {
+	from: Node, 
+	to: Node, 
+	strokeStyle: string, 
+	lineWidth: number, 
+	speed: number, 
+	labelText: string | undefined 
+};
+
+let makerWidth = 0;
+let makerSpeed = 0;
+
+function makeConnection(from: Machine, to: Machine, kind: "request"|"partial"|"full", msg: string): NodeConnection {
+	let style: string;
+	switch (kind) {
+		case ("request"): style = yellowWire; break;
+		case ("partial"): style = redWire; break;
+		case ("full"): style = greenWire; break;
+	}
+	return {from: from.node, to: to.node, strokeStyle: style, lineWidth: makerWidth, speed: makerSpeed, labelText: msg};
+}
+
 function roundRect(x: number, y: number, w: number, h: number, r: number): CanvasRenderingContext2D {
 	if (w < 2 * r) r = w / 2;
 	if (h < 2 * r) r = h / 2;
@@ -357,7 +375,6 @@ function run() {
 				let middle = "";
 				for (let i = 2; i < domainParts.length - 1; i++) middle += domainParts[i] + ((i < domainParts.length - 2)?".":"");
 				domainParts = [domainParts[0],domainParts[1],middle,domainParts[domainParts.length-1]];
-				hasInter = true;
 				interStr = middle;
 			}	
 			
@@ -375,95 +392,38 @@ function run() {
 				case "veryfast": speed = veryFastSpeed; break;
 			}
 
-			interNode.visible = hasInter;
-			interLabel.visible = hasInter;
 
-			if (localModeDOM.value === "recursive") {
+			if (local.modeDOM.value === "recursive") {
 
-				if (hasInter) {
-					
-					connectMultipleNodes([
-						{ from: clientNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-						{ from: localNode, to: rootNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-						{ from: rootNode, to: localNode, strokeStyle: redWire, lineWidth: width, speed: speed, labelText: interStr + "." + rootStr },
-						{ from: localNode, to: interNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-						{ from: interNode, to: localNode, strokeStyle: redWire, lineWidth: width, speed: speed, labelText: adminStr + "." + interStr + "." + rootStr },
-						{ from: localNode, to: adminNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-						{ from: adminNode, to: localNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
-						{ from: localNode, to: clientNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr }
-					], onSuccess);
+				if (root.modeDOM.value === "recursive") {
+
+					// connectMultipleNodes([
+					// 	{ from: clientNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
+					// 	{ from: localNode, to: rootNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
+					// 	{ from: rootNode, to: interNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
+					// 	{ from: interNode, to: adminNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
+					// 	{ from: adminNode, to: interNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
+					// 	{ from: interNode, to: rootNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
+					// 	{ from: rootNode, to: localNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
+					// 	{ from: localNode, to: clientNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr }
+					// ], onSuccess);
 
 				}
-				else {
+				else if (root.modeDOM.value === "iterative") {
 
-					connectMultipleNodes([
-						{ from: clientNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-						{ from: localNode, to: rootNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-						{ from: rootNode, to: localNode, strokeStyle: redWire, lineWidth: width, speed: speed, labelText: adminStr + "." + rootStr },
-						{ from: localNode, to: adminNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-						{ from: adminNode, to: localNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
-						{ from: localNode, to: clientNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr }
-					], onSuccess);
-
-				}
+				}			
 
 			}
-			else if (localModeDOM.value === "iterative") {
+			else if (local.modeDOM.value === "iterative") {
 
-				if (rootModeDOM.value === "recursive") {
+				if (root.modeDOM.value === "recursive") {
 
-					if (hasInter) {
-						connectMultipleNodes([
-							{ from: clientNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-							{ from: localNode, to: rootNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-							{ from: rootNode, to: interNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-							{ from: interNode, to: rootNode, strokeStyle: redWire, lineWidth: width, speed: speed, labelText: adminStr + "." + interStr + "." + rootStr },
-							{ from: rootNode, to: adminNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-							{ from: adminNode, to: rootNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
-							{ from: rootNode, to: localNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
-							{ from: localNode, to: clientNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr }
-						], onSuccess);
-					}
-					else {
-						connectMultipleNodes([
-							{ from: clientNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-							{ from: localNode, to: rootNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-							{ from: rootNode, to: adminNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-							{ from: adminNode, to: rootNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
-							{ from: rootNode, to: localNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
-							{ from: localNode, to: clientNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr }
-						], onSuccess);
-					}
+					
 
 				}
-				else if (rootModeDOM.value === "iterative") {
+				else if (root.modeDOM.value === "iterative") {
 
-					if (hasInter) {
-						
-						connectMultipleNodes([
-							{ from: clientNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-							{ from: localNode, to: rootNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-							{ from: rootNode, to: interNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-							{ from: interNode, to: adminNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-							{ from: adminNode, to: interNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
-							{ from: interNode, to: rootNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
-							{ from: rootNode, to: localNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
-							{ from: localNode, to: clientNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr }
-						], onSuccess);
-
-					}
-					else {
-
-						connectMultipleNodes([
-							{ from: clientNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-							{ from: localNode, to: rootNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-							{ from: rootNode, to: adminNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-							{ from: adminNode, to: rootNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
-							{ from: rootNode, to: localNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
-							{ from: localNode, to: clientNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr }
-						], onSuccess);
-
-					}
+					
 
 				}
 
@@ -508,9 +468,11 @@ function run() {
 }
 
 function onSuccess() {
-	connectNodes(clientNode, destNode, blueWire, 10, fastSpeed, undefined);
-	connectNodes(destNode, clientNode, blueWire, 10, fastSpeed, undefined);
+	connectNodes(client.node, dest.node, blueWire, 10, fastSpeed, undefined);
+	connectNodes(dest.node, client.node, blueWire, 10, fastSpeed, undefined);
 }
+
+function onFailure() {}
 
 function connectNodes(from: Node, to: Node, strokeStyle: string, lineWidth: number, speed: number, labelText: string|undefined, callback: Function = undefined): Line {
 
@@ -557,7 +519,7 @@ function connectNodes(from: Node, to: Node, strokeStyle: string, lineWidth: numb
 }
 
 function connectMultipleNodes(
-	connections: { from: Node, to: Node, strokeStyle: string, lineWidth: number, speed: number, labelText: string|undefined }[],
+	connections: NodeConnection[],
 	callback: Function = undefined) {
 
 	function iterativeConnect(index: number) {
@@ -648,42 +610,42 @@ function resetCanvas() {
 	let w = canvasDOM.width;
 	let h = canvasDOM.height;
 	
-	clientNode = new Node({x: pl, y: h - pb},60,60, clientImage);
-	localNode = new Node({ x: pl, y: h / 2 }, 60, 60, serverImage);
-	rootNode = new Node({ x: pl, y: pt }, 60, 60, serverImage);
-	interNode = new Node({ x: w - pr, y: pt }, 60, 60, serverImage);
-	adminNode = new Node({ x: w - pr, y: h / 2 }, 60, 60, serverImage);
-	destNode = new Node({ x: w - pr, y: h - pb }, 60, 60, clientImage);
+	client.node = new Node({x: pl, y: h - pb},60,60, clientImage);
+	local.node = new Node({ x: pl, y: h / 2 }, 60, 60, serverImage);
+	root.node = new Node({ x: pl, y: pt }, 60, 60, serverImage);
+	inter.node = new Node({ x: w - pr, y: pt }, 60, 60, serverImage);
+	admin.node = new Node({ x: w - pr, y: h / 2 }, 60, 60, serverImage);
+	dest.node = new Node({ x: w - pr, y: h - pb }, 60, 60, clientImage);
 
-	clientLabel = new Label({x: 0, y: 0}, "Host Cliente", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-	localLabel = new Label({x: 0, y: 0}, "Local", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-	rootLabel = new Label({x: 0, y: 0}, "Root", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-	interLabel = new Label({x: 0, y: 0}, "Intermediários", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-	adminLabel = new Label({x: 0, y: 0}, "Autoritativo", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-	destLabel = new Label({x: 0, y: 0}, "Host Destino", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+	client.label = new Label({x: 0, y: 0}, "Host Cliente", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+	local.label = new Label({x: 0, y: 0}, "Local", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+	root.label = new Label({x: 0, y: 0}, "Root", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+	inter.label = new Label({x: 0, y: 0}, "Intermediários", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+	admin.label = new Label({x: 0, y: 0}, "Autoritativo", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+	dest.label = new Label({x: 0, y: 0}, "Host Destino", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
 	
-	clientLabel.pos = getAlignedPoint(clientNode, clientLabel, "bottom", "center");
-	localLabel.pos = getAlignedPoint(localNode, localLabel, "center", "left");
-	rootLabel.pos = getAlignedPoint(rootNode, rootLabel, "center", "left");
-	interLabel.pos = getAlignedPoint(interNode, interLabel, "center", "right");
-	adminLabel.pos = getAlignedPoint(adminNode, adminLabel, "center", "right");
-	destLabel.pos = getAlignedPoint(destNode, destLabel, "bottom", "center");
+	client.label.pos = getAlignedPoint(client.node, client.label, "bottom", "center");
+	local.label.pos = getAlignedPoint(local.node, local.label, "center", "left");
+	root.label.pos = getAlignedPoint(root.node, root.label, "center", "left");
+	inter.label.pos = getAlignedPoint(inter.node, inter.label, "center", "right");
+	admin.label.pos = getAlignedPoint(admin.node, admin.label, "center", "right");
+	dest.label.pos = getAlignedPoint(dest.node, dest.label, "bottom", "center");
 
 	drawables = [];
 
-	drawables.push(clientNode);
-	drawables.push(localNode);
-	drawables.push(rootNode);
-	drawables.push(interNode);
-	drawables.push(adminNode);
-	drawables.push(destNode);
+	drawables.push(client.node);
+	drawables.push(local.node);
+	drawables.push(root.node);
+	drawables.push(inter.node);
+	drawables.push(admin.node);
+	drawables.push(dest.node);
 
-	drawables.push(clientLabel);
-	drawables.push(localLabel);
-	drawables.push(rootLabel);
-	drawables.push(interLabel);
-	drawables.push(adminLabel);
-	drawables.push(destLabel);
+	drawables.push(client.label);
+	drawables.push(local.label);
+	drawables.push(root.label);
+	drawables.push(inter.label);
+	drawables.push(admin.label);
+	drawables.push(dest.label);
 
 }
 
