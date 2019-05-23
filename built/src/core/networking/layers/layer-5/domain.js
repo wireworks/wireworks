@@ -2,29 +2,33 @@ define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
-     * Error name for a when a root Domain has a label that isn't "." or undefined.
+     * Error name for when a root Domain has a label that isn't "." or undefined.
      */
     exports.ERROR_INVALID_ROOT_LABEL = "InvalidRootLabelError";
     /**
-     * Error name for a when a Domain has an invalid label.
+     * Error name for when a Domain has an invalid label.
      */
     exports.ERROR_INVALID_LABEL = "InvalidLabelError";
     /**
-     * Error name for a when a Domain's full name is greater than 253.
+     * Error name for when a Domain's full name is greater than 253.
      */
     exports.ERROR_FULL_NAME_RANGE = "FullNameRangeError";
     /**
-     * Error name for a when a root Domain has an Address.
+     * Error name for when a root Domain has an Address.
      */
     exports.ERROR_ROOT_ADDRESS = "RootAddressError";
     /**
-     * Error name for a when a domain with same label but different address is found during merge.
+     * Error name for when a domain with same label but different address is found during merge.
      */
     exports.ERROR_MERGE_OVERLAP = "MergeOverlapError";
     /**
-     * Error name for a when two merging domains have different labels.
+     * Error name for when two merging domains have different labels.
      */
     exports.ERROR_MERGE_WRONG_ROOT = "MergeWrongRootError";
+    /**
+     * Error name for when trying to get the parts of an incomplete domain.
+     */
+    exports.ERROR_SMALL_DOMAIN = "SmallDomainError";
     /**
      * A DNS domain tree.
      * @author Henrique Colini
@@ -249,6 +253,37 @@ define(["require", "exports"], function (require, exports) {
                 return this.label;
             }
             return this.label + "." + this.parent.getFullName();
+        };
+        /**
+         * Returns the parts of a complete domain (such as the full domain, top-level domain etc), as strings. Adds "www" if missing.
+         */
+        Domain.prototype.getDomainParts = function () {
+            var domainParts = this.getFullName().split(".");
+            if (domainParts.length < 2) {
+                var error = Error();
+                error.name = exports.ERROR_SMALL_DOMAIN;
+                throw error;
+            }
+            var fullStr = "";
+            var tldStr = domainParts[domainParts.length - 1];
+            var destStr = domainParts[0];
+            var interStr = "";
+            var adminStr = "";
+            if (domainParts.length == 2 || destStr !== "www") {
+                domainParts.unshift("www");
+                destStr = "www";
+            }
+            if (domainParts.length > 3) {
+                var middle = "";
+                for (var i = 2; i < domainParts.length - 1; i++)
+                    middle += domainParts[i] + ((i < domainParts.length - 2) ? "." : "");
+                domainParts = [domainParts[0], domainParts[1], middle, domainParts[domainParts.length - 1]];
+                interStr = middle;
+            }
+            for (var i = 0; i < domainParts.length; i++)
+                fullStr += domainParts[i] + ((i < domainParts.length - 1) ? "." : "");
+            adminStr = domainParts[1];
+            return { full: fullStr, tld: tldStr, dest: destStr, inter: interStr, admin: adminStr };
         };
         /**
          * Returns a neatly formatted string showing the whole tree. Raw method.

@@ -1,34 +1,39 @@
 import { Address } from "../layer-3/address";
 
 /**
- * Error name for a when a root Domain has a label that isn't "." or undefined.
+ * Error name for when a root Domain has a label that isn't "." or undefined.
  */
 export const ERROR_INVALID_ROOT_LABEL = "InvalidRootLabelError";
 
 /**
- * Error name for a when a Domain has an invalid label.
+ * Error name for when a Domain has an invalid label.
  */
 export const ERROR_INVALID_LABEL = "InvalidLabelError";
 
 /**
- * Error name for a when a Domain's full name is greater than 253.
+ * Error name for when a Domain's full name is greater than 253.
  */
 export const ERROR_FULL_NAME_RANGE = "FullNameRangeError";
 
 /**
- * Error name for a when a root Domain has an Address.
+ * Error name for when a root Domain has an Address.
  */
 export const ERROR_ROOT_ADDRESS = "RootAddressError";
 
 /**
- * Error name for a when a domain with same label but different address is found during merge.
+ * Error name for when a domain with same label but different address is found during merge.
  */
 export const ERROR_MERGE_OVERLAP = "MergeOverlapError";
 
 /**
- * Error name for a when two merging domains have different labels.
+ * Error name for when two merging domains have different labels.
  */
 export const ERROR_MERGE_WRONG_ROOT = "MergeWrongRootError";
+
+/**
+ * Error name for when trying to get the parts of an incomplete domain.
+ */
+export const ERROR_SMALL_DOMAIN = "SmallDomainError"
 
 /**
  * A DNS domain tree.
@@ -312,6 +317,44 @@ export class Domain {
 		return this.label + "." + this.parent.getFullName();
 	}
 	
+	/**
+	 * Returns the parts of a complete domain (such as the full domain, top-level domain etc), as strings. Adds "www" if missing.
+	 */
+	public getDomainParts(): { full: string, tld: string, dest: string, inter: string, admin: string } {
+
+		let domainParts = this.getFullName().split(".");
+
+		if (domainParts.length < 2) {
+			let error = Error();
+			error.name = ERROR_SMALL_DOMAIN;
+			throw error;
+		}
+
+		let fullStr = "";
+		let tldStr = domainParts[domainParts.length - 1];
+		let destStr = domainParts[0];
+		let interStr = "";
+		let adminStr = "";
+
+		if (domainParts.length == 2 || destStr !== "www") {
+			domainParts.unshift("www");
+			destStr = "www";
+		}
+		
+		if (domainParts.length > 3) {
+			let middle = "";
+			for (let i = 2; i < domainParts.length - 1; i++) middle += domainParts[i] + ((i < domainParts.length - 2) ? "." : "");
+			domainParts = [domainParts[0], domainParts[1], middle, domainParts[domainParts.length - 1]];
+			interStr = middle;
+		}
+
+		for (let i = 0; i < domainParts.length; i++) fullStr += domainParts[i] + ((i < domainParts.length - 1) ? "." : "");
+		adminStr = domainParts[1];
+
+		return { full: fullStr, tld: tldStr, dest: destStr, inter: interStr, admin: adminStr };
+
+	}
+
 	/**
 	 * Returns a neatly formatted string showing the whole tree. Raw method.
 	 * @param  {boolean} first Whether this is the root of the tree.

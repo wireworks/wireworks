@@ -14,24 +14,27 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     var canvasDOM = dom_1.id("canvas");
     var speedDOM = dom_1.id("speed");
     var ctx = canvasDOM.getContext("2d");
-    var fixedDeltaTime = 20;
+    var fixedDeltaTime = 1000 / 60;
     var verySlowSpeed = 10;
     var slowSpeed = 25;
     var normalSpeed = 100;
     var fastSpeed = 400;
     var veryFastSpeed = 600;
-    var client = { node: undefined, label: undefined, modeDOM: undefined };
-    var local = { node: undefined, label: undefined, modeDOM: dom_1.id("local_mode") };
-    var root = { node: undefined, label: undefined, modeDOM: dom_1.id("root_mode") };
-    var inter = { node: undefined, label: undefined, modeDOM: undefined };
-    var admin = { node: undefined, label: undefined, modeDOM: undefined };
-    var dest = { node: undefined, label: undefined, modeDOM: undefined };
+    var client = { name: "Host Cliente", node: undefined, label: undefined, modeDOM: undefined };
+    var local = { name: "Local", node: undefined, label: undefined, modeDOM: dom_1.id("local_mode") };
+    var root = { name: "Root", node: undefined, label: undefined, modeDOM: dom_1.id("root_mode") };
+    var tld = { name: "TLD", node: undefined, label: undefined, modeDOM: dom_1.id("tld_mode") };
+    var inter = { name: "Intermediários", node: undefined, label: undefined, modeDOM: dom_1.id("inter_mode") };
+    var admin = { name: "Autoritativo", node: undefined, label: undefined, modeDOM: undefined };
+    var dest = { name: "Host Destino", node: undefined, label: undefined, modeDOM: undefined };
     var drawables = [];
     var lineIntervals = [];
     var greenWire = "#b0db8a";
     var redWire = "#db938a";
     var blueWire = "#9ac9ed";
     var yellowWire = "#e5c16e";
+    var ITERATIVE = "iterative";
+    var RECURSIVE = "recursive";
     var Node = /** @class */ (function () {
         function Node(pos, width, heigth, image) {
             this.visible = true;
@@ -194,23 +197,6 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         };
         return Line;
     }());
-    var makerWidth = 0;
-    var makerSpeed = 0;
-    function makeConnection(from, to, kind, msg) {
-        var style;
-        switch (kind) {
-            case ("request"):
-                style = yellowWire;
-                break;
-            case ("partial"):
-                style = redWire;
-                break;
-            case ("full"):
-                style = greenWire;
-                break;
-        }
-        return { from: from.node, to: to.node, strokeStyle: style, lineWidth: makerWidth, speed: makerSpeed, labelText: msg };
-    }
     function roundRect(x, y, w, h, r) {
         if (w < 2 * r)
             r = w / 2;
@@ -248,72 +234,26 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             }
             else {
                 var tmpRoot = new domain_1.Domain(".", undefined);
-                var domainParts = domain_1.Domain.extractDomain(tmpRoot, fullName).getFullName().split(".");
-                if (domainParts.length < 2) {
-                    errStr = "Você deve inserir um domínio com mais partes.";
-                    throw Error();
-                }
-                var hasInter = false;
-                var fullStr = "";
-                var rootStr = domainParts[domainParts.length - 1];
-                var destStr = domainParts[0];
-                var interStr = "";
-                var adminStr = "";
-                if (domainParts.length == 2) {
-                    domainParts.unshift("www");
-                    destStr = "www";
-                }
-                else if (domainParts.length > 3) {
-                    var middle = "";
-                    for (var i = 2; i < domainParts.length - 1; i++)
-                        middle += domainParts[i] + ((i < domainParts.length - 2) ? "." : "");
-                    domainParts = [domainParts[0], domainParts[1], middle, domainParts[domainParts.length - 1]];
-                    interStr = middle;
-                }
-                for (var i = 0; i < domainParts.length; i++)
-                    fullStr += domainParts[i] + ((i < domainParts.length - 1) ? "." : "");
-                adminStr = domainParts[1];
-                var speed = void 0;
-                var width = 10;
+                makerWidth = 10;
                 switch (speedDOM.value) {
                     case "veryslow":
-                        speed = verySlowSpeed;
+                        makerSpeed = verySlowSpeed;
                         break;
                     case "slow":
-                        speed = slowSpeed;
+                        makerSpeed = slowSpeed;
                         break;
                     case "normal":
-                        speed = normalSpeed;
+                        makerSpeed = normalSpeed;
                         break;
                     case "fast":
-                        speed = fastSpeed;
+                        makerSpeed = fastSpeed;
                         break;
                     case "veryfast":
-                        speed = veryFastSpeed;
+                        makerSpeed = veryFastSpeed;
                         break;
                 }
-                if (local.modeDOM.value === "recursive") {
-                    if (root.modeDOM.value === "recursive") {
-                        // connectMultipleNodes([
-                        // 	{ from: clientNode, to: localNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-                        // 	{ from: localNode, to: rootNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-                        // 	{ from: rootNode, to: interNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-                        // 	{ from: interNode, to: adminNode, strokeStyle: yellowWire, lineWidth: width, speed: speed, labelText: fullStr + "?" },
-                        // 	{ from: adminNode, to: interNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
-                        // 	{ from: interNode, to: rootNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
-                        // 	{ from: rootNode, to: localNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr },
-                        // 	{ from: localNode, to: clientNode, strokeStyle: greenWire, lineWidth: width, speed: speed, labelText: fullStr }
-                        // ], onSuccess);
-                    }
-                    else if (root.modeDOM.value === "iterative") {
-                    }
-                }
-                else if (local.modeDOM.value === "iterative") {
-                    if (root.modeDOM.value === "recursive") {
-                    }
-                    else if (root.modeDOM.value === "iterative") {
-                    }
-                }
+                var cons = calculateConnections(domain_1.Domain.extractDomain(tmpRoot, fullName));
+                connectMultipleNodes(cons.connections, cons.success ? onSuccess : onFailure);
             }
         }
         catch (error) {
@@ -327,6 +267,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                         break;
                     case domain_1.ERROR_FULL_NAME_RANGE:
                         errStr = "Esse domínio possui um nome grande demais.";
+                        break;
+                    case domain_1.ERROR_SMALL_DOMAIN:
+                        errStr = "Você deve inserir um domínio com mais partes.";
                         break;
                     default:
                         errStr = "Erro desconhecido (" + error.name + ").";
@@ -343,6 +286,183 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         connectNodes(dest.node, client.node, blueWire, 10, fastSpeed, undefined);
     }
     function onFailure() { }
+    function calculateConnections(domain) {
+        var parts = domain.getDomainParts();
+        var connections = [
+            makeConnection(client, local, "request", parts.full + "?")
+        ];
+        var success = false;
+        // LOCAL returns "."
+        if (local.modeDOM.value === ITERATIVE) {
+            connections.push(makeConnection(local, client, "partial", "."));
+        }
+        // LOCAL returns "www.example.com.br"
+        else if (local.modeDOM.value === RECURSIVE) {
+            connections.push(makeConnection(local, root, "request", parts.full + "?"));
+            // ROOT returns "br"
+            if (root.modeDOM.value === ITERATIVE) {
+                connections.push(makeConnection(root, local, "partial", parts.tld));
+                connections.push(makeConnection(local, tld, "request", parts.full + "?"));
+                // TLD returns "com.br"
+                if (tld.modeDOM.value === ITERATIVE) {
+                    if (parts.inter) {
+                        // INTER returns "example.com.br"
+                        if (inter.modeDOM.value === ITERATIVE) {
+                            connections.push.apply(connections, [
+                                makeConnection(tld, local, "partial", parts.inter + "." + parts.tld),
+                                makeConnection(local, inter, "request", parts.full + "?"),
+                                makeConnection(inter, local, "partial", parts.admin + "." + parts.inter + "." + parts.tld),
+                                makeConnection(local, admin, "request", parts.full + "?"),
+                                makeConnection(admin, local, "full", parts.full)
+                            ]);
+                        }
+                        // INTER returns "www.example.com.br"
+                        else if (inter.modeDOM.value === RECURSIVE) {
+                            connections.push.apply(connections, [
+                                makeConnection(tld, local, "partial", parts.inter + "." + parts.tld),
+                                makeConnection(local, inter, "request", parts.full + "?"),
+                                makeConnection(inter, admin, "request", parts.full + "?"),
+                                makeConnection(admin, inter, "full", parts.full),
+                                makeConnection(inter, local, "full", parts.full)
+                            ]);
+                        }
+                    }
+                    else {
+                        connections.push.apply(connections, [
+                            makeConnection(tld, local, "partial", parts.admin + "." + parts.tld),
+                            makeConnection(local, admin, "request", parts.full + "?"),
+                            makeConnection(admin, local, "full", parts.full)
+                        ]);
+                    }
+                }
+                // TLD returns "www.example.com.br"
+                else if (tld.modeDOM.value === RECURSIVE) {
+                    if (parts.inter) {
+                        // INTER returns "example.com.br"
+                        // ADMIN returns "www.example.com.br"
+                        if (inter.modeDOM.value === ITERATIVE) {
+                            connections.push.apply(connections, [
+                                makeConnection(tld, inter, "request", parts.full + "?"),
+                                makeConnection(inter, tld, "partial", parts.admin + "." + parts.inter + "." + parts.tld),
+                                makeConnection(tld, admin, "request", parts.full + "?"),
+                                makeConnection(admin, tld, "full", parts.full)
+                            ]);
+                        }
+                        // INTER returns "www.example.com.br"
+                        // ADMIN returns "www.example.com.br"
+                        else if (inter.modeDOM.value === RECURSIVE) {
+                            connections.push.apply(connections, [
+                                makeConnection(tld, inter, "request", parts.full + "?"),
+                                makeConnection(inter, admin, "request", parts.full + "?"),
+                                makeConnection(admin, inter, "full", parts.full),
+                                makeConnection(inter, tld, "full", parts.full)
+                            ]);
+                        }
+                    }
+                    // ADMIN returns "www.example.com.br"
+                    else {
+                        connections.push.apply(connections, [
+                            makeConnection(tld, admin, "request", parts.full + "?"),
+                            makeConnection(admin, tld, "full", parts.full)
+                        ]);
+                    }
+                    connections.push(makeConnection(tld, local, "full", parts.full));
+                }
+            }
+            // ROOT returns "www.example.com.br"
+            else if (root.modeDOM.value === RECURSIVE) {
+                connections.push(makeConnection(root, tld, "request", parts.full + "?"));
+                // TLD returns "com.br"
+                if (tld.modeDOM.value === ITERATIVE) {
+                    if (parts.inter) {
+                        connections.push(makeConnection(tld, root, "partial", parts.inter + "." + parts.tld));
+                        // INTER returns "example.com.br"
+                        // ADMIN returns "www.example.com.br"
+                        if (inter.modeDOM.value === ITERATIVE) {
+                            connections.push.apply(connections, [
+                                makeConnection(root, inter, "request", parts.full + "?"),
+                                makeConnection(inter, root, "partial", parts.admin + "." + parts.inter + "." + parts.tld),
+                                makeConnection(root, admin, "request", parts.full + "?"),
+                                makeConnection(admin, root, "full", parts.full)
+                            ]);
+                        }
+                        // INTER returns "www.example.com.br"
+                        // ADMIN returns "www.example.com.br"
+                        else if (inter.modeDOM.value === RECURSIVE) {
+                            connections.push.apply(connections, [
+                                makeConnection(root, inter, "request", parts.full + "?"),
+                                makeConnection(inter, admin, "request", parts.full + "?"),
+                                makeConnection(admin, inter, "full", parts.full),
+                                makeConnection(inter, root, "full", parts.full)
+                            ]);
+                        }
+                    }
+                    else {
+                        // ADMIN returns "www.example.com.br"
+                        connections.push.apply(connections, [
+                            makeConnection(tld, root, "partial", parts.admin + "." + parts.tld),
+                            makeConnection(root, admin, "request", parts.full + "?"),
+                            makeConnection(admin, root, "full", parts.full)
+                        ]);
+                    }
+                }
+                // TLD returns "www.example.com.br"
+                else if (tld.modeDOM.value === RECURSIVE) {
+                    if (parts.inter) {
+                        // INTER returns "example.com.br"
+                        // ADMIN returns "www.example.com.br"
+                        if (inter.modeDOM.value === ITERATIVE) {
+                            connections.push.apply(connections, [
+                                makeConnection(tld, inter, "request", parts.full + "?"),
+                                makeConnection(inter, tld, "partial", parts.admin + "." + parts.inter + "." + parts.tld),
+                                makeConnection(tld, admin, "request", parts.full + "?"),
+                                makeConnection(admin, tld, "full", parts.full)
+                            ]);
+                        }
+                        // INTER returns "www.example.com.br"
+                        // ADMIN returns "www.example.com.br"
+                        else if (inter.modeDOM.value === RECURSIVE) {
+                            connections.push.apply(connections, [
+                                makeConnection(tld, inter, "request", parts.full + "?"),
+                                makeConnection(inter, admin, "request", parts.full + "?"),
+                                makeConnection(admin, inter, "full", parts.full),
+                                makeConnection(inter, tld, "full", parts.full)
+                            ]);
+                        }
+                    }
+                    else {
+                        // ADMIN returns "www.example.com.br"
+                        connections.push.apply(connections, [
+                            makeConnection(tld, admin, "request", parts.full + "?"),
+                            makeConnection(admin, tld, "full", parts.full)
+                        ]);
+                    }
+                    connections.push(makeConnection(tld, root, "full", parts.full));
+                }
+                connections.push(makeConnection(root, local, "full", parts.full));
+            }
+            connections.push(makeConnection(local, client, "full", parts.full));
+            success = true;
+        }
+        return { connections: connections, success: success };
+    }
+    var makerWidth = 0;
+    var makerSpeed = 0;
+    function makeConnection(from, to, kind, msg) {
+        var style;
+        switch (kind) {
+            case ("request"):
+                style = yellowWire;
+                break;
+            case ("partial"):
+                style = redWire;
+                break;
+            case ("full"):
+                style = greenWire;
+                break;
+        }
+        return { from: from.node, to: to.node, strokeStyle: style, lineWidth: makerWidth, speed: makerSpeed, labelText: msg };
+    }
     function connectNodes(from, to, strokeStyle, lineWidth, speed, labelText, callback) {
         if (callback === void 0) { callback = undefined; }
         var line = new Line(from, to, 0, strokeStyle, lineWidth);
@@ -350,11 +470,14 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             line.label = new Label({ x: 0, y: 0 }, labelText, "#000000", strokeStyle, 5, 10, "12px Monserrat, sans-serif", 10);
         }
         drawables.push(line);
+        var prevTime = Date.now();
         var interval = setInterval(function () {
+            var deltaTime = Date.now() - prevTime;
+            prevTime = Date.now();
             var startPoint = line.getStartPoint();
             var endPoint = line.getEndPoint();
             var distance = Math.sqrt(((startPoint.x - endPoint.x) * (startPoint.x - endPoint.x)) + ((startPoint.y - endPoint.y) * (startPoint.y - endPoint.y)));
-            line.time = math_1.clamp(line.time + ((fixedDeltaTime / 1000) * (speed / distance)), 0, 1);
+            line.time = math_1.clamp(line.time + ((deltaTime / 1000) * (speed / distance)), 0, 1);
             render();
             if (line.time >= 1) {
                 line.time = 1;
@@ -446,25 +569,28 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     function resetCanvas() {
         var pl = 100; // padding
         var pr = 170;
-        var pt = 50;
+        var pt = 70;
         var pb = 70;
         var w = canvasDOM.width;
         var h = canvasDOM.height;
         client.node = new Node({ x: pl, y: h - pb }, 60, 60, clientImage);
-        local.node = new Node({ x: pl, y: h / 2 }, 60, 60, serverImage);
-        root.node = new Node({ x: pl, y: pt }, 60, 60, serverImage);
-        inter.node = new Node({ x: w - pr, y: pt }, 60, 60, serverImage);
-        admin.node = new Node({ x: w - pr, y: h / 2 }, 60, 60, serverImage);
+        local.node = new Node({ x: pl, y: (2 * h - pb) / 3 }, 60, 60, serverImage);
+        root.node = new Node({ x: pl, y: pt + h / 7 }, 60, 60, serverImage);
+        inter.node = new Node({ x: w - pr, y: pt + h / 7 }, 60, 60, serverImage);
+        tld.node = new Node({ x: (w + pl - pr) / 2, y: pt }, 60, 60, serverImage);
+        admin.node = new Node({ x: w - pr, y: (2 * h - pb) / 3 }, 60, 60, serverImage);
         dest.node = new Node({ x: w - pr, y: h - pb }, 60, 60, clientImage);
-        client.label = new Label({ x: 0, y: 0 }, "Host Cliente", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-        local.label = new Label({ x: 0, y: 0 }, "Local", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-        root.label = new Label({ x: 0, y: 0 }, "Root", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-        inter.label = new Label({ x: 0, y: 0 }, "Intermediários", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-        admin.label = new Label({ x: 0, y: 0 }, "Autoritativo", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-        dest.label = new Label({ x: 0, y: 0 }, "Host Destino", "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+        client.label = new Label({ x: 0, y: 0 }, client.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+        local.label = new Label({ x: 0, y: 0 }, local.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+        root.label = new Label({ x: 0, y: 0 }, root.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+        tld.label = new Label({ x: 0, y: 0 }, tld.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+        inter.label = new Label({ x: 0, y: 0 }, inter.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+        admin.label = new Label({ x: 0, y: 0 }, admin.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+        dest.label = new Label({ x: 0, y: 0 }, dest.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
         client.label.pos = getAlignedPoint(client.node, client.label, "bottom", "center");
         local.label.pos = getAlignedPoint(local.node, local.label, "center", "left");
         root.label.pos = getAlignedPoint(root.node, root.label, "center", "left");
+        tld.label.pos = getAlignedPoint(tld.node, tld.label, "top", "center");
         inter.label.pos = getAlignedPoint(inter.node, inter.label, "center", "right");
         admin.label.pos = getAlignedPoint(admin.node, admin.label, "center", "right");
         dest.label.pos = getAlignedPoint(dest.node, dest.label, "bottom", "center");
@@ -475,12 +601,14 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         drawables.push(inter.node);
         drawables.push(admin.node);
         drawables.push(dest.node);
+        drawables.push(tld.node);
         drawables.push(client.label);
         drawables.push(local.label);
         drawables.push(root.label);
         drawables.push(inter.label);
         drawables.push(admin.label);
         drawables.push(dest.label);
+        drawables.push(tld.label);
     }
     serverImage.onload = render;
     clientImage.onload = render;
