@@ -5,21 +5,24 @@
 define(["require", "exports", "../../core/utils/dom", "../../core/networking/layers/layer-5/domain", "../../core/utils/math"], function (require, exports, dom_1, domain_1, math_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    // Images used in the canvas.
     var serverImage = new Image();
     serverImage.src = "../../../images/layers/5/server.png";
     var clientImage = new Image();
     clientImage.src = "../../../images/layers/5/client.png";
+    // DOM elements.
     var errorWrapperDOM = dom_1.id("error_wrapper");
     var domainDOM = dom_1.id("domain");
     var canvasDOM = dom_1.id("canvas");
     var speedDOM = dom_1.id("speed");
     var ctx = canvasDOM.getContext("2d");
-    var fixedDeltaTime = 1000 / 60;
+    // Simulation speed constants.
     var verySlowSpeed = 10;
     var slowSpeed = 25;
     var normalSpeed = 100;
     var fastSpeed = 400;
     var veryFastSpeed = 600;
+    // Data structures representing servers and hosts in the canvas.
     var client = { name: "Host Cliente", node: undefined, label: undefined, modeDOM: undefined };
     var local = { name: "Local", node: undefined, label: undefined, modeDOM: dom_1.id("local_mode") };
     var root = { name: "Root", node: undefined, label: undefined, modeDOM: dom_1.id("root_mode") };
@@ -27,14 +30,30 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     var inter = { name: "Intermediários", node: undefined, label: undefined, modeDOM: dom_1.id("inter_mode") };
     var admin = { name: "Autoritativo", node: undefined, label: undefined, modeDOM: undefined };
     var dest = { name: "Host Destino", node: undefined, label: undefined, modeDOM: undefined };
-    var drawables = [];
-    var lineIntervals = [];
+    // Wire colors.
     var greenWire = "#a9cc78";
     var redWire = "#db938a";
     var blueWire = "#9ac9ed";
     var yellowWire = "#e5c16e";
+    // Constants representing the mode of a DNS server.
     var ITERATIVE = "iterative";
     var RECURSIVE = "recursive";
+    /**
+     * The target duration of each frame while animating lines.
+     */
+    var fixedDeltaTime = 1000 / 60;
+    /**
+     * The intervals of each line being drawn.
+     */
+    var lineIntervals = [];
+    /**
+     * The list of elements drawn to the canvas.
+     */
+    var drawables = [];
+    /**
+     * A Drawable image that has special connecting points. Used to represent servers and clients in the canvas.
+     * @author Henrique Colini
+     */
     var Node = /** @class */ (function () {
         function Node(pos, width, heigth, margins, image) {
             this.visible = true;
@@ -48,6 +67,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             if (this.visible)
                 ctx.drawImage(this.image, this.pos.x - (this.width / 2), this.pos.y - (this.height / 2), this.width, this.height);
         };
+        /**
+         * Returns the 4 vertices of this rectangular Node. A, B, C and D represent the vertices clockwise, starting from the top left corner.
+         */
         Node.prototype.getVertices = function () {
             var x = this.pos.x;
             var y = this.pos.y;
@@ -59,6 +81,10 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             var d = { x: x - w2, y: y + h2 };
             return { a: a, b: b, c: c, d: d };
         };
+        /**
+         * Returns an exit point of this Node, given the side.
+         * @param side Which side to get the point from.
+         */
         Node.prototype.getOutput = function (side) {
             var p = this.getVertices();
             var f = 0.25;
@@ -75,6 +101,10 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                     return { x: p.c.x + this.margins.r, y: p.b.y + fh };
             }
         };
+        /**
+         * Returns an entry point of this Node, given the side.
+         * @param side Which side to get the point from.
+         */
         Node.prototype.getInput = function (side) {
             var p = this.getVertices();
             var f = 0.25;
@@ -93,6 +123,10 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         };
         return Node;
     }());
+    /**
+     * A Drawable text box.
+     * @author Henrique Colini
+     */
     var Label = /** @class */ (function () {
         function Label(pos, text, textColor, backgroundColor, padding, borderRadius, font, textHeight) {
             this.visible = true;
@@ -116,15 +150,24 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 ctx.fillText(this.text, this.pos.x + this.padding - (width / 2), this.pos.y + this.padding + this.textHeight - (height / 2));
             }
         };
+        /**
+         * Returns the width of this Label, considering the width of the text and the padding.
+         */
         Label.prototype.getRealWidth = function () {
             ctx.font = this.font;
             return ctx.measureText(this.text).width + (2 * this.padding);
         };
+        /**
+         * Returns the height of this Label, considering the height of the text and the padding.
+         */
         Label.prototype.getRealHeight = function () {
             return this.textHeight + (2 * this.padding);
         };
         return Label;
     }());
+    /**
+     * A Drawable line that connects the outputs and inputs of Nodes.
+     */
     var Line = /** @class */ (function () {
         function Line(from, to, time, strokeStyle, strokeWidth) {
             this.visible = true;
@@ -134,6 +177,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             this.strokeStyle = strokeStyle;
             this.lineWidth = strokeWidth;
         }
+        /**
+         * Returns the start point of this Line.
+         */
         Line.prototype.getStartPoint = function () {
             var offX = this.from.pos.x - this.to.pos.x;
             var offY = this.from.pos.y - this.to.pos.y;
@@ -154,6 +200,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 }
             }
         };
+        /**
+         * Returns the end point of this Line.
+         */
         Line.prototype.getEndPoint = function () {
             var offX = this.from.pos.x - this.to.pos.x;
             var offY = this.from.pos.y - this.to.pos.y;
@@ -174,6 +223,11 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 }
             }
         };
+        /**
+         * Returns the current end point of this Line in a point of time.
+         * @param fromPoint The starting point.
+         * @param toPoint The end point to be reached.
+         */
         Line.prototype.getCurrentEndPoint = function (fromPoint, toPoint) {
             if (fromPoint === void 0) { fromPoint = this.getStartPoint(); }
             if (toPoint === void 0) { toPoint = this.getEndPoint(); }
@@ -198,6 +252,14 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         };
         return Line;
     }());
+    /**
+     * Draws a rounded rectangle in the canvas.
+     * @param x The x coordinate of the rectangle.
+     * @param y The y coordinate of the rectangle.
+     * @param w The width of the rectangle.
+     * @param h The height of the rectangle.
+     * @param r The radius of the border.
+     */
     function roundRect(x, y, w, h, r) {
         if (w < 2 * r)
             r = w / 2;
@@ -212,6 +274,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         ctx.closePath();
         return ctx;
     }
+    /**
+     * Runs the simulation.
+     */
     function run() {
         var drawIndex = drawables.length;
         while (drawIndex--) {
@@ -282,11 +347,21 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             errorWrapperDOM.appendChild(table);
         }
     }
+    /**
+     * What to do when a DNS query ends in success.
+     */
     function onSuccess() {
         connectNodes(client.node, dest.node, blueWire, 10, fastSpeed, undefined);
         connectNodes(dest.node, client.node, blueWire, 10, fastSpeed, undefined);
     }
+    /**
+     * What to do when a DNS query ends in failure.
+     */
     function onFailure() { }
+    /**
+     * Calculates the connections between servers needed in a DNS query. Returns a list of said connections and whether the query was successful.
+     * @param domain The host domain.
+     */
     function calculateConnections(domain) {
         var parts = domain.getDomainParts();
         var connections = [
@@ -447,8 +522,21 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         }
         return { connections: connections, success: success };
     }
+    /**
+     * The speed of the lines the line maker makes.
+     */
     var makerWidth = 0;
+    /**
+     * The width of the lines the line maker makes.
+     */
     var makerSpeed = 0;
+    /**
+     * Creates NodeConnections.
+     * @param from What machine to start from.
+     * @param to What machine to go to.
+     * @param kind What kind of connection to create. Must be either "request", "partial" (responses) or "full" (responses).
+     * @param msg What message to carry in the end of the line.
+     */
     function makeConnection(from, to, kind, msg) {
         var style;
         switch (kind) {
@@ -464,6 +552,16 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         }
         return { from: from.node, to: to.node, strokeStyle: style, lineWidth: makerWidth, speed: makerSpeed, labelText: msg };
     }
+    /**
+     * Connects two Nodes with a Line, drawing it over time, given a speed.
+     * @param from The Node to start the Line from.
+     * @param to The Node to get the Line to.
+     * @param strokeStyle The stroke style of the Line.
+     * @param lineWidth The line width.
+     * @param speed The speed of the Line being drawn, in pixels per second.
+     * @param labelText The text of the Line's label.
+     * @param callback A callback for when the Line finishes drawing.
+     */
     function connectNodes(from, to, strokeStyle, lineWidth, speed, labelText, callback) {
         if (callback === void 0) { callback = undefined; }
         var line = new Line(from, to, 0, strokeStyle, lineWidth);
@@ -493,6 +591,11 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         lineIntervals.push(interval);
         return line;
     }
+    /**
+     * Connects multiple nodes, in succession.
+     * @param connections The list of connections to be made.
+     * @param callback What do to when the last line finishes being drawn.
+     */
     function connectMultipleNodes(connections, callback) {
         if (callback === void 0) { callback = undefined; }
         function iterativeConnect(index) {
@@ -511,12 +614,22 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         }
         iterativeConnect(0);
     }
+    /**
+     * Renders all the Drawables to the canvas.
+     */
     function render() {
         ctx.clearRect(0, 0, canvasDOM.width, canvasDOM.height);
         for (var i = 0; i < drawables.length; i++) {
             drawables[i].draw();
         }
     }
+    /**
+     * Returns the position of a Node or Label when put aligned to another one.
+     * @param from The Node or Label to be positioned relative to.
+     * @param to The Node or Label to be positioned.
+     * @param positionY How to align the Node or Label vertically. Can be "top", "center" or "bottom".
+     * @param positionX How to align the Node or Label horizontally. Can be "left", "center" or "right".
+     */
     function getAlignedPoint(from, to, positionY, positionX) {
         var offX;
         var offY;
@@ -567,6 +680,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             y: from.pos.y + offY * (fromHeight + toHeight)
         };
     }
+    /**
+     * Deletes all drawables, sets up all Nodes and their Labels.
+     */
     function resetCanvas() {
         var pl = 80; // padding
         var pr = 80;
@@ -610,7 +726,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         drawables.push(admin.label);
         drawables.push(dest.label);
         drawables.push(tld.label);
+        render();
     }
+    // +==============================================+
     serverImage.onload = render;
     clientImage.onload = render;
     resetCanvas();
