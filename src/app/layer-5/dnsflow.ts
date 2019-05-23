@@ -37,7 +37,7 @@ const dest: Machine = { name: "Host Destino", node: undefined, label: undefined,
 let drawables: Drawable[] = [];
 let lineIntervals: number[] = [];
 
-const greenWire = "#b0db8a";
+const greenWire = "#a9cc78";
 const redWire = "#db938a";
 const blueWire = "#9ac9ed";
 const yellowWire = "#e5c16e";
@@ -97,7 +97,7 @@ class Node implements Drawable {
 	public getOutput(side: "top" | "bottom" | "left" | "right"): Point {
 
 		let p = this.getVertices();
-		let f = 0.3;
+		let f = 0.25;
 		let fw = f * this.width;
 		let fh = f * this.height;
 
@@ -119,7 +119,7 @@ class Node implements Drawable {
 	public getInput(side: "top" | "bottom" | "left" | "right"): Point {
 
 		let p = this.getVertices();
-		let f = 0.3;
+		let f = 0.25;
 		let fw = f * this.width;
 		let fh = f * this.height;
 
@@ -744,8 +744,8 @@ function getAlignedPoint(from: Node|Label, to: Node|Label, positionY: "top"|"cen
 
 function resetCanvas() {
 
-	let pl = 70; // padding
-	let pr = 70;
+	let pl = 80; // padding
+	let pr = 80;
 	let pt = 70;
 	let pb = 70;
 

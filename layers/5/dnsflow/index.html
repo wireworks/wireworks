@@ -25,7 +25,31 @@
 			
 			<main>
 
-				<canvas id="canvas" width="700" height="560"></canvas>
+				<div class="hbox">
+					<div>
+						<label for="domain">Domínio</label>
+						<h1>
+							<input type="text" name="domain" id="domain" placeholder="www.exemplo.com.br">
+						</h1>
+					</div>
+					<div>
+						<label for="speed">Velocidade</label>
+						<h1>
+							<select name="speed" id="speed">
+								<option value="veryslow">Muito Lento</option>
+								<option value="slow">Lento</option>
+								<option value="normal" selected>Normal</option>
+								<option value="fast">Rápido</option>
+								<option value="veryfast">Muito Rápido</option>
+							</select>
+							<button id="run">Visualizar</button>
+						</h1>
+					</div>
+				</div>
+				
+				<div id="error_wrapper"></div>
+
+				<canvas id="canvas" width="750" height="560"></canvas>
 
 				<div class="hbox">
 
@@ -60,32 +84,13 @@
 						<label>Intermediários</label>
 						<h1>
 							<select id="inter_mode">
-								<option value="iterative" selected>Iterativo</option>
-								<option value="recursive">Recursivo</option>
+								<option value="iterative" selected>Iterativos</option>
+								<option value="recursive">Recursivos</option>
 							</select>
 						</h1>
 					</div>
 
 				</div>
-
-				<label for="speed">Velocidade</label>
-				<h1>
-					<select name="speed" id="speed">
-						<option value="veryslow">Muito Lento</option>
-						<option value="slow">Lento</option>
-						<option value="normal" selected>Normal</option>
-						<option value="fast">Rápido</option>
-						<option value="veryfast">Muito Rápido</option>
-					</select>
-				</h1>
-
-				<label for="domain">Domínio</label>
-				<h1>
-					<input type="text" name="domain" id="domain" placeholder="www.exemplo.com.br">
-					<button id="run">Visualizar</button>
-				</h1>
-
-				<div id="error_wrapper"></div>
 
 			</main>
 

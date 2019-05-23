@@ -29,7 +29,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     var dest = { name: "Host Destino", node: undefined, label: undefined, modeDOM: undefined };
     var drawables = [];
     var lineIntervals = [];
-    var greenWire = "#b0db8a";
+    var greenWire = "#a9cc78";
     var redWire = "#db938a";
     var blueWire = "#9ac9ed";
     var yellowWire = "#e5c16e";
@@ -61,7 +61,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         };
         Node.prototype.getOutput = function (side) {
             var p = this.getVertices();
-            var f = 0.3;
+            var f = 0.25;
             var fw = f * this.width;
             var fh = f * this.height;
             switch (side) {
@@ -77,7 +77,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         };
         Node.prototype.getInput = function (side) {
             var p = this.getVertices();
-            var f = 0.3;
+            var f = 0.25;
             var fw = f * this.width;
             var fh = f * this.height;
             switch (side) {
@@ -568,8 +568,8 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         };
     }
     function resetCanvas() {
-        var pl = 70; // padding
-        var pr = 70;
+        var pl = 80; // padding
+        var pr = 80;
         var pt = 70;
         var pb = 70;
         var w = canvasDOM.width;
