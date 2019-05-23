@@ -7,24 +7,30 @@ import { id } from "../../core/utils/dom";
 import { Domain, ERROR_INVALID_LABEL, ERROR_FULL_NAME_RANGE, ERROR_SMALL_DOMAIN } from "../../core/networking/layers/layer-5/domain";
 import { clamp } from "../../core/utils/math";
 
+// Images used in the canvas.
+
 const serverImage = new Image();
 serverImage.src = "../../../images/layers/5/server.png";
 const clientImage = new Image();
 clientImage.src = "../../../images/layers/5/client.png";
 
+// DOM elements.
+
 const errorWrapperDOM = id("error_wrapper");
 const domainDOM = id("domain");
 const canvasDOM = <HTMLCanvasElement>id("canvas");
 const speedDOM = <HTMLSelectElement>id("speed");
-
 const ctx = canvasDOM.getContext("2d");
-const fixedDeltaTime = 1000/60;
+
+// Simulation speed constants.
 
 const verySlowSpeed = 10;
 const slowSpeed = 25;
 const normalSpeed = 100;
 const fastSpeed = 400;
 const veryFastSpeed = 600;
+
+// Data structures representing servers and hosts in the canvas.
 
 const client: Machine = { name: "Host Cliente", node: undefined, label: undefined, modeDOM: undefined };
 const local: Machine = { name: "Local", node: undefined, label: undefined, modeDOM: <HTMLSelectElement>id("local_mode") };
@@ -34,19 +40,41 @@ const inter: Machine = { name: "Intermediários", node: undefined, label: undefi
 const admin: Machine = { name: "Autoritativo", node: undefined, label: undefined, modeDOM: undefined };
 const dest: Machine = { name: "Host Destino", node: undefined, label: undefined, modeDOM: undefined };
 
-let drawables: Drawable[] = [];
-let lineIntervals: number[] = [];
+// Wire colors.
 
 const greenWire = "#a9cc78";
 const redWire = "#db938a";
 const blueWire = "#9ac9ed";
 const yellowWire = "#e5c16e";
 
+// Constants representing the mode of a DNS server.
+
 const ITERATIVE = "iterative";
 const RECURSIVE = "recursive";
 
+/**
+ * The target duration of each frame while animating lines.
+ */
+const fixedDeltaTime = 1000 / 60;
+
+/**
+ * The intervals of each line being drawn.
+ */
+let lineIntervals: number[] = [];
+
+/**
+ * The list of elements drawn to the canvas.
+ */
+let drawables: Drawable[] = [];
+
+/**
+ * A 2D point.
+ */
 type Point = {	x: number, y: number }
 
+/**
+ * Interface representing anything that can be drawn on the canvas.
+ */
 interface Drawable {
 
 	visible: boolean;
@@ -54,6 +82,10 @@ interface Drawable {
 
 }
 
+/**
+ * A Drawable image that has special connecting points. Used to represent servers and clients in the canvas.
+ * @author Henrique Colini
+ */
 class Node implements Drawable {
 	
 	public visible = true;
@@ -78,6 +110,9 @@ class Node implements Drawable {
 
 	}
 
+	/**
+	 * Returns the 4 vertices of this rectangular Node. A, B, C and D represent the vertices clockwise, starting from the top left corner.
+	 */
 	public getVertices(): {a: Point, b: Point, c: Point, d: Point} {
 
 		let x = this.pos.x;
@@ -94,6 +129,10 @@ class Node implements Drawable {
 
 	}
 
+	/**
+	 * Returns an exit point of this Node, given the side.
+	 * @param side Which side to get the point from.
+	 */
 	public getOutput(side: "top" | "bottom" | "left" | "right"): Point {
 
 		let p = this.getVertices();
@@ -116,6 +155,10 @@ class Node implements Drawable {
 
 	}
 
+	/**
+	 * Returns an entry point of this Node, given the side.
+	 * @param side Which side to get the point from.
+	 */
 	public getInput(side: "top" | "bottom" | "left" | "right"): Point {
 
 		let p = this.getVertices();
@@ -140,6 +183,10 @@ class Node implements Drawable {
 
 }
 
+/**
+ * A Drawable text box.
+ * @author Henrique Colini
+ */
 class Label implements Drawable {
 	
 	public visible = true;
@@ -177,17 +224,26 @@ class Label implements Drawable {
 		}
 	}	
 	
+	/**
+	 * Returns the width of this Label, considering the width of the text and the padding.
+	 */
 	public getRealWidth(): number {
 		ctx.font = this.font;
 		return ctx.measureText(this.text).width + (2*this.padding);
 	}
 
+	/**
+	 * Returns the height of this Label, considering the height of the text and the padding.
+	 */
 	public getRealHeight(): number {
 		return this.textHeight + (2*this.padding);
 	}
 
 }
 
+/**
+ * A Drawable line that connects the outputs and inputs of Nodes.
+ */
 class Line implements Drawable {
 
 	public visible = true;
@@ -208,6 +264,9 @@ class Line implements Drawable {
 
 	}
 
+	/**
+	 * Returns the start point of this Line.
+	 */
 	public getStartPoint(): Point {
 
 		let offX = this.from.pos.x - this.to.pos.x;
@@ -232,6 +291,9 @@ class Line implements Drawable {
 
 	}
 
+	/**
+	 * Returns the end point of this Line.
+	 */
 	public getEndPoint(): Point {
 
 		let offX = this.from.pos.x - this.to.pos.x;
@@ -256,6 +318,11 @@ class Line implements Drawable {
 
 	}
 
+	/**
+	 * Returns the current end point of this Line in a point of time.
+	 * @param fromPoint The starting point.
+	 * @param toPoint The end point to be reached.
+	 */
 	public getCurrentEndPoint(fromPoint = this.getStartPoint(), toPoint = this.getEndPoint()): Point {
 		return {x: fromPoint.x + (this.time * (toPoint.x - fromPoint.x)), y: fromPoint.y + (this.time * (toPoint.y - fromPoint.y))};
 	}
@@ -286,6 +353,9 @@ class Line implements Drawable {
 
 }
 
+/**
+ * A data structure that represents servers and hosts.
+ */
 type Machine = {
 	name: string,
 	node: Node,
@@ -293,6 +363,9 @@ type Machine = {
 	modeDOM: HTMLSelectElement|undefined
 }
 
+/**
+ * A helper data structure used to represent the connection between two Nodes when creating a line. 
+ */
 type NodeConnection = {
 	from: Node, 
 	to: Node, 
@@ -302,6 +375,14 @@ type NodeConnection = {
 	labelText: string | undefined 
 };
 
+/**
+ * Draws a rounded rectangle in the canvas.
+ * @param x The x coordinate of the rectangle.
+ * @param y The y coordinate of the rectangle.
+ * @param w The width of the rectangle.
+ * @param h The height of the rectangle.
+ * @param r The radius of the border.
+ */
 function roundRect(x: number, y: number, w: number, h: number, r: number): CanvasRenderingContext2D {
 	if (w < 2 * r) r = w / 2;
 	if (h < 2 * r) r = h / 2;
@@ -315,6 +396,9 @@ function roundRect(x: number, y: number, w: number, h: number, r: number): Canva
 	return ctx;
 }
 
+/**
+ * Runs the simulation.
+ */
 function run() {
 
 	let drawIndex = drawables.length;
@@ -403,13 +487,23 @@ function run() {
 
 }
 
+/**
+ * What to do when a DNS query ends in success. 
+ */
 function onSuccess() {
 	connectNodes(client.node, dest.node, blueWire, 10, fastSpeed, undefined);
 	connectNodes(dest.node, client.node, blueWire, 10, fastSpeed, undefined);
 }
 
+/**
+ * What to do when a DNS query ends in failure.
+ */
 function onFailure() {}
 
+/**
+ * Calculates the connections between servers needed in a DNS query. Returns a list of said connections and whether the query was successful.
+ * @param domain The host domain.
+ */
 function calculateConnections(domain: Domain): { connections: NodeConnection[], success: boolean} {
 		
 	let parts = domain.getDomainParts();
@@ -598,9 +692,23 @@ function calculateConnections(domain: Domain): { connections: NodeConnection[], 
 
 }
 
+/**
+ * The speed of the lines the line maker makes.
+ */
 let makerWidth = 0;
+
+/**
+ * The width of the lines the line maker makes.
+ */
 let makerSpeed = 0;
 
+/**
+ * Creates NodeConnections.
+ * @param from What machine to start from.
+ * @param to What machine to go to.
+ * @param kind What kind of connection to create. Must be either "request", "partial" (responses) or "full" (responses).
+ * @param msg What message to carry in the end of the line.
+ */
 function makeConnection(from: Machine, to: Machine, kind: "request" | "partial" | "full", msg: string): NodeConnection {
 	let style: string;
 	switch (kind) {
@@ -611,6 +719,16 @@ function makeConnection(from: Machine, to: Machine, kind: "request" | "partial" 
 	return { from: from.node, to: to.node, strokeStyle: style, lineWidth: makerWidth, speed: makerSpeed, labelText: msg };
 }
 
+/**
+ * Connects two Nodes with a Line, drawing it over time, given a speed. 
+ * @param from The Node to start the Line from.
+ * @param to The Node to get the Line to.
+ * @param strokeStyle The stroke style of the Line.
+ * @param lineWidth The line width.
+ * @param speed The speed of the Line being drawn, in pixels per second.
+ * @param labelText The text of the Line's label.
+ * @param callback A callback for when the Line finishes drawing.
+ */
 function connectNodes(from: Node, to: Node, strokeStyle: string, lineWidth: number, speed: number, labelText: string|undefined, callback: Function = undefined): Line {
 
 	let line = new Line(from, to, 0, strokeStyle, lineWidth);
@@ -660,6 +778,11 @@ function connectNodes(from: Node, to: Node, strokeStyle: string, lineWidth: numb
 
 }
 
+/**
+ * Connects multiple nodes, in succession.
+ * @param connections The list of connections to be made.
+ * @param callback What do to when the last line finishes being drawn.
+ */
 function connectMultipleNodes(
 	connections: NodeConnection[],
 	callback: Function = undefined) {
@@ -686,6 +809,9 @@ function connectMultipleNodes(
 
 }
 
+/**
+ * Renders all the Drawables to the canvas.
+ */
 function render() {
 
 	ctx.clearRect(0, 0, canvasDOM.width, canvasDOM.height);
@@ -696,6 +822,13 @@ function render() {
 
 }
 
+/**
+ * Returns the position of a Node or Label when put aligned to another one.
+ * @param from The Node or Label to be positioned relative to.
+ * @param to The Node or Label to be positioned.
+ * @param positionY How to align the Node or Label vertically. Can be "top", "center" or "bottom".
+ * @param positionX How to align the Node or Label horizontally. Can be "left", "center" or "right".
+ */
 function getAlignedPoint(from: Node|Label, to: Node|Label, positionY: "top"|"center"|"bottom", positionX: "left"|"center"|"right"): Point {
 
 	let offX: number;	
@@ -742,6 +875,9 @@ function getAlignedPoint(from: Node|Label, to: Node|Label, positionY: "top"|"cen
 
 }
 
+/**
+ * Deletes all drawables, sets up all Nodes and their Labels.
+ */
 function resetCanvas() {
 
 	let pl = 80; // padding
@@ -794,7 +930,11 @@ function resetCanvas() {
 	drawables.push(dest.label);
 	drawables.push(tld.label);
 
+	render();
+
 }
+
+// +==============================================+
 
 serverImage.onload = render;
 clientImage.onload = render;
