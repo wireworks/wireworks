@@ -58,15 +58,17 @@ class Node implements Drawable {
 	
 	public visible = true;
 	public pos: Point;
+	public margins: { l: number, t: number, r: number, b: number };
 	public width: number;
 	public height: number;
 	public image: HTMLImageElement;
 
-	constructor(pos: Point, width: number, heigth: number, image: HTMLImageElement) {
+	constructor(pos: Point, width: number, heigth: number, margins: { l: number, t: number, r: number, b: number }, image: HTMLImageElement) {
 		this.pos = pos;
 		this.width = width;
 		this.height = heigth;
 		this.image = image;
+		this.margins = margins;
 	}
 
 	public draw(): void {
@@ -102,13 +104,13 @@ class Node implements Drawable {
 		switch (side) {
 
 			case "top":
-				return { x: p.a.x + fw, y: p.a.y };
+				return { x: p.a.x + fw, y: p.a.y - this.margins.t };
 			case "bottom":
-				return { x: p.c.x - fw, y: p.c.y };
+				return { x: p.c.x - fw, y: p.c.y + this.margins.b };
 			case "left":
-				return { x: p.d.x, y: p.d.y - fh };
+				return { x: p.d.x - this.margins.l, y: p.d.y - fh };
 			case "right":
-				return { x: p.c.x, y: p.b.y + fh };
+				return { x: p.c.x + this.margins.r, y: p.b.y + fh };
 
 		}
 
@@ -124,13 +126,13 @@ class Node implements Drawable {
 		switch (side) {
 
 			case "top":
-				return { x: p.b.x - fw, y: p.a.y };
+				return { x: p.b.x - fw, y: p.a.y - this.margins.t };
 			case "bottom":
-				return { x: p.d.x + fw, y: p.c.y };
+				return { x: p.d.x + fw, y: p.c.y + this.margins.b };
 			case "left":
-				return { x: p.d.x, y: p.a.y + fh };
+				return { x: p.d.x - this.margins.l, y: p.a.y + fh };
 			case "right":
-				return { x: p.c.x, y: p.c.y - fh };
+				return { x: p.c.x + this.margins.r, y: p.c.y - fh };
 
 		}
 
@@ -742,37 +744,37 @@ function getAlignedPoint(from: Node|Label, to: Node|Label, positionY: "top"|"cen
 
 function resetCanvas() {
 
-	let pl = 100; // padding
-	let pr = 170;
+	let pl = 70; // padding
+	let pr = 70;
 	let pt = 70;
 	let pb = 70;
 
 	let w = canvasDOM.width;
 	let h = canvasDOM.height;
 	
-	client.node = new Node({x: pl, y: h - pb},60,60, clientImage);
-	local.node = new Node({ x: pl, y: (2*h-pb) / 3 }, 60, 60, serverImage);
-	root.node = new Node({ x: pl, y: pt + h/7 }, 60, 60, serverImage);
-	inter.node = new Node({ x: w - pr, y: pt + h/7 }, 60, 60, serverImage);
-	tld.node = new Node({ x: (w+pl-pr)/2, y: pt }, 60, 60, serverImage);
-	admin.node = new Node({ x: w - pr, y: (2*h-pb) / 3 }, 60, 60, serverImage);
-	dest.node = new Node({ x: w - pr, y: h - pb }, 60, 60, clientImage);
+	client.node = new Node({ x: pl, y: h - pb },           60, 60, {l: 10, t: 10, r: 10, b: 10}, clientImage);
+	local.node  = new Node({ x: pl, y: h - pb - 180 },     60, 60, {l: 10, t: 10, r: 10, b: 40}, serverImage);
+	root.node   = new Node({ x: pl, y: pt + 80 },          60, 60, {l: 10, t: 10, r: 10, b: 10}, serverImage);
+	inter.node  = new Node({ x: w - pr, y: pt + 80 },      60, 60, {l: 10, t: 10, r: 10, b: 10}, serverImage);
+	tld.node    = new Node({ x: (w+pl-pr)/2, y: pt },      60, 60, {l: 10, t: 10, r: 10, b: 10}, serverImage);
+	admin.node  = new Node({ x: w - pr, y: h - pb - 180 }, 60, 60, {l: 10, t: 10, r: 10, b: 10}, serverImage);
+	dest.node   = new Node({ x: w - pr, y: h - pb },       60, 60, {l: 10, t: 10, r: 10, b: 10}, clientImage);
 
 	client.label = new Label({x: 0, y: 0}, client.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-	local.label = new Label({x: 0, y: 0}, local.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-	root.label = new Label({x: 0, y: 0}, root.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-	tld.label = new Label({x: 0, y: 0}, tld.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-	inter.label = new Label({x: 0, y: 0}, inter.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-	admin.label = new Label({x: 0, y: 0}, admin.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-	dest.label = new Label({x: 0, y: 0}, dest.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+	local.label  = new Label({x: 0, y: 0}, local.name,  "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+	root.label   = new Label({x: 0, y: 0}, root.name,   "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+	tld.label    = new Label({x: 0, y: 0}, tld.name,    "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+	inter.label  = new Label({x: 0, y: 0}, inter.name,  "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+	admin.label  = new Label({x: 0, y: 0}, admin.name,  "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+	dest.label   = new Label({x: 0, y: 0}, dest.name,   "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
 	
 	client.label.pos = getAlignedPoint(client.node, client.label, "bottom", "center");
-	local.label.pos = getAlignedPoint(local.node, local.label, "center", "left");
-	root.label.pos = getAlignedPoint(root.node, root.label, "center", "left");
-	tld.label.pos = getAlignedPoint(tld.node, tld.label, "top", "center");
-	inter.label.pos = getAlignedPoint(inter.node, inter.label, "center", "right");
-	admin.label.pos = getAlignedPoint(admin.node, admin.label, "center", "right");
-	dest.label.pos = getAlignedPoint(dest.node, dest.label, "bottom", "center");
+	local.label.pos  = getAlignedPoint(local.node, local.label, "bottom", "center");
+	root.label.pos   = getAlignedPoint(root.node, root.label, "top", "center");
+	tld.label.pos    = getAlignedPoint(tld.node, tld.label, "top", "center");
+	inter.label.pos  = getAlignedPoint(inter.node, inter.label, "top", "center");
+	admin.label.pos  = getAlignedPoint(admin.node, admin.label, "bottom", "center");
+	dest.label.pos   = getAlignedPoint(dest.node, dest.label, "bottom", "center");
 
 	drawables = [];
 
@@ -801,8 +803,9 @@ resetCanvas();
 
 setInterval(render, 2000);
 
-id("run").addEventListener("click", function(ev: MouseEvent) {
+id("run").addEventListener("click", run);
 
-	run();
-
-})
+id("domain").addEventListener("keydown", function (ev: KeyboardEvent): void {
+	if (ev.key === "Enter")
+		run();
+});

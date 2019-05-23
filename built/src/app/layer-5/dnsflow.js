@@ -36,12 +36,13 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     var ITERATIVE = "iterative";
     var RECURSIVE = "recursive";
     var Node = /** @class */ (function () {
-        function Node(pos, width, heigth, image) {
+        function Node(pos, width, heigth, margins, image) {
             this.visible = true;
             this.pos = pos;
             this.width = width;
             this.height = heigth;
             this.image = image;
+            this.margins = margins;
         }
         Node.prototype.draw = function () {
             if (this.visible)
@@ -65,13 +66,13 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             var fh = f * this.height;
             switch (side) {
                 case "top":
-                    return { x: p.a.x + fw, y: p.a.y };
+                    return { x: p.a.x + fw, y: p.a.y - this.margins.t };
                 case "bottom":
-                    return { x: p.c.x - fw, y: p.c.y };
+                    return { x: p.c.x - fw, y: p.c.y + this.margins.b };
                 case "left":
-                    return { x: p.d.x, y: p.d.y - fh };
+                    return { x: p.d.x - this.margins.l, y: p.d.y - fh };
                 case "right":
-                    return { x: p.c.x, y: p.b.y + fh };
+                    return { x: p.c.x + this.margins.r, y: p.b.y + fh };
             }
         };
         Node.prototype.getInput = function (side) {
@@ -81,13 +82,13 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             var fh = f * this.height;
             switch (side) {
                 case "top":
-                    return { x: p.b.x - fw, y: p.a.y };
+                    return { x: p.b.x - fw, y: p.a.y - this.margins.t };
                 case "bottom":
-                    return { x: p.d.x + fw, y: p.c.y };
+                    return { x: p.d.x + fw, y: p.c.y + this.margins.b };
                 case "left":
-                    return { x: p.d.x, y: p.a.y + fh };
+                    return { x: p.d.x - this.margins.l, y: p.a.y + fh };
                 case "right":
-                    return { x: p.c.x, y: p.c.y - fh };
+                    return { x: p.c.x + this.margins.r, y: p.c.y - fh };
             }
         };
         return Node;
@@ -567,19 +568,19 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         };
     }
     function resetCanvas() {
-        var pl = 100; // padding
-        var pr = 170;
+        var pl = 70; // padding
+        var pr = 70;
         var pt = 70;
         var pb = 70;
         var w = canvasDOM.width;
         var h = canvasDOM.height;
-        client.node = new Node({ x: pl, y: h - pb }, 60, 60, clientImage);
-        local.node = new Node({ x: pl, y: (2 * h - pb) / 3 }, 60, 60, serverImage);
-        root.node = new Node({ x: pl, y: pt + h / 7 }, 60, 60, serverImage);
-        inter.node = new Node({ x: w - pr, y: pt + h / 7 }, 60, 60, serverImage);
-        tld.node = new Node({ x: (w + pl - pr) / 2, y: pt }, 60, 60, serverImage);
-        admin.node = new Node({ x: w - pr, y: (2 * h - pb) / 3 }, 60, 60, serverImage);
-        dest.node = new Node({ x: w - pr, y: h - pb }, 60, 60, clientImage);
+        client.node = new Node({ x: pl, y: h - pb }, 60, 60, { l: 10, t: 10, r: 10, b: 10 }, clientImage);
+        local.node = new Node({ x: pl, y: h - pb - 180 }, 60, 60, { l: 10, t: 10, r: 10, b: 40 }, serverImage);
+        root.node = new Node({ x: pl, y: pt + 80 }, 60, 60, { l: 10, t: 10, r: 10, b: 10 }, serverImage);
+        inter.node = new Node({ x: w - pr, y: pt + 80 }, 60, 60, { l: 10, t: 10, r: 10, b: 10 }, serverImage);
+        tld.node = new Node({ x: (w + pl - pr) / 2, y: pt }, 60, 60, { l: 10, t: 10, r: 10, b: 10 }, serverImage);
+        admin.node = new Node({ x: w - pr, y: h - pb - 180 }, 60, 60, { l: 10, t: 10, r: 10, b: 10 }, serverImage);
+        dest.node = new Node({ x: w - pr, y: h - pb }, 60, 60, { l: 10, t: 10, r: 10, b: 10 }, clientImage);
         client.label = new Label({ x: 0, y: 0 }, client.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
         local.label = new Label({ x: 0, y: 0 }, local.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
         root.label = new Label({ x: 0, y: 0 }, root.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
@@ -588,11 +589,11 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         admin.label = new Label({ x: 0, y: 0 }, admin.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
         dest.label = new Label({ x: 0, y: 0 }, dest.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
         client.label.pos = getAlignedPoint(client.node, client.label, "bottom", "center");
-        local.label.pos = getAlignedPoint(local.node, local.label, "center", "left");
-        root.label.pos = getAlignedPoint(root.node, root.label, "center", "left");
+        local.label.pos = getAlignedPoint(local.node, local.label, "bottom", "center");
+        root.label.pos = getAlignedPoint(root.node, root.label, "top", "center");
         tld.label.pos = getAlignedPoint(tld.node, tld.label, "top", "center");
-        inter.label.pos = getAlignedPoint(inter.node, inter.label, "center", "right");
-        admin.label.pos = getAlignedPoint(admin.node, admin.label, "center", "right");
+        inter.label.pos = getAlignedPoint(inter.node, inter.label, "top", "center");
+        admin.label.pos = getAlignedPoint(admin.node, admin.label, "bottom", "center");
         dest.label.pos = getAlignedPoint(dest.node, dest.label, "bottom", "center");
         drawables = [];
         drawables.push(client.node);
@@ -614,7 +615,9 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
     clientImage.onload = render;
     resetCanvas();
     setInterval(render, 2000);
-    dom_1.id("run").addEventListener("click", function (ev) {
-        run();
+    dom_1.id("run").addEventListener("click", run);
+    dom_1.id("domain").addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter")
+            run();
     });
 });
