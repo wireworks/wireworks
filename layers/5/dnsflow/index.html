@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+		<link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Montserrat:300,400|Boogaloo|Kelly+Slab|Lobster" rel="stylesheet">
+		<link rel="stylesheet" href="../../../css/pages/layers/5/dnsflow.css">
+		<link rel="shortcut icon" href="../../../favicon.png">
+		<title>Wireworks - DNSFlow</title>
+	</head>
+	<body>
+		<div class="container" id="container">
+
+			<header>
+				<div class="spacer">
+					<a href="../../../" class="logo">wireworks</a>
+					<span>
+						<a href="../">Camada 5</a>
+						<span class="breadcrumb"></span>
+						<span>DNSFlow</span>
+					</span>
+				</div>
+			</header>
+			
+			<main>
+
+				<div class="hbox">
+					<div>
+						<label for="domain">Domínio</label>
+						<h1>
+							<input type="text" name="domain" id="domain" placeholder="www.exemplo.com.br">
+						</h1>
+					</div>
+					<div>
+						<label for="speed">Velocidade</label>
+						<h1>
+							<select name="speed" id="speed">
+								<option value="veryslow">Muito Lento</option>
+								<option value="slow">Lento</option>
+								<option value="normal" selected>Normal</option>
+								<option value="fast">Rápido</option>
+								<option value="veryfast">Muito Rápido</option>
+							</select>
+							<button id="run">Visualizar</button>
+						</h1>
+					</div>
+				</div>
+				
+				<div id="error_wrapper"></div>
+
+				<canvas id="canvas" width="750" height="560"></canvas>
+
+				<div class="hbox">
+
+					<div>
+						<label>Local</label>
+						<h1>
+							<select id="local_mode">
+								<option value="iterative">Iterativo</option>
+								<option value="recursive" selected>Recursivo</option>
+							</select>
+						</h1>
+					</div>
+					<div>
+						<label>Root</label>
+						<h1>
+							<select id="root_mode">
+								<option value="iterative" selected>Iterativo</option>
+								<option value="recursive">Recursivo</option>
+							</select>
+						</h1>
+					</div>
+					<div>
+						<label>TLD</label>
+						<h1>
+							<select id="tld_mode">
+								<option value="iterative" selected>Iterativo</option>
+								<option value="recursive">Recursivo</option>
+							</select>
+						</h1>
+					</div>
+					<div>
+						<label>Intermediários</label>
+						<h1>
+							<select id="inter_mode">
+								<option value="iterative" selected>Iterativos</option>
+								<option value="recursive">Recursivos</option>
+							</select>
+						</h1>
+					</div>
+
+				</div>
+
+			</main>
+
+		</div>
+		
+		<script data-main="../../../built/src/app/layer-5/dnsflow" type="text/javascript" src="../../../built/require.js"></script>
+
+	</body>
+</html>

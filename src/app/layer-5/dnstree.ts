@@ -80,7 +80,7 @@ function refreshBrowser(): void {
 			addressBarDOM.classList.remove("address-error");
 
 			let tmpRoot = new Domain(".", undefined);
-			domain = extractDomain(tmpRoot, ( < HTMLInputElement > addressBarDOM).value);
+			domain = Domain.extractDomain(tmpRoot, ( < HTMLInputElement > addressBarDOM).value);
 
 			let tmpCurr: Domain = tmpRoot;
 			let curr: Domain = rootDomain;
@@ -241,35 +241,6 @@ function refreshTree(): void {
 }
 
 /**
- * Extracts a Domain from a string, in the format abc.def.ghi. Returns the last subdomain.
- * @param  {Domain} root The root domain to be used.
- * @param  {string} fullName The full name of the domain, in the format abc.def.ghi.
- */
-function extractDomain(root: Domain, fullName: string): Domain {
-
-	let parts = fullName.trim().split(".");
-
-	let curr: Domain = root;
-
-	for (let i = parts.length - 1; i >= 0; i--) {
-
-		if (parts[i].length === 0) {
-			let err = new Error();
-			err.name = ERROR_INVALID_LABEL;
-			throw err;
-		}
-
-		let next = new Domain(parts[i], curr);
-		curr.getSubdomains().push(next);
-		curr = next;
-
-	}
-
-	return curr;
-
-}
-
-/**
  * Creates a fake website from user input.
  */
 function createSite(): void {
@@ -387,7 +358,7 @@ function registerDomain(): void {
 			errStr = "Você não pode usar esse nome.";
 			throw Error();
 		} else {
-			let domain = extractDomain(tmpRoot, fullName);
+			let domain = Domain.extractDomain(tmpRoot, fullName);
 			let addressStr = ( < HTMLInputElement > domainAddressDOM).value.trim();
 
 			if (addressStr !== "") {

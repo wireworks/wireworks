@@ -54,7 +54,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
             catch (error) {
                 addressBarDOM.classList.remove("address-error");
                 var tmpRoot = new domain_1.Domain(".", undefined);
-                domain_2 = extractDomain(tmpRoot, addressBarDOM.value);
+                domain_2 = domain_1.Domain.extractDomain(tmpRoot, addressBarDOM.value);
                 var tmpCurr = tmpRoot;
                 var curr = rootDomain;
                 var exit = false;
@@ -169,26 +169,6 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
         }
     }
     /**
-     * Extracts a Domain from a string, in the format abc.def.ghi. Returns the last subdomain.
-     * @param  {Domain} root The root domain to be used.
-     * @param  {string} fullName The full name of the domain, in the format abc.def.ghi.
-     */
-    function extractDomain(root, fullName) {
-        var parts = fullName.trim().split(".");
-        var curr = root;
-        for (var i = parts.length - 1; i >= 0; i--) {
-            if (parts[i].length === 0) {
-                var err = new Error();
-                err.name = domain_1.ERROR_INVALID_LABEL;
-                throw err;
-            }
-            var next = new domain_1.Domain(parts[i], curr);
-            curr.getSubdomains().push(next);
-            curr = next;
-        }
-        return curr;
-    }
-    /**
      * Creates a fake website from user input.
      */
     function createSite() {
@@ -271,7 +251,7 @@ define(["require", "exports", "../../core/utils/dom", "../../core/networking/lay
                 throw Error();
             }
             else {
-                var domain = extractDomain(tmpRoot, fullName);
+                var domain = domain_1.Domain.extractDomain(tmpRoot, fullName);
                 var addressStr = domainAddressDOM.value.trim();
                 if (addressStr !== "") {
                     var address = new address_1.Address(addressStr);
