@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "outDir": "./built/src",
+        "allowJs": false,
+        "noEmitOnError": true,
+        "noImplicitAny": true,
+		"target": "es5",
+		"module": "AMD"
+    },
+    "include": [
+        "./src/**/*"
+    ]
+}
