@@ -1,0 +1,268 @@
+@import "layer5";
+
+#root_tree {
+
+	margin-top: 10px;
+	overflow-x: auto;
+
+}
+
+.domain-tree,
+.domain-tree ul,
+.domain-tree li {
+	position: relative;
+}
+
+.domain-tree {
+
+	.domain {
+		
+		margin: 10px 0;
+		height: 32px;
+		display: inline-flex;
+		width: 100%;
+		align-items: center;
+
+		$domain-color: #fd8f46;
+
+		.label {
+
+			height: 32px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 32px;
+			background: $domain-color;
+			color: white;
+			padding: 0 1em;
+			border-radius: 16px;
+			user-select: none;
+
+		}
+
+		.address {
+
+			color: $color-text-light;
+			margin-left: 1em;
+
+		}
+
+		.domain-delete,
+		.domain-address-delete {
+			margin-left: 1em;
+			cursor: pointer;
+			transition: color 0.3s;
+		}
+
+		.domain-delete {
+			color: transparentize($domain-color, 1);
+		}
+
+		.domain-address-delete {
+			color: transparentize($color-text-light, 1);
+		}
+
+		&:hover {
+
+			.domain-delete {
+				color: $domain-color;
+			}
+
+			.domain-address-delete {
+				color: $color-text-light;
+			}
+
+		}
+
+	}
+
+	ul {
+
+		list-style: none;
+		padding-left: 32px;
+
+		&>li:last-child::after {
+			height: 38px;
+		}
+
+	}
+
+	li {
+
+		&::before,
+		&::after {
+
+			content: "";
+			position: absolute;
+			left: -18px;
+
+		}
+
+		&::before {
+			border-top: 4px solid #b9afa9;
+			top: 24px;
+			width: 18px;
+			height: 0;
+		}
+
+		&::after {
+			border-left: 4px solid #b9afa9;
+			height: 100%;
+			width: 0px;
+			top: -10px;
+		}
+
+	}
+
+}
+
+.browser {
+
+	border: 2px solid #cfcfcf;
+	border-radius: 10px;
+	margin-bottom: 1.5rem;
+	overflow: hidden;
+
+	.top-bar {
+
+		display: flex;
+		align-items: center;
+		border-bottom: 2px solid #cfcfcf;
+		padding: 10px;
+		background: #f4f4f4;
+
+		.previous,
+		.next,
+		.reload {
+
+			$size: 36px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: $size;
+			height: $size;
+			border-radius: $size / 2;
+			margin-right: 5px;			
+			color: #808080;
+			transition: background 0.4s;
+
+			&:hover {
+				background: #e5e5e5;
+			}
+
+			&.disabled {
+
+				color: #c7c7c7;
+
+				&:hover {
+					background: transparent;
+				}
+
+			}
+
+		}
+
+		.address-bar {
+
+			flex: 1;
+			margin: 0;
+			height: 1.5em;
+			border: 2px solid #cfcfcf;
+			border-radius: 1.5em;
+			background: white;
+			padding: 0.2em 1em;
+			text-overflow: ellipsis;
+			font-family: 'Segoe UI', Tahoma, sans-serif;
+			font-weight: unset;
+
+			&:focus {
+				border-color: #a2d2d4;
+			}
+
+			&.address-error {
+				border-color: #df9c9c;
+			}
+
+		}
+
+	}
+
+	.browser-content {
+
+		font-size: $font-size-medium;
+		min-height: 10em;
+		overflow-y: auto;
+
+		.page {
+
+			padding: 20px;
+
+			h1, h2, h3, p {
+				font-family: 'Segoe UI', Tahoma, sans-serif;
+			}
+
+			.font-bold {
+				font-weight: 500;
+			}
+
+			.separator {
+				height: 1px;
+				background: #cfcfcf;
+				margin: 20px 0;
+			}
+
+			.style-0 {
+				font-family: 'Lobster', cursive;
+				font-weight: $font-weight-bold;
+				color: #eea02b;
+			}
+			.style-1 {
+				font-family: 'Lobster', cursive;
+				font-weight: $font-weight-bold;
+				color: #d42c7b;
+			}
+			.style-2 {
+				font-family: 'Boogaloo', cursive;
+				font-weight: $font-weight-bold;
+				color: #4864df;
+			}
+			.style-3 {
+				font-family: 'Boogaloo', cursive;
+				font-weight: $font-weight-bold;
+				color: #2c9c8a;
+			}
+			.style-4 {
+				font-family: 'Kelly Slab', cursive;
+				font-weight: $font-weight-bold;
+				color: #aec529;
+			}
+			.style-5 {
+				font-family: 'Kelly Slab', cursive;
+				font-weight: $font-weight-bold;
+				color: #c54545;
+			}
+
+			img {
+				margin-bottom: 1.5rem;
+			}
+
+		}
+
+	}
+
+}
+
+.site-name {
+	margin-right: 1em;
+}
+
+.site-delete {
+	color: #a84545;
+	cursor: pointer;
+}
+
+.hidden {
+
+	display: none !important;
+
+}

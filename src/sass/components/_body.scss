@@ -1,0 +1,7 @@
+@import "../utils/colors/base";
+@import "../base/typography";
+
+body {
+	font-family: $font-family-base;
+	background: $color-primary-extralight;
+}

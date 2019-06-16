@@ -1,0 +1,9 @@
+$asset-root-path: '../../' !default;
+
+@function asset($type, $file) {
+	@return url($asset-root-path + '/' + $type + '/' + $file);
+}
+
+@function image($file) {
+	@return asset('images', $file);
+}

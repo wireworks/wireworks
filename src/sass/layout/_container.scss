@@ -1,0 +1,48 @@
+@import "../utils/colors/base";
+@import "../base/typography";
+
+.container {
+
+	margin: 40px auto;
+	background: white;
+    width: 1200px;
+    border-radius: 15px 15px 10px 10px;
+	box-shadow: 0px 2px 6px 1px rgba(0, 0, 0, 0.2);
+	
+	header {
+
+		color: white;
+		background: $color-primary;
+		font-size: $font-size-big;
+		padding: 0.5em;
+		border-radius: 10px 10px 0 0;
+		user-select: none;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		a { 
+
+			color: white;
+			text-shadow: 0px 0px 0px rgba(0,0,0,0);
+			transition: text-shadow .5s;
+
+			&:hover {
+				text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+			}
+
+		}
+
+	}
+
+	main {
+
+		padding: 25px;
+		
+		&>*:last-child {
+			margin-bottom: 0;
+		}
+
+	}	
+
+}

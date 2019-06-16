@@ -1,0 +1,50 @@
+@import "../utils/colors/base";
+
+$font-family-base: 'Montserrat', sans-serif;
+$font-family-mono: 'Roboto Mono', monospace;
+
+$font-size-base: 16px;
+$font-size-medium: 20px;
+$font-size-big: 30px;
+
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-bold: 700;
+
+h1, h2, h3, h4, h5, h6, p {
+	font-family: $font-family-base;
+	color: $color-text;
+	margin-bottom: 1.5rem;
+}
+
+h1 {
+	font-size: $font-size-big;
+}
+
+h2 {
+	font-size: $font-size-medium;
+}
+
+h3, h4, h5, h6, p {
+	font-size: $font-size-base;
+}
+
+.font-light {
+	font-weight: $font-weight-light;
+}
+
+.font-bold {
+	font-weight: $font-weight-bold;
+}
+
+.font-medium {
+	font-size: $font-size-medium;
+}
+
+.font-big {
+	font-size: $font-size-big;
+}
+
+.font-mono {
+	font-family: $font-family-mono;
+}
