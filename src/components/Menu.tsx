@@ -7,9 +7,6 @@ interface MenuProps {
 export default class Menu extends Component<MenuProps> {
 
 	render() {
-
-		console.log(typeof this.props.children)
-
 		return (
 			<main>
 				<h2>{this.props.title}</h2>
