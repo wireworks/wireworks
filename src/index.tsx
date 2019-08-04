@@ -11,8 +11,12 @@ const Layer3 = lazy(() => import("./app/pages/layers/Layer3"));
 const Layer4 = lazy(() => import("./app/pages/layers/Layer4"));
 const Layer5 = lazy(() => import("./app/pages/layers/Layer5"));
 
-const Ipbits = lazy(() => import("./app/pages/tools/ipbits"));
-const Undernets = lazy(() => import("./app/pages/tools/undernets"));
+const Ipbits = lazy(() => import("./app/pages/tools/layer-3/ipbits"));
+const Undernets = lazy(() => import("./app/pages/tools/layer-3/undernets"));
+const Planner = lazy(() => import("./app/pages/tools/layer-3/planner"));
+
+const DnsFlow = lazy(() => import("./app/pages/tools/layer-5/dnsflow"));
+const DnsTree = lazy(() => import("./app/pages/tools/layer-5/dnstree"));
 
 const MainMenu = lazy(() => import("./app/pages/MainMenu"));
 
@@ -30,11 +34,21 @@ const Wireworks: FC = () =>
 
                 {/* All possible Routes */}
 
+                {/* Main Menu */}
                 <Route path="/" exact component={MainMenu}/>
 
+
+                {/* Layer 3 */}
                 <Route path="/layers/3/ipbits"  component={Ipbits}/>
                 <Route path="/layers/3/undernets"  component={Undernets}/>
+                <Route path="/layers/3/planner"  component={Planner}/>
 
+                {/* Layer 5 */}
+                <Route path="/layers/5/dnsflow"  component={DnsFlow}/>
+                <Route path="/layers/5/dnstree"  component={DnsTree}/>
+
+
+                {/* Layer Tools Menu */}
                 <Route path="/layers/1"  component={Layer1}/>
                 <Route path="/layers/2"  component={Layer2}/>
                 <Route path="/layers/3"  component={Layer3}/>

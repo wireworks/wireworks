@@ -11,22 +11,81 @@ import { make } from "../../core/utils/dom";
 
 let rootDomain = new Domain(".", undefined);
 
-const domainErrorWrapperDOM = id("domain_error_wrapper");
-const siteErrorWrapperDOM = id("site_error_wrapper");
-const rootTreeDOM = id("root_tree");
-const browserDOM = id("browser");
-const pageLoadedDOM = id("page_loaded");
-const pageNxdomainDOM = id("page_nxdomain");
-const nxdomainDescriptionDOM = id("nxdomain_description");
-const pageTimedoutDOM = id("page_timedout");
-const timedoutDescriptionDOM = id("timedout_description");
-const headerDOM = id("loaded_header");
-const addressBarDOM = id("address_bar");
-const domainNameDOM = id("domain_name");
-const domainAddressDOM = id("domain_address");
-const siteTitleDOM = id("site_title");
-const siteAddressDOM = id("site_address");
-const sitesWrapperDOM = id("sites_wrapper");
+let domainErrorWrapperDOM: HTMLElement;
+let siteErrorWrapperDOM: HTMLElement;
+let rootTreeDOM: HTMLElement;
+let browserDOM: HTMLElement;
+let pageLoadedDOM: HTMLElement;
+let pageNxdomainDOM: HTMLElement;
+let nxdomainDescriptionDOM: HTMLElement;
+let pageTimedoutDOM: HTMLElement;
+let timedoutDescriptionDOM: HTMLElement;
+let headerDOM: HTMLElement;
+let addressBarDOM: HTMLElement;
+let domainNameDOM: HTMLElement;
+let domainAddressDOM: HTMLElement;
+let siteTitleDOM: HTMLElement;
+let siteAddressDOM: HTMLElement;
+let sitesWrapperDOM: HTMLElement;
+
+export function init() {
+	domainErrorWrapperDOM = id("domain_error_wrapper");
+	siteErrorWrapperDOM = id("site_error_wrapper");
+	rootTreeDOM = id("root_tree");
+	browserDOM = id("browser");
+	pageLoadedDOM = id("page_loaded");
+	pageNxdomainDOM = id("page_nxdomain");
+	nxdomainDescriptionDOM = id("nxdomain_description");
+	pageTimedoutDOM = id("page_timedout");
+	timedoutDescriptionDOM = id("timedout_description");
+	headerDOM = id("loaded_header");
+	addressBarDOM = id("address_bar");
+	domainNameDOM = id("domain_name");
+	domainAddressDOM = id("domain_address");
+	siteTitleDOM = id("site_title");
+	siteAddressDOM = id("site_address");
+	sitesWrapperDOM = id("sites_wrapper");
+
+	id("domain_address").addEventListener("keydown", function (ev: KeyboardEvent): void {
+		if (ev.key === "Enter")
+			registerDomain();
+	});
+	
+	id("domain_name").addEventListener("keydown", function (ev: KeyboardEvent): void {
+		if (ev.key === "Enter")
+			registerDomain();
+	});
+	
+	id("button_add_domain").addEventListener("click", function (ev: MouseEvent): void {
+		registerDomain();
+	});
+	
+	id("site_title").addEventListener("keydown", function (ev: KeyboardEvent): void {
+		if (ev.key === "Enter")
+			createSite();
+	});
+	
+	id("site_address").addEventListener("keydown", function (ev: KeyboardEvent): void {
+		if (ev.key === "Enter")
+			createSite();
+	});
+	
+	id("button_add_site").addEventListener("click", function (ev: MouseEvent): void {
+		createSite();
+	});
+	
+	addressBarDOM.addEventListener("keydown", function (ev: KeyboardEvent): void {
+		if (ev.key === "Enter") {
+			refreshBrowser();
+			addressBarDOM.blur();
+		}
+	});
+	
+	id("button_refresh").addEventListener("click", function (ev: MouseEvent): void {
+		refreshBrowser();
+	});
+
+}
 
 /**
  * An alias that represents a fake website. Used only for DNSTree.
@@ -199,7 +258,7 @@ function refreshTree(): void {
 		if (domain.getParent()) {
 			let btn = make("i", "fas fa-trash fa-lg domain-delete");
 			btn.addEventListener("click", function (ev: MouseEvent) {
-				if (domain.getSubdomains().length === 0 || confirm("Tem certeza de quer remover esse domínio?\nTodos os seus subdomínios também serão removidos.")) {
+				if (domain.getSubdomains().length === 0 || window.confirm("Tem certeza de quer remover esse domínio?\nTodos os seus subdomínios também serão removidos.")) {
 					domain.setAddress(undefined);
 					domain.setParent(undefined, false, true);
 					refreshTree();
@@ -417,41 +476,3 @@ function registerDomain(): void {
 
 // +==============================================+
 
-id("domain_address").addEventListener("keydown", function (ev: KeyboardEvent): void {
-	if (ev.key === "Enter")
-		registerDomain();
-});
-
-id("domain_name").addEventListener("keydown", function (ev: KeyboardEvent): void {
-	if (ev.key === "Enter")
-		registerDomain();
-});
-
-id("button_add_domain").addEventListener("click", function (ev: MouseEvent): void {
-	registerDomain();
-});
-
-id("site_title").addEventListener("keydown", function (ev: KeyboardEvent): void {
-	if (ev.key === "Enter")
-		createSite();
-});
-
-id("site_address").addEventListener("keydown", function (ev: KeyboardEvent): void {
-	if (ev.key === "Enter")
-		createSite();
-});
-
-id("button_add_site").addEventListener("click", function (ev: MouseEvent): void {
-	createSite();
-});
-
-addressBarDOM.addEventListener("keydown", function (ev: KeyboardEvent): void {
-	if (ev.key === "Enter") {
-		refreshBrowser();
-		addressBarDOM.blur();
-	}
-});
-
-id("button_refresh").addEventListener("click", function (ev: MouseEvent): void {
-	refreshBrowser();
-});

@@ -10,17 +10,39 @@ import { clamp } from "../../core/utils/math";
 // Images used in the canvas.
 
 const serverImage = new Image();
-serverImage.src = "../../../images/layers/5/server.png";
+// serverImage.src = "images/layers/5/server.png";
 const clientImage = new Image();
-clientImage.src = "../../../images/layers/5/client.png";
+// clientImage.src = "images/layers/5/client.png";
+
+import("images/layers/5/client.png").then(res => clientImage.src = res.default);
+import("images/layers/5/server.png").then(res => serverImage.src = res.default);
+
 
 // DOM elements.
 
-const errorWrapperDOM = id("error_wrapper");
-const domainDOM = id("domain");
-const canvasDOM = <HTMLCanvasElement>id("canvas");
-const speedDOM = <HTMLSelectElement>id("speed");
-const ctx = canvasDOM.getContext("2d");
+let errorWrapperDOM: HTMLElement;
+let domainDOM: HTMLElement;
+let canvasDOM: HTMLCanvasElement;
+let speedDOM: HTMLSelectElement;
+let ctx: CanvasRenderingContext2D;
+
+export function init() {	
+	errorWrapperDOM = id("error_wrapper");
+	domainDOM = id("domain");
+	canvasDOM = <HTMLCanvasElement>id("canvas");
+	speedDOM = <HTMLSelectElement>id("speed");
+	ctx = canvasDOM.getContext("2d");
+
+
+	client = { name: "Host Cliente", node: undefined, label: undefined, modeDOM: undefined };
+	local = { name: "Local", node: undefined, label: undefined, modeDOM: <HTMLSelectElement>id("local_mode") };
+	root = { name: "Root", node: undefined, label: undefined, modeDOM: <HTMLSelectElement>id("root_mode") };
+	tld = { name: "TLD", node: undefined, label: undefined, modeDOM: <HTMLSelectElement>id("tld_mode") };
+	inter = { name: "Intermediários", node: undefined, label: undefined, modeDOM: <HTMLSelectElement>id("inter_mode") };
+	admin = { name: "Autoritativo", node: undefined, label: undefined, modeDOM: undefined };
+	dest = { name: "Host Destino", node: undefined, label: undefined, modeDOM: undefined };
+
+}
 
 // Simulation speed constants.
 
@@ -32,13 +54,13 @@ const veryFastSpeed = 600;
 
 // Data structures representing servers and hosts in the canvas.
 
-const client: Machine = { name: "Host Cliente", node: undefined, label: undefined, modeDOM: undefined };
-const local: Machine = { name: "Local", node: undefined, label: undefined, modeDOM: <HTMLSelectElement>id("local_mode") };
-const root: Machine = { name: "Root", node: undefined, label: undefined, modeDOM: <HTMLSelectElement>id("root_mode") };
-const tld: Machine = { name: "TLD", node: undefined, label: undefined, modeDOM: <HTMLSelectElement>id("tld_mode") };
-const inter: Machine = { name: "Intermediários", node: undefined, label: undefined, modeDOM: <HTMLSelectElement>id("inter_mode") };
-const admin: Machine = { name: "Autoritativo", node: undefined, label: undefined, modeDOM: undefined };
-const dest: Machine = { name: "Host Destino", node: undefined, label: undefined, modeDOM: undefined };
+let client: Machine;
+let local: Machine;
+let root: Machine;
+let tld: Machine;
+let inter: Machine;
+let admin: Machine;
+let dest: Machine;
 
 // Wire colors.
 
@@ -399,7 +421,7 @@ function roundRect(x: number, y: number, w: number, h: number, r: number): Canva
 /**
  * Runs the simulation.
  */
-function run() {
+export function run() {
 
 	let drawIndex = drawables.length;
 
@@ -754,12 +776,12 @@ function connectNodes(from: Node, to: Node, strokeStyle: string, lineWidth: numb
 
 		line.time = clamp(line.time + ((deltaTime/1000) * (speed/distance)), 0, 1);
 
-		render();
+		myRender();
 		
 		if (line.time >= 1) {
 
 			line.time = 1;
-			render();
+			myRender();
 
 			line.label = undefined;
 
@@ -812,7 +834,7 @@ function connectMultipleNodes(
 /**
  * Renders all the Drawables to the canvas.
  */
-function render() {
+export function myRender() {
 
 	ctx.clearRect(0, 0, canvasDOM.width, canvasDOM.height);
 
@@ -878,7 +900,7 @@ function getAlignedPoint(from: Node|Label, to: Node|Label, positionY: "top"|"cen
 /**
  * Deletes all drawables, sets up all Nodes and their Labels.
  */
-function resetCanvas() {
+export function resetCanvas() {
 
 	let pl = 80; // padding
 	let pr = 80;
@@ -930,22 +952,11 @@ function resetCanvas() {
 	drawables.push(dest.label);
 	drawables.push(tld.label);
 
-	render();
+	myRender();
 
 }
 
 // +==============================================+
 
-serverImage.onload = render;
-clientImage.onload = render;
-
-resetCanvas();
-
-setInterval(render, 2000);
-
-id("run").addEventListener("click", run);
-
-id("domain").addEventListener("keydown", function (ev: KeyboardEvent): void {
-	if (ev.key === "Enter")
-		run();
-});
+serverImage.onload = myRender;
+clientImage.onload = myRender;

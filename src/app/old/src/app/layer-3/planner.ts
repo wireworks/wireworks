@@ -7,13 +7,18 @@ import { id, make } from "../../core/utils/dom";
 import { Address, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE, ERROR_NOT_NETWORK } from "../../core/networking/layers/layer-3/address";
 import { ERROR_BYTE_RANGE } from "../../core/networking/byte";
 
-const planWrapper = id('plan-wrapper');
-const addressDOM = (<HTMLInputElement>id('address'));
+let planWrapper = id('plan-wrapper');
+let addressDOM = (<HTMLInputElement>id('address'));
+
+export function init() {
+	planWrapper = id('plan-wrapper');
+	addressDOM = (<HTMLInputElement>id('address'));
+}
 
 /**
  * Creates the network plan table.
  */
-function createPlan() {
+export function createPlan() {
 
 	let oldPlan = id('plan');
 
@@ -109,11 +114,3 @@ function createPlan() {
 
 // +==============================================+
 
-id("address").addEventListener("keydown", function(ev: KeyboardEvent): void {
-	if (ev.key === "Enter")
-		createPlan();
-});
-
-id("button_generate").addEventListener("click", function(ev: MouseEvent):void {
-	createPlan();
-});

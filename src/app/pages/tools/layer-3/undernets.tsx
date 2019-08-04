@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "app/old/src/app/layer-3/undernets.ts"
-import { reset, init } from "../../old/src/app/layer-3/undernets";
-import { id } from "../../old/src/core/utils/dom";
+import { reset, init } from "app/old/src/app/layer-3/undernets";
+import { id } from "app/old/src/core/utils/dom";
 import "sass/pages/layers/3/undernets.scss"
 
 class Undernets extends Component {
