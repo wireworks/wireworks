@@ -12,6 +12,7 @@ const Layer4 = lazy(() => import("./app/pages/layers/Layer4"));
 const Layer5 = lazy(() => import("./app/pages/layers/Layer5"));
 
 const Ipbits = lazy(() => import("./app/pages/tools/ipbits"));
+const Undernets = lazy(() => import("./app/pages/tools/undernets"));
 
 const MainMenu = lazy(() => import("./app/pages/MainMenu"));
 
@@ -32,6 +33,7 @@ const Wireworks: FC = () =>
                 <Route path="/" exact component={MainMenu}/>
 
                 <Route path="/layers/3/ipbits"  component={Ipbits}/>
+                <Route path="/layers/3/undernets"  component={Undernets}/>
 
                 <Route path="/layers/1"  component={Layer1}/>
                 <Route path="/layers/2"  component={Layer2}/>

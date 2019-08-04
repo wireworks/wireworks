@@ -18,19 +18,26 @@ for (let i = 0; i < 10; i++) COLORS[i] = 'ss-'+i;
  */
 const COLOR_QUEUE = COLORS.slice();
 
-const errorWrapper = id("error_wrapper");
-const rootBlock = id("root_block");
-const rootTree = id("root_tree");
-const tooltip = id("tooltip");
+let errorWrapper = id("error_wrapper");
+let rootBlock = id("root_block");
+let rootTree = id("root_tree");
+let tooltip = id("tooltip");
 let rootNet: VisualNetwork = undefined;
 let firstTime = true;
+
+export function init() {
+	errorWrapper = id("error_wrapper");
+	rootBlock = id("root_block");
+	rootTree = id("root_tree");
+	tooltip = id("tooltip");
+}
 
 /**
  * Resets the Visual Networks.
  */
-function reset() {
+export function reset() {
 
-	if (firstTime || confirm("Tem certeza de que quer visualizar uma nova rede?\nIsso irá excluir todas as sub-redes existentes.")) {
+	if (firstTime || window.confirm("Tem certeza de que quer visualizar uma nova rede?\nIsso irá excluir todas as sub-redes existentes.")) {
 
 		let oldTable = id('error');
 
@@ -181,7 +188,7 @@ class VisualNetwork {
 			this.treeText.addEventListener("click", function () {
 				if (net.hasSubnets()) {
 					if ((!net.subnets[0].hasSubnets() && !net.subnets[1].hasSubnets()) ||
-						confirm("Tem certeza de quer fundir essas duas sub-redes?\nTodas as sub-redes dessas duas serão apagadas para sempre.")) {
+						window.confirm("Tem certeza de quer fundir essas duas sub-redes?\nTodas as sub-redes dessas duas serão apagadas para sempre.")) {
 
 						if (!net.merge())
 							alert("Você não pode fundir essas sub-redes");
@@ -364,11 +371,3 @@ class VisualNetwork {
 
 // +==============================================+
 
-id("address").addEventListener("keydown", function (ev: KeyboardEvent): void {
-	if (ev.key === "Enter")
-		reset();
-});
-
-id("button_generate").addEventListener("click", function (ev: MouseEvent): void {
-	reset();
-});
