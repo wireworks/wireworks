@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
-import "./sass/pages/index.scss"
+import "sass/pages/index.scss"
 import MainMenu from "./app/pages/MainMenu";
 import Menu from "./app/components/Menu";
 import ToolItem from "./app/components/ToolItem";

@@ -1,7 +1,6 @@
 import Menu from "../components/Menu";
 import LayerItem from "../components/LayerItem";
 import React, { FC } from "react";
-import "sass/pages/index.scss"
 
 
 const MainMenu: FC = () =>
