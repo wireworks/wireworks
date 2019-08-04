@@ -1,10 +1,26 @@
-import React from "react";
+import React, { FC, lazy, Suspense } from "react";
 import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
-import App from "./App";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
+const MainMenu = lazy(() => import("./app/pages/MainMenu"));
 
-ReactDOM.render(<App/>, document.getElementById('root'));
+const Wireworks: FC = () =>
+
+<Router>
+
+    <header>
+        <Link to="/" className="logo">wireworks</Link>
+    </header>
+
+    <Switch>
+        <Suspense fallback={<div>Loading...</div>}>
+            <Route path="/" exact component={MainMenu}/>
+        </Suspense>
+    </Switch>
+</Router>
+
+ReactDOM.render(<Wireworks/>, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
