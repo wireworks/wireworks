@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import "sass/pages/index.scss"
-
+import { id } from "./app/wireworks/utils/dom";
 
 const Layer1 = lazy(() => import("./app/pages/layers/Layer1"));
 const Layer2 = lazy(() => import("./app/pages/layers/Layer2"));
@@ -29,7 +29,7 @@ const Wireworks: FC = () =>
         <Link to="/" className="logo">wireworks</Link>
     </header>
 
-    <Suspense fallback={<div className="vbox align-center px-2 py-2"><div className="lds-dual-ring"></div></div>}>
+    <Suspense fallback={<div className="vbox align-center px-3 py-3"><div className="lds-dual-ring"></div></div>}>
         <Switch>
 
                 {/* All possible Routes */}
@@ -59,7 +59,7 @@ const Wireworks: FC = () =>
                 {/* 404 */}
                 <Route component={() =>
                     <main>
-                        <h2 className="font-big">Nada aqui <span style={{fontFamily: "monospace"}}>¯\_(ツ)_/¯</span></h2>
+                        <h2 className="font-big p-3">Nada aqui <span className="font-mono">¯\_(ツ)_/¯</span></h2>
                     </main>
                 }/>
 
@@ -67,8 +67,7 @@ const Wireworks: FC = () =>
     </Suspense>
 </Router>
 
-
-ReactDOM.render(<Wireworks/>, document.getElementById('root'));
+ReactDOM.render(<Wireworks/>, id('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
