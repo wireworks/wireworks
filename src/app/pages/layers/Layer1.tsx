@@ -4,7 +4,7 @@ import Menu from "../../components/Menu";
 class Layer1 extends Component {
 
     componentDidMount() {
-        document.body.classList.add("theme-layer1");
+        document.body.className = "theme-layer1";
     }
 
     render () {

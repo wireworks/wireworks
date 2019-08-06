@@ -29,7 +29,7 @@ const Wireworks: FC = () =>
         <Link to="/" className="logo">wireworks</Link>
     </header>
 
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="vbox align-center px-2 py-2"><div className="lds-dual-ring"></div></div>}>
         <Switch>
 
                 {/* All possible Routes */}

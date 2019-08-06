@@ -1,10 +1,17 @@
-import React, { FC } from "react";
+import React, { Component } from "react";
 import Menu from "../../components/Menu";
 
-const Layer5: FC = () =>
+class Layer5 extends Component {
 
-<Menu title="Camada 5 • Camada de Rede">
-</Menu>
+    componentDidMount() {
+        document.body.className = "theme-layer5";
+    }
 
+    render () {
+        return <Menu title="Camada 5 • Camada de Rede">
+
+        </Menu>
+    }
+}
 
 export default Layer5;

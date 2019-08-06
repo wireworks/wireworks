@@ -17,52 +17,54 @@ $asset-root-path: '..' !default;
 
 body {
 
+	background: $layer1-color-primary;
+
 	&.theme-wireworks {
-		--wireworks-color-primary: $wireworks-color-primary;
-		--wireworks-color-primary-light: $wireworks-color-primary-light;
-		--wireworks-color-primary-extralight: $wireworks-color-primary-extralight;
-		--wireworks-color-secondary: $wireworks-color-secondary;
-		--wireworks-color-secondary-light: $wireworks-color-secondary-light;
+		--color-primary: #{$wireworks-color-primary};
+		--color-primary-light: #{$wireworks-color-primary-light};
+		--color-primary-extralight: #{$wireworks-color-primary-extralight};
+		--color-secondary: #{$wireworks-color-secondary};
+		--color-secondary-light: #{$wireworks-color-secondary-light};
 	}
 
 	&.theme-layer1 {
-		--layer1-color-primary: $layer1-color-primary;
-		--layer1-color-primary-light: $layer1-color-primary-light;
-		--layer1-color-primary-extralight: $layer1-color-primary-extralight;
-		--layer1-color-secondary: $layer1-color-secondary;
-		--layer1-color-secondary-light: $layer1-color-secondary-light;
+		--color-primary: #{$layer1-color-primary};
+		--color-primary-light: #{$layer1-color-primary-light};
+		--color-primary-extralight: #{$layer1-color-primary-extralight};
+		--color-secondary: #{$layer1-color-secondary};
+		--color-secondary-light: #{$layer1-color-secondary-light};
 	}
 
 	&.theme-layer2 {
-		--layer2-color-primary: $layer2-color-primary;
-		--layer2-color-primary-light: $layer2-color-primary-light;
-		--layer2-color-primary-extralight: $layer2-color-primary-extralight;
-		--layer2-color-secondary: $layer2-color-secondary;
-		--layer2-color-secondary-light: $layer2-color-secondary-light;
+		--color-primary: #{$layer2-color-primary};
+		--color-primary-light: #{$layer2-color-primary-light};
+		--color-primary-extralight: #{$layer2-color-primary-extralight};
+		--color-secondary: #{$layer2-color-secondary};
+		--color-secondary-light: #{$layer2-color-secondary-light};
 	}
 
 	&.theme-layer3 {
-		--layer3-color-primary: $layer3-color-primary;
-		--layer3-color-primary-light: $layer3-color-primary-light;
-		--layer3-color-primary-extralight: $layer3-color-primary-extralight;
-		--layer3-color-secondary: $layer3-color-secondary;
-		--layer3-color-secondary-light: $layer3-color-secondary-light;
+		--color-primary: #{$layer3-color-primary};
+		--color-primary-light: #{$layer3-color-primary-light};
+		--color-primary-extralight: #{$layer3-color-primary-extralight};
+		--color-secondary: #{$layer3-color-secondary};
+		--color-secondary-light: #{$layer3-color-secondary-light};
 	}
 
 	&.theme-layer4 {
-		--layer4-color-primary: $layer4-color-primary;
-		--layer4-color-primary-light: $layer4-color-primary-light;
-		--layer4-color-primary-extralight: $layer4-color-primary-extralight;
-		--layer4-color-secondary: $layer4-color-secondary;
-		--layer4-color-secondary-light: $layer4-color-secondary-light;
+		--color-primary: #{$layer4-color-primary};
+		--color-primary-light: #{$layer4-color-primary-light};
+		--color-primary-extralight: #{$layer4-color-primary-extralight};
+		--color-secondary: #{$layer4-color-secondary};
+		--color-secondary-light: #{$layer4-color-secondary-light};
 	}
 
 	&.theme-layer5 {
-		--layer5-color-primary: $layer5-color-primary;
-		--layer5-color-primary-light: $layer5-color-primary-light;
-		--layer5-color-primary-extralight: $layer5-color-primary-extralight;
-		--layer5-color-secondary: $layer5-color-secondary;
-		--layer5-color-secondary-light: $layer5-color-secondary-light;
+		--color-primary: #{$layer5-color-primary};
+		--color-primary-light: #{$layer5-color-primary-light};
+		--color-primary-extralight: #{$layer5-color-primary-extralight};
+		--color-secondary: #{$layer5-color-secondary};
+		--color-secondary-light: #{$layer5-color-secondary-light};
 	}
 
 	font-family: $font-family-base;
