@@ -12,7 +12,7 @@
 	header {
 
 		color: white;
-		background: $color-primary;
+		background: var(--color-primary,$color-primary);
 		font-size: $font-size-big;
 		padding: 0.5em;
 		border-radius: 10px 10px 0 0;

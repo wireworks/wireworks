@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "sass/pages/layers/5/dnstree.scss"
+import "sass/pages/dnstree.scss"
 import "app/old/src/app/layer-5/dnstree"
 import { init } from "../../../old/src/app/layer-5/dnstree";
 
@@ -31,13 +31,13 @@ class DnsTree extends Component {
 						</div>
 
 						<div className="page hidden" id="page_nxdomain">
-							<img src="../../../images/layers/5/unreachable.png"/>
+							<img src="../../../images/unreachable.png"/>
 							<h2 className="font-bold">Não é possível acessar esse site</h2>
 							<h3 className="text-light" id="nxdomain_description">Domínio inexistente</h3>
 						</div>
 
 						<div className="page hidden" id="page_timedout">
-							<img src="../../../images/layers/5/unreachable.png"/>
+							<img src="../../../images/unreachable.png"/>
 							<h2 className="font-bold">Não é possível acessar esse site</h2>
 							<h3 className="text-light" id="timedout_description">O host demorou muito tempo para responder</h3>
 						</div>

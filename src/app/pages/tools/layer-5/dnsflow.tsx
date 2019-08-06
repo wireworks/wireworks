@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "app/old/src/app/layer-5/dnsflow"
 import { resetCanvas, run, init, myRender } from "app/old/src/app/layer-5/dnsflow";
 import { id } from "../../../old/src/core/utils/dom";
-import "sass/pages/layers/5/dnsflow.scss"
+import "sass/pages/dnsflow.scss"
 
 class DnsFlow extends Component {
 

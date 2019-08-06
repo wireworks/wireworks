@@ -1,4 +1,6 @@
-@import "layer3";
+$asset-root-path: '../../' !default;
+
+@import "../main";
 
 .blocks-wrapper {
 

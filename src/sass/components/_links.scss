@@ -2,11 +2,11 @@
 
 a {
 	
-	color: $color-secondary;
+	color: var(--color-secondary,$color-secondary);
 	text-decoration:none;
 
 	&:hover {
-		color: $color-secondary-light;
+		color: var(--color-secondary-light,$color-secondary-light);
 	}
 
 }

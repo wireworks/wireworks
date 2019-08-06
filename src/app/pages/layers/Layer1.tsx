@@ -1,11 +1,18 @@
-import React, { FC } from "react";
+import React, { FC, Component } from "react";
 import Menu from "../../components/Menu";
 
-const Layer1: FC = () =>
+class Layer1 extends Component {
 
-<Menu title="Camada 1 • Camada de Rede">
+    componentDidMount() {
+        document.body.classList.add("theme-layer1");
+    }
 
-</Menu>
+    render () {
+        return <Menu title="Camada 1 • Camada de Rede">
+
+        </Menu>
+    }
+}
 
 
 export default Layer1;

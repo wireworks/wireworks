@@ -10,9 +10,9 @@ import { clamp } from "../../core/utils/math";
 // Images used in the canvas.
 
 const serverImage = new Image();
-// serverImage.src = "images/layers/5/server.png";
+// serverImage.src = "images/server.png";
 const clientImage = new Image();
-// clientImage.src = "images/layers/5/client.png";
+// clientImage.src = "images/client.png";
 
 import("images/layers/5/client.png").then(res => clientImage.src = res.default);
 import("images/layers/5/server.png").then(res => serverImage.src = res.default);

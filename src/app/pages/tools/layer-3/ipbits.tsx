@@ -1,5 +1,5 @@
 import React, { FC, Component } from "react";
-import "sass/pages/layers/3/ipbits.scss"
+import "sass/pages/ipbits.scss"
 import "app/old/src/app/layer-3/ipbits.ts"
 import { loadDOMComponents, updateDisplays, copyIPToClipboard, copyMaskToClipboard } from "app/old/src/app/layer-3/ipbits";
 import { id } from "app/old/src/core/utils/dom";
