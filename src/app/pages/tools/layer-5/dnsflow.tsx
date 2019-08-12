@@ -5,7 +5,7 @@
 
 import React, { Component } from "react";
 
-import "sass/pages/dnsflow.scss"
+import "src/sass/pages/dnsflow.scss"
 import { id } from "../../../wireworks/utils/dom";
 import { Domain, ERROR_INVALID_LABEL, ERROR_FULL_NAME_RANGE, ERROR_SMALL_DOMAIN } from "../../../wireworks/networking/layers/layer-5/domain";
 import { clamp } from "../../../wireworks/utils/math";
@@ -15,8 +15,8 @@ import { clamp } from "../../../wireworks/utils/math";
 const serverImage = new Image();
 const clientImage = new Image();
 
-import("images/layers/5/client.png").then(res => clientImage.src = res.default);
-import("images/layers/5/server.png").then(res => serverImage.src = res.default);
+import("src/images/layers/5/client.png").then(res => clientImage.src = res.default);
+import("src/images/layers/5/server.png").then(res => serverImage.src = res.default);
 
 // DOM elements.
 

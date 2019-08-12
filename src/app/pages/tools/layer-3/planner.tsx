@@ -7,7 +7,7 @@ import React, { Component } from "react";
 import { id, make } from "../../../wireworks/utils/dom";
 import { Address, ERROR_NOT_NETWORK, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE } from "../../../wireworks/networking/layers/layer-3/address";
 import { ERROR_BYTE_RANGE } from "../../../wireworks/networking/byte";
-import "sass/pages/planner.scss"
+import "src/sass/pages/planner.scss"
 
 let planWrapper = id('plan-wrapper');
 let addressDOM = id('address') as HTMLInputElement;

@@ -2,8 +2,9 @@ import React, { FC, lazy, Suspense } from "react";
 import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import "sass/pages/index.scss"
+import "src/sass/pages/index.scss"
 import { id } from "./app/wireworks/utils/dom";
+import { WireworksHeader } from "./app/components/Header";
 
 const Layer1 = lazy(() => import("./app/pages/layers/Layer1"));
 const Layer2 = lazy(() => import("./app/pages/layers/Layer2"));
@@ -25,9 +26,7 @@ const Wireworks: FC = () =>
 
 <Router>
 
-    <header>
-        <Link to="/" className="logo">wireworks</Link>
-    </header>
+    <WireworksHeader/>
 
     <Suspense fallback={<div className="vbox align-center px-3 py-3"><div className="lds-dual-ring"></div></div>}>
         <Switch>

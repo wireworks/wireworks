@@ -9,7 +9,7 @@ import { isCharNumeric, isStringNumeric } from "../../../wireworks/utils/string"
 import { clamp } from "../../../wireworks/utils/math";
 import { Byte } from "../../../wireworks/networking/byte";
 import { joinBitIndex, Address, Byte4Zero, splitBitIndex } from "../../../wireworks/networking/layers/layer-3/address";
-import "sass/pages/ipbits.scss";
+import "src/sass/pages/ipbits.scss";
 
 /**
  * The checkboxes corresponding to the IP bits.

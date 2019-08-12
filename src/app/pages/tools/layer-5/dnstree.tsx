@@ -4,7 +4,7 @@
 // Version: 1.0 (2019-03-14)
 
 import React, { Component } from "react";
-import "sass/pages/dnstree.scss";
+import "src/sass/pages/dnstree.scss";
 import { id, make, clearChildren } from "../../../wireworks/utils/dom";
 import { Address, ERROR_ADDRESS_PARSE } from "../../../wireworks/networking/layers/layer-3/address";
 import { Domain, ERROR_INVALID_LABEL, ERROR_FULL_NAME_RANGE } from "../../../wireworks/networking/layers/layer-5/domain";
