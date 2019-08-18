@@ -12,19 +12,21 @@ export const WireworksHeader: FC<RouteComponentProps> = ({match}) => {
         'planner': 'Planner',
         'undernets': 'Undernets',
 
+        'tcptransmission': 'TCP Carrier',
+
         'dnsflow': 'DNS Flow',
         'dnstree': 'DNS Tree'
     };
 
     let layer = 0;
-    let toolname = "";
+    let toolname;
 
     let regm = reg.exec(window.location.pathname);
     if (regm) {
 
         layer = parseInt(regm[1]);
         if (regm[2]) {
-            toolname = toolNames[regm[2]] || regm[2];
+            toolname = toolNames[regm[2]];
         }
     }
 
@@ -39,7 +41,7 @@ export const WireworksHeader: FC<RouteComponentProps> = ({match}) => {
                     }
 
                     {
-                    toolname === "" ||
+                    toolname === undefined ||
                     <>
                         <span className="breadcrumb"></span>
                         <span>{toolname}</span>

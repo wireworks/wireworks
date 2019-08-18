@@ -17,6 +17,8 @@ const Ipbits = lazy(() => import("./app/pages/tools/layer-3/ipbits"));
 const Undernets = lazy(() => import("./app/pages/tools/layer-3/undernets"));
 const Planner = lazy(() => import("./app/pages/tools/layer-3/planner"));
 
+const TcpCarrier = lazy(() => import("./app/pages/tools/layer-4/tcpcarrier"));
+
 const DnsFlow = lazy(() => import("./app/pages/tools/layer-5/dnsflow"));
 const DnsTree = lazy(() => import("./app/pages/tools/layer-5/dnstree"));
 
@@ -42,6 +44,9 @@ const Wireworks: FC = () =>
                 <Route path="/layers/3/ipbits"  component={Ipbits}/>
                 <Route path="/layers/3/undernets"  component={Undernets}/>
                 <Route path="/layers/3/planner"  component={Planner}/>
+
+                {/* Layer 4 */}
+                <Route path="/layers/4/tcpcarrier"  component={TcpCarrier}/>
 
                 {/* Layer 5 */}
                 <Route path="/layers/5/dnsflow"  component={DnsFlow}/>
