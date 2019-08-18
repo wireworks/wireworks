@@ -1,51 +1,56 @@
 import React, { createContext, FC, useState, Component } from "react";
-import { string } from "prop-types";
-import { Link } from "react-router-dom";
+import { Link, RouteComponentProps } from "react-router-dom";
 
-const titleContext = createContext({
-    name: "Wireworks"
-});
+export interface IHeader {layer: number, toolname: string}
 
-export class TitleContextProvider extends Component {
+export const WireworksHeader: FC<RouteComponentProps> = ({match}) => {
 
-    setName = (newName: string) => this.setState({name: newName});
+    const reg = /\/layers\/(\d)(?:\/([a-z]*))?/;
 
-    state = {
-        name: "wireworks",
-        setName: this.setName
+    const toolNames : { [key:string]:string; } = {
+        'ipbits': 'IPBits',
+        'planner': 'Planner',
+        'undernets': 'Undernets',
+
+        'dnsflow': 'DNS Flow',
+        'dnstree': 'DNS Tree'
     };
 
-    render() {
-        return(
-            <titleContext.Provider value={this.state}>
-                {this.props.children}
-            </titleContext.Provider>
-        );
+    let layer = 0;
+    let toolname = "";
+
+    let regm = reg.exec(window.location.pathname);
+    if (regm) {
+
+        layer = parseInt(regm[1]);
+        if (regm[2]) {
+            toolname = toolNames[regm[2]] || regm[2];
+        }
     }
 
-}
-
-export const WireworksHeader: FC = () =>
-
-<header>
-    <div className="spacer">
-        <Link to="/" className="logo">wireworks</Link>
-        <TitleContextProvider>
-            <titleContext.Consumer>
-                { ({name, setName} ) =>
+    return (
+        <header>
+            <div className="spacer">
+                <Link to="/" className="logo">wireworks</Link>
                 <span>
-                    <Link to="./">{name}</Link>
-                    <span className="breadcrumb"></span>
-                    <span onClick={() => {setName("Camada 5")}}>DNSTree</span>
-                </span>
-                }
-            </titleContext.Consumer>
-        </TitleContextProvider>
-        
-    </div>
-</header>
+                    {
+                    layer > 0 &&
+                    <Link to={`/layers/${layer}`}>Camada {layer}</Link>
+                    }
 
-export const ToolTitleConsumer = titleContext.Consumer;
+                    {
+                    toolname === "" ||
+                    <>
+                        <span className="breadcrumb"></span>
+                        <span>{toolname}</span>
+                    </>
+                    }
+                </span>
+            </div>
+        </header>
+    );
+
+}
 
 {/* <header>
     <div class="spacer">

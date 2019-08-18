@@ -1,10 +1,11 @@
-import React, { FC, lazy, Suspense } from "react";
+import React, { FC, lazy, Suspense, useState } from "react";
 import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { WireworksHeader, IHeader } from "./app/components/Header";
 import "src/sass/pages/index.scss"
-import { id } from "./app/wireworks/utils/dom";
-import { WireworksHeader } from "./app/components/Header";
+import { object, number } from "prop-types";
+
 
 const Layer1 = lazy(() => import("./app/pages/layers/Layer1"));
 const Layer2 = lazy(() => import("./app/pages/layers/Layer2"));
@@ -26,7 +27,7 @@ const Wireworks: FC = () =>
 
 <Router>
 
-    <WireworksHeader/>
+    <Route path="/" component={WireworksHeader} />
 
     <Suspense fallback={<div className="vbox align-center px-3 py-3"><div className="lds-dual-ring"></div></div>}>
         <Switch>
@@ -66,7 +67,9 @@ const Wireworks: FC = () =>
     </Suspense>
 </Router>
 
-ReactDOM.render(<Wireworks/>, id('root'));
+
+
+ReactDOM.render(<Wireworks/>, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
