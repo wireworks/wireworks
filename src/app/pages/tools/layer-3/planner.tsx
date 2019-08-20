@@ -8,6 +8,7 @@ import { id, make } from "../../../wireworks/utils/dom";
 import { Address, ERROR_NOT_NETWORK, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE } from "../../../wireworks/networking/layers/layer-3/address";
 import { ERROR_BYTE_RANGE } from "../../../wireworks/networking/byte";
 import "src/sass/pages/planner.scss"
+import ErrorBox from "../../../components/ErrorBox";
 
 let planWrapper = id('plan-wrapper');
 let addressDOM = id('address') as HTMLInputElement;
@@ -118,7 +119,20 @@ export function createPlan() {
 
 class Planner extends Component {
 
+	state = {
+		errorMessage: null,
+		network: "",
+		mask: "",
+		firstValid: "",
+		lastValid: "",
+		broadcast: "",
+		hosts: "",
+		showTable: false
+	};
+
 	componentDidMount() {
+
+		let c = this;
 
 		document.body.className = "theme-layer3";
 		
@@ -130,6 +144,7 @@ class Planner extends Component {
 		});
 		
 		id("button_generate").addEventListener("click", function(ev: MouseEvent):void {
+			c.setState({errorMessage: "wow not gay :)"});
 			createPlan();
 		});
 	}
@@ -142,7 +157,27 @@ class Planner extends Component {
 					<input type="text" name="address" id="address" placeholder="0.0.0.0/0"/>
 					<button type="button" id="button_generate">Gerar plano</button>
 				</h1>
-				<div id="plan-wrapper"></div>
+				<ErrorBox errorMessage={this.state.errorMessage}/>
+				{ this.state.showTable &&
+					<table>
+						<tr>
+							<th>Rede</th>
+							<th>Máscara</th>
+							<th>Primeiro Válido</th>
+							<th>Último Válido</th>
+							<th>Broadcast</th>
+							<th>Hosts</th>
+						</tr>
+						<tr>
+							<td>{this.state.network}</td>
+							<td>{this.state.mask}</td>
+							<td>{this.state.firstValid}</td>
+							<td>{this.state.lastValid}</td>
+							<td>{this.state.broadcast}</td>
+							<td>{this.state.hosts}</td>
+						</tr>
+					</table>
+				}
 			</main>
         );
     }

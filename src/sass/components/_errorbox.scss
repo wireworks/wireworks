@@ -1,0 +1,18 @@
+@import "../base/typography";
+@import "../utils/colors/base";
+
+.errorbox {
+
+	width: 100%;
+	border-radius: 5px;
+	border: 1px solid $color-gray-light;
+	margin-bottom: 1.5rem;
+	border-collapse: separate;
+	overflow: hidden;
+	padding: 1em;
+	font-size: $font-size-medium;
+	color: $color-danger;
+	font-family: $font-family-mono;
+	text-align: center;
+
+}
