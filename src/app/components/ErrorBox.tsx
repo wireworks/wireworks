@@ -6,7 +6,7 @@ interface ErrorBoxProps {
 
 const ErrorBox: FC<ErrorBoxProps> = ({errorMessage}) => {
 
-    if (errorMessage != null) {
+    if (errorMessage) {
         return (
             <div className="errorbox">{errorMessage}</div>
         );
