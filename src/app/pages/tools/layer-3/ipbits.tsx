@@ -10,7 +10,7 @@ import { clamp } from "../../../wireworks/utils/math";
 import { Byte } from "../../../wireworks/networking/byte";
 import { joinBitIndex, Address, Byte4Zero, splitBitIndex } from "../../../wireworks/networking/layers/layer-3/address";
 import "src/sass/pages/ipbits.scss";
-import ContentEditable from 'react-contenteditable'
+import ContentEditable, { ContentEditableEvent } from 'react-contenteditable'
 
 /**
  * A zero-width character used to work around empty contenteditable fields issues.
@@ -25,43 +25,52 @@ class Ipbits extends Component {
 	/**
 	 * The checkboxes corresponding to the IP bits.
 	 */
-	private IP: HTMLInputElement[][] = [];
+	private IP: RefObject<HTMLInputElement>[][] = [];
 	/**
 	 * The checkboxes corresponding to the mask bits.
 	 */
-	private MASK: HTMLInputElement[][] = [];
+	private MASK: RefObject<HTMLInputElement>[][] = [];
 
 	/**
 	 * The mask displays.
 	 */
-	private maskDisplays: RefObject<HTMLDivElement>[];
+	private maskDisplays: RefObject<HTMLDivElement>[] = [];
 
 	/**
 	 * The IP displays.
 	 */
-	private ipDisplays: RefObject<HTMLDivElement>[];
-	
+	private ipDisplays: RefObject<HTMLDivElement>[] = [];
+
 	/**
-	 * Loads the DOM checkboxes into IP and MASK and sets the events for the input displays.
+	 * The short IP display.
 	 */
-	private loadDOMComponents(): void {
-		
-		for (let i = 0; i < 4; i++) {
+	private ipDisplayShort: RefObject<HTMLHeadingElement>;
 
-			this.IP[i] = [];
-			this.MASK[i] = [];
+	/**
+	 * The short mask display.
+	 */
+	private maskDisplayShort: RefObject<HTMLHeadingElement>;
 
-			for (let j = 0; j < 8; j++) {
+	/**
+	 * The button that copies the mask.
+	 */
+	private copyMaskButton: RefObject<HTMLElement>;
 
-				let ipBit = id("byte_ip_" + i + "_" + j);
-				let maskBit = id("byte_mask_" + i + "_" + j);
+	/**
+	 * The button that copies the IP.
+	 */
+	private copyIPButton: RefObject<HTMLElement>;
 
-				this.IP[i][j] = ipBit as HTMLInputElement;
-				this.MASK[i][j] = maskBit as HTMLInputElement;
-			}
-		}
-	}
+	/**
+	 * The button that copies the mask.
+	 */
+	private copyMaskText: RefObject<HTMLSpanElement>;
 
+	/**
+	 * The button that copies the IP.
+	 */
+	private copyIPText: RefObject<HTMLSpanElement>;
+	
 	/**
 	 * Returns the Address, extracted from the DOM elements.
 	 */
@@ -72,8 +81,8 @@ class Ipbits extends Component {
 
 		for (let i = 0; i < 4; i++) {
 			for (let j = 0; j < 8; j++) {
-				ipBytes[i].bit(j, (this.IP[i][j]).checked ? true : false);
-				maskBytes[i].bit(j, (this.MASK[i][j]).checked ? true : false);
+				ipBytes[i].bit(j, (this.IP[i][j]).current.checked ? true : false);
+				maskBytes[i].bit(j, (this.MASK[i][j]).current.checked ? true : false);
 			}
 		}
 
@@ -94,7 +103,7 @@ class Ipbits extends Component {
 
 		for (let i = 0; i < 8; i++) {
 			
-			dom[i].checked = byte.bit(i);
+			dom[i].current.checked = byte.bit(i);
 			
 		}
 		
@@ -113,7 +122,7 @@ class Ipbits extends Component {
 	 */
 	private updateIPShort(str?: string): void {
 
-		id("ip_value").textContent = str ? str : this.extractAddress().toString(true);
+		this.ipDisplayShort.current.textContent = str ? str : this.extractAddress().toString(true);
 
 	}
 
@@ -123,7 +132,7 @@ class Ipbits extends Component {
 	 */
 	private updateMaskShort(str?: string): void {
 
-		id("mask_value").textContent = str ? str : this.extractAddress().shortMaskString();
+		this.maskDisplayShort.current.textContent = str ? str : this.extractAddress().shortMaskString();
 
 	}
 
@@ -153,15 +162,15 @@ class Ipbits extends Component {
 
 		let { bitIndex: bitIndex, byteIndex: byteIndex } = splitBitIndex(index);
 
-		index += ((id("byte_mask_" + byteIndex + "_" + bitIndex) as HTMLInputElement).checked ? 1 : 0);
+		index += this.MASK[byteIndex][bitIndex].current.checked ? 1 : 0;
 
 		for (let byte4Index = 0; byte4Index < 32; byte4Index++) {
 			
 			let { bitIndex: bitIndex, byteIndex: byteIndex } = splitBitIndex(byte4Index);
 			let on = byte4Index < index;
 
-			(id("byte_mask_" + byteIndex + "_" + bitIndex) as HTMLInputElement).checked = on;
-			(id("byte_ip_" + byteIndex + "_" + bitIndex) as HTMLInputElement).disabled = on;		
+			this.MASK[byteIndex][bitIndex].current.checked = on;
+			this.IP[byteIndex][bitIndex].current.disabled = on;		
 
 		}
 
@@ -174,9 +183,11 @@ class Ipbits extends Component {
 	 */
 	private copyIPToClipboard = (): void => {
 
+		let scope: Ipbits = this;
+
 		copyToClipboard(this.extractAddress().toString(true), function (success: boolean): void {
 
-			let text = id("copy_ip_text");
+			let text = scope.copyIPText.current;
 			text.style.transition = "";
 			text.style.opacity = "1";
 			setTimeout(function () {
@@ -193,9 +204,11 @@ class Ipbits extends Component {
 	 */
 	private copyMaskToClipboard = (): void => {
 
+		let scope: Ipbits = this;
+
 		copyToClipboard(this.extractAddress().maskString(), function (success: boolean): void {
 
-			let text = id("copy_mask_text");
+			let text = scope.copyMaskText.current;
 			text.style.transition = "";
 			text.style.opacity = "1";
 			setTimeout(function () {
@@ -217,8 +230,8 @@ class Ipbits extends Component {
 
 	private blurByte: Byte;
 
-	private handleDisplayFocus = (display: HTMLElement, byteIndex: number): void => {
-
+	private handleDisplayFocus = (display: HTMLDivElement, byteIndex: number): void => {
+		
 		let range, selection;
 		if (document.createRange) {
 			range = document.createRange();
@@ -237,8 +250,8 @@ class Ipbits extends Component {
 		this.setIPByteDOM(this.blurByte, byteIndex, true);
 	}
 
-	private handleDisplayKeydown = (evt: KeyboardEvent, display: HTMLElement): void => { 
-
+	private handleDisplayKeydown = (evt: React.KeyboardEvent<HTMLDivElement>, display: HTMLDivElement): void => { 
+		
 		if (evt.key === "Enter") {
 			display.blur();
 		}
@@ -258,8 +271,8 @@ class Ipbits extends Component {
 
 	}
 
-	private handleDisplayKeyup = (evt: KeyboardEvent, display: HTMLElement, byteIndex: number): void => {
-		
+	private handleDisplayKeyup = (evt: React.KeyboardEvent<HTMLDivElement>, display: HTMLDivElement, byteIndex: number): void => {
+				
 		let next = byteIndex < 3 ? this.ipDisplays[byteIndex + 1].current : undefined;
 
 		let selectedText = window.getSelection().anchorNode.parentNode == display && window.getSelection().toString();
@@ -274,7 +287,10 @@ class Ipbits extends Component {
 
 	}
 
-	private handleDisplayInput = (display: HTMLElement, byteIndex: number): void => {
+	private handleDisplayChange = (evt: ContentEditableEvent, display: HTMLDivElement, byteIndex: number): void => {
+		
+		console.log("[Change]");
+		console.log(display);
 
 		if (display.textContent === "") {
 			display.textContent = HIDDENCHAR;
@@ -344,20 +360,35 @@ class Ipbits extends Component {
 	}
 
 	constructor(props: any) {
+		
 		super(props);
 
-		this.maskDisplays = [];
-		this.ipDisplays = [];
-
 		for (let i = 0; i < 4; i++) {
+			
 			this.maskDisplays[i] = React.createRef();
 			this.ipDisplays[i] = React.createRef();
+			this.MASK[i] = [];
+			this.IP[i] = [];
+
+			for (let j = 0; j < 8; j++) {
+				this.MASK[i][j] = React.createRef();
+				this.IP[i][j] = React.createRef();
+			}
+			
 		}
+
+		this.maskDisplayShort = React.createRef();
+		this.ipDisplayShort = React.createRef();
+
+		this.copyMaskButton = React.createRef();
+		this.copyIPButton = React.createRef();
+		this.copyMaskText = React.createRef();
+		this.copyIPText = React.createRef();
+
 	}
 
 	componentDidMount() {
 		document.body.className = "theme-layer3";
-		this.loadDOMComponents();
 		this.updateDisplays();
 	}
 
@@ -374,7 +405,7 @@ class Ipbits extends Component {
 				let id = "byte_mask_"+i+"_"+j;
 				bitBox.push(
 					<div className="bit" key={id+"_bit"}>
-						<input tabIndex={-1} id={id} type="checkbox" onChange={()=>{this.handleMaskBitChange(i,j)}}/>
+						<input tabIndex={-1} id={id} ref={this.MASK[i][j]} type="checkbox" onChange={()=>{this.handleMaskBitChange(i,j)}}/>
 						<label htmlFor={id}></label>
 					</div>
 				)
@@ -398,14 +429,22 @@ class Ipbits extends Component {
 				let id = "byte_ip_"+i+"_"+j;
 				bitBox.push(
 					<div className="bit" key={id+"_bit"}>
-						<input tabIndex={-1} id={id} type="checkbox" onChange={this.handleIPBitChange}/>
+						<input tabIndex={-1} id={id} ref={this.IP[i][j]} type="checkbox" onChange={this.handleIPBitChange}/>
 						<label htmlFor={id}></label>
 					</div>
 				)
 			}
 
 			let ipDisplay = <ContentEditable
-								className="display" innerRef={this.ipDisplays[i]} contentEditable onFocus={} onBlur={} onKeydown={} onKeyup={} onInput={}>0</div>;
+								className="display"
+								innerRef={this.ipDisplays[i]}
+								html="0"
+								onChange={(evt) => {this.handleDisplayChange(evt, this.ipDisplays[i].current, i)}}
+								onFocus={() => {this.handleDisplayFocus(this.ipDisplays[i].current, i)}}
+								onBlur={() => {this.handleDisplayBlur(i)}}
+								onKeyDown={(evt: React.KeyboardEvent<HTMLDivElement>) => {this.handleDisplayKeydown(evt, this.ipDisplays[i].current)}}
+								onKeyUp={(evt: React.KeyboardEvent<HTMLDivElement>) => {this.handleDisplayKeyup(evt, this.ipDisplays[i].current, i)}}
+								/>;
 
 			ipBox.push(
 				<div className="block" key={"ip_block_"+i}>
@@ -420,15 +459,15 @@ class Ipbits extends Component {
 		return(
 			<main>
 				<div className="spacer">
-					<h2>Máscara <i className="far fa-clipboard copy-icon" id="copy_mask"></i> <span className="copy-text" onClick={this.copyMaskToClipboard}>Máscara copiada</span></h2>
-					<h2 className="text-light font-light" id="mask_value"></h2>
+					<h2>Máscara <i className="far fa-clipboard copy-icon" ref={this.copyMaskButton} onClick={this.copyMaskToClipboard}></i> <span className="copy-text" ref={this.copyMaskText}>Máscara copiada</span></h2>
+					<h2 className="text-light font-light" ref={this.maskDisplayShort}></h2>
 				</div>
 				
 				<div className="box"> {maskBox} </div>
 				
 				<div className="spacer">
-					<h2>IP <i className="far fa-clipboard copy-icon" id="copy_ip"></i> <span className="copy-text" onClick={this.copyIPToClipboard}>IP Copiado</span></h2>
-					<h2 className="text-light font-light" id="ip_value"></h2>
+					<h2>IP <i className="far fa-clipboard copy-icon" ref={this.copyIPButton} onClick={this.copyIPToClipboard}></i> <span className="copy-text" ref={this.copyIPText}>IP Copiado</span></h2>
+					<h2 className="text-light font-light" ref={this.ipDisplayShort}></h2>
 				</div>
 				
 				<div className="box"> {ipBox} </div>
@@ -438,6 +477,5 @@ class Ipbits extends Component {
 	}
 
 }
-
 
 export default Ipbits;
