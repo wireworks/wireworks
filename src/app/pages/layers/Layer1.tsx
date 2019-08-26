@@ -8,7 +8,7 @@ class Layer1 extends Component {
     }
 
     render () {
-        return <Menu title="Camada 1 • Camada de Rede">
+        return <Menu title="Camada 1 • Camada Física">
 
         </Menu>
     }

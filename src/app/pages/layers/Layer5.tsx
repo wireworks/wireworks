@@ -10,7 +10,7 @@ class Layer5 extends Component<RouteComponentProps> {
     }
 
     render () {
-        return <Menu title="Camada 5 • Camada de Rede">
+        return <Menu title="Camada 5 • Camada de Aplicação">
 
             <ToolItem 	name="DNSTree"
                         path={`${this.props.match.path}/dnstree`}
