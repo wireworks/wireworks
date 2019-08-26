@@ -10,27 +10,39 @@ const TcpPacket: FC<{progress: number}> = (props) =>
 
 
 
-class TcpCarrier extends Component<{}, {progress: number}> {
+class TcpCarrier extends Component<{}, {progress: number[]}> {
 
-    speed = 1.5;
+    speed = 0.7;
 
     constructor(props) {
         super(props);
         this.state = {
-            progress: 0
+            progress: [0, 0, 0, 0, 0]
         }
     }
 
+    isComplete = () => this.state.progress.findIndex((val) => val < 100) === -1;
+
     tick = () => {
+
         this.setState((state) => {
-            if (this.state.progress < 100)
+
+            let newProgress = state.progress;
+            let index = newProgress.findIndex((val) => val < 100);
+            if (index !== -1) {
+                newProgress[index] += this.speed;
+                if(newProgress[index] > 100)
+                    newProgress[index] = 100;
                 window.requestAnimationFrame(this.tick);
+            }
 
-            if (this.state.progress > 100)
-                return {progress: 100}
-
-            return {progress: state.progress + this.speed}
+            return {progress: newProgress}
         });
+    }
+
+    reset = () => {
+        let zero = this.state.progress.fill(0);
+        this.setState({progress: zero});
     }
 
     changeSpeed = (newSpeed: ChangeEvent<HTMLInputElement>) => this.speed = parseFloat(newSpeed.target.value);
@@ -41,17 +53,16 @@ class TcpCarrier extends Component<{}, {progress: number}> {
 
                 {/* TCP animation */}
                 <div className="tcp-container">
-                    <TcpPacket progress={this.state.progress}></TcpPacket>
-                    <TcpPacket progress={this.state.progress}></TcpPacket>
+                    {this.state.progress.map((val, key) => <TcpPacket key={key} progress={val}/>)}
                 </div>
 
                 {/* Menu */}
                 <div>
 
                     <button onClick={this.tick}>Start</button>
-                    <button onClick={this.tick}>Stop</button>
+                    <button onClick={this.reset}>Reset</button>
 
-                    <input type="range" min={0.1} max={2} step={0.1} onChange={this.changeSpeed}/>
+                    <input type="range" value={this.speed} min={0.1} max={2} step={0.1} onChange={this.changeSpeed}/>
 
                 </div>
                 
