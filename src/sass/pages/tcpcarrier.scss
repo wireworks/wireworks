@@ -9,20 +9,39 @@ main#tcp-carrier {
 }
 
 .tcp-slider {
+    top: 0;
     position: relative;
     display: block;
-    padding: 25px;
     height: 50px;
+}
+
+.tcp-25padding {
+    padding: 0 25px;
 }
 
 .tcp-packet {
     position: absolute;
-    right: 0;
     top: 0;
     width: 50px;
     height: 50px;
     border-radius: 50px;
+    
+}
+
+.tcp-p-real {
     background-color: rgb(158, 66, 66);
+}
+
+.tcp-p-hint {
+    background-color: rgb(102, 93, 93);
+}
+
+.tcp-p-left {
+    left: 0;
+}
+
+.tcp-p-right {
+    right: 0;
 }
 
 .tcp-container {
