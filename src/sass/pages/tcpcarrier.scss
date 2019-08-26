@@ -1,0 +1,27 @@
+$asset-root-path: '../../' !default;
+
+@import "../main";
+
+
+.tcp-slider {
+    position: relative;
+    display: block;
+    padding: 25px;
+    height: 50px;
+}
+
+.tcp-packet {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    background-color: rgb(158, 66, 66);
+}
+
+.tcp-container {
+    padding: 20px;
+    width: 80%;
+    background-color: rgb(233, 233, 233);
+}

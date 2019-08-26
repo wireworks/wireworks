@@ -12,7 +12,7 @@ export const WireworksHeader: FC<RouteComponentProps> = ({match}) => {
         'planner': 'Planner',
         'undernets': 'Undernets',
 
-        'tcptransmission': 'TCP Carrier',
+        'tcpcarrier': 'TCP Carrier',
 
         'dnsflow': 'DNS Flow',
         'dnstree': 'DNS Tree'
