@@ -1,4 +1,4 @@
-@import "../utils/colors/base";
+@import "../utils/colors/theme";
 @import "../base/typography";
 
 .container {
@@ -12,7 +12,7 @@
 	header {
 
 		color: white;
-		background: var(--color-primary,$color-primary);
+		background: theme(primary);
 		font-size: $font-size-big;
 		padding: 0.5em;
 		border-radius: 10px 10px 0 0;

@@ -2,7 +2,7 @@ $asset-root-path: '..' !default;
 
 @import "base/reset";
 @import "base/typography";
-@import "utils/colors/base";
+@import "utils/colors/theme";
 @import "utils/colors/layers";
 @import "utils/colors/classes";
 @import "layout/container";
@@ -70,5 +70,5 @@ body {
 	}
 
 	font-family: $font-family-base;
-	background: var(--color-primary-extralight,$color-primary-extralight);
+	background: theme(primary-extralight);
 }

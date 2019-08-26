@@ -1,12 +1,12 @@
-@import "../utils/colors/base";
+@import "../utils/colors/theme";
 
 a {
 	
-	color: var(--color-secondary,$color-secondary);
+	color: theme(secondary);
 	text-decoration:none;
 
 	&:hover {
-		color: var(--color-secondary-light,$color-secondary-light);
+		color: theme(secondary-light);
 	}
 
 }

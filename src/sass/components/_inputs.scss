@@ -1,5 +1,5 @@
 @import "../base/typography";
-@import "../utils/colors/base";
+@import "../utils/colors/theme";
 
 input, button, select {
 
@@ -14,7 +14,7 @@ input, button, select {
 input[type="text"], select {
 	
 	padding: 0.25em;
-	border: 2px solid var(--color-secondary,$color-secondary);
+	border: 2px solid theme(secondary);
 	border-radius: 5px;
 	font-family: $font-family-mono;
 	font-weight: $font-weight-light;
@@ -30,13 +30,13 @@ input[type="text"], select {
 button {
 
 	color: white;
-	background: var(--color-secondary,$color-secondary);
+	background: theme(secondary);
 	border-radius: 5px;
 	padding: 0.4em 0.8em;
 	cursor: pointer;
 
 	&:hover {
-		background: var(--color-secondary-light,$color-secondary-light);
+		background: theme(secondary-light);
 	}
 
 }

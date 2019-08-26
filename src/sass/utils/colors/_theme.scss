@@ -1,0 +1,28 @@
+@import "base";
+
+$colors-map: (
+
+	primary: $color-primary,
+	primary-light: $color-primary-light,
+	primary-extralight: $color-primary-extralight,
+	secondary: $color-secondary,
+	secondary-light: $color-secondary-light,
+	text: $color-text,
+	text-light: $color-text-light,
+	text-extralight: $color-text-extralight,
+	gray: $color-gray,
+	gray-light: $color-gray-light,
+	danger: $color-danger,
+	danger-light: $color-danger-light
+
+);
+
+@function theme($color-name) {
+	@return	
+	if(map-has-key($colors-map, $color-name),
+
+		/*then*/ var(--color-#{$color-name}, map-get($colors-map, $color-name)),
+		/*else*/ map-get($colors-map, $color-name)
+
+	);
+}

@@ -1,3 +1,5 @@
+@import "../utils/colors/theme";
+
 .lds-dual-ring {
 	display: inline-block;
 	width: 64px;
@@ -11,8 +13,8 @@
 	height: 46px;
 	margin: 1px;
 	border-radius: 50%;
-	border: 5px solid var(--color-primary, $color-primary);
-	border-color: var(--color-primary, $color-primary) transparent var(--color-primary, $color-primary) transparent;
+	border: 5px solid theme(primary);
+	border-color: theme(primary) transparent theme(primary) transparent;
 	animation: lds-dual-ring 1.2s linear infinite;
 }
 

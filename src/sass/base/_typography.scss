@@ -1,4 +1,4 @@
-@import "../utils/colors/base";
+@import "../utils/colors/theme";
 
 $font-family-base: 'Montserrat', sans-serif;
 $font-family-mono: 'Roboto Mono', monospace;
@@ -13,7 +13,7 @@ $font-weight-bold: 700;
 
 h1, h2, h3, h4, h5, h6, p {
 	font-family: $font-family-base;
-	color: $color-text;
+	color: theme(text);
 	margin-bottom: 1.5rem;
 }
 
