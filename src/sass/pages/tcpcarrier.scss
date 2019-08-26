@@ -2,6 +2,11 @@ $asset-root-path: '../../' !default;
 
 @import "../main";
 
+main#tcp-carrier {
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
 
 .tcp-slider {
     position: relative;

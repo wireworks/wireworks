@@ -1,24 +1,14 @@
-import React, { Component, FC } from "react";
+import React, { Component, FC, ChangeEvent } from "react";
 import "src/sass/pages/tcpcarrier.scss";
 
-class Computer {
 
-}
-
-class TcpHeader {
-
-}
-
-class Router {
-    
-}
-
-/////////////////////////////////////
 
 const TcpPacket: FC<{progress: number}> = (props) =>
 <div className="tcp-slider" style={{width: props.progress + "%"}}>
     <div className="tcp-packet"></div>
 </div>
+
+
 
 class TcpCarrier extends Component<{}, {progress: number}> {
 
@@ -29,10 +19,6 @@ class TcpCarrier extends Component<{}, {progress: number}> {
         this.state = {
             progress: 0
         }
-    }
-
-    componentDidMount() {
-        this.tick();
     }
 
     tick = () => {
@@ -47,9 +33,11 @@ class TcpCarrier extends Component<{}, {progress: number}> {
         });
     }
 
+    changeSpeed = (newSpeed: ChangeEvent<HTMLInputElement>) => this.speed = parseFloat(newSpeed.target.value);
+
     render() {
         return (
-            <div>
+            <main id="tcp-carrier">
 
                 {/* TCP animation */}
                 <div className="tcp-container">
@@ -59,9 +47,15 @@ class TcpCarrier extends Component<{}, {progress: number}> {
 
                 {/* Menu */}
                 <div>
+
+                    <button onClick={this.tick}>Start</button>
+                    <button onClick={this.tick}>Stop</button>
+
+                    <input type="range" min={0.1} max={2} step={0.1} onChange={this.changeSpeed}/>
+
                 </div>
                 
-            </div>
+            </main>
         );
     }
 
