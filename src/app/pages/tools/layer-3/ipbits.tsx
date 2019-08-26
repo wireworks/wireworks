@@ -1,21 +1,19 @@
 // IPBits
 // +=========================+
 // Author: Henrique Colini
-// Version: 3.1 (2019-03-03)
+// Version: 4.0 (2019-08-25)
 
-import React, { FC, Component, RefObject } from "react";
-import { id, copyToClipboard } from "../../../wireworks/utils/dom";
+import React, { Component, RefObject, ChangeEvent } from "react";
+import { copyToClipboard } from "../../../wireworks/utils/dom";
 import { isCharNumeric, isStringNumeric } from "../../../wireworks/utils/string";
 import { clamp } from "../../../wireworks/utils/math";
 import { Byte } from "../../../wireworks/networking/byte";
 import { joinBitIndex, Address, Byte4Zero, splitBitIndex } from "../../../wireworks/networking/layers/layer-3/address";
 import "src/sass/pages/ipbits.scss";
-import ContentEditable, { ContentEditableEvent } from 'react-contenteditable'
 
 /**
- * A zero-width character used to work around empty contenteditable fields issues.
+ * Keys that will not trigger keyUp/keyDown events.
  */
-const HIDDENCHAR = String.fromCharCode(8205);
 const additionalKeys = ["Backspace", "Delete", "Tab", "ArrowLeft", "ArrowRight", "Home", "End", "Insert"];
 
 // +==============================================+
@@ -39,7 +37,7 @@ class Ipbits extends Component {
 	/**
 	 * The IP displays.
 	 */
-	private ipDisplays: RefObject<HTMLDivElement>[] = [];
+	private ipDisplays: RefObject<HTMLInputElement>[] = [];
 
 	/**
 	 * The short IP display.
@@ -145,7 +143,7 @@ class Ipbits extends Component {
 		address = address? address : this.extractAddress();
 
 		for (let i = 0; i < 4; i++) {
-			this.ipDisplays[i].current.textContent = "" + address.getIp()[i].getDecimal();
+			this.ipDisplays[i].current.value = "" + address.getIp()[i].getDecimal();
 			this.maskDisplays[i].current.textContent = "" + address.getMask()[i].getDecimal();
 		}
 
@@ -220,40 +218,51 @@ class Ipbits extends Component {
 
 	}
 
+	/**
+	 * Handles IP bit clicking.
+	 */
 	handleIPBitChange = () => {
 		this.updateDisplays();
 	}
 
+	/**
+	 * Handles mask bit clicking.
+	 */
 	handleMaskBitChange = (byteIndex: number, bitIndex: number) => {		
 		this.selectMaskBit(joinBitIndex(byteIndex, bitIndex));
 	}
 
+	/**
+	 * The byte that will be set after the last display gets blurred.
+	 */
 	private blurByte: Byte;
 
-	private handleDisplayFocus = (display: HTMLDivElement, byteIndex: number): void => {
+	/**
+	 * Handles IP display focus.
+	 */
+	private handleDisplayFocus = (display: HTMLInputElement, byteIndex: number): void => {
 		
-		let range, selection;
-		if (document.createRange) {
-			range = document.createRange();
-			range.selectNodeContents(display);
-			selection = window.getSelection();
-			selection.removeAllRanges();
-			selection.addRange(range);
-		}
+		display.select();
 
 		let originalAddress = this.extractAddress();
 		this.blurByte = originalAddress.getIp()[byteIndex];
 
 	}
 
+	/**
+	 * Handles IP display blur.
+	 */
 	private handleDisplayBlur = (byteIndex: number): void => {
 		this.setIPByteDOM(this.blurByte, byteIndex, true);
 	}
 
-	private handleDisplayKeydown = (evt: React.KeyboardEvent<HTMLDivElement>, display: HTMLDivElement): void => { 
+	/**
+	 * Handles IP display key down.
+	 */
+	private handleDisplayKeydown = (evt: React.KeyboardEvent<HTMLInputElement>, display: HTMLInputElement): void => { 
 		
 		if (evt.key === "Enter") {
-			display.blur();
+			display.blur(); // only for UX, otherwise useless
 		}
 		
 		if (additionalKeys.indexOf(evt.key) === -1 && !isCharNumeric(evt.key)){				
@@ -261,23 +270,22 @@ class Ipbits extends Component {
 			return;
 		}
 
-		let selectedText = window.getSelection().anchorNode.parentNode == display && window.getSelection().toString();
+		let selectedText = window.getSelection().anchorNode == display.parentNode ? window.getSelection().toString() : "";
 
-		if (additionalKeys.indexOf(evt.key) === -1 && display.textContent.replace(HIDDENCHAR, "").length == 3 && selectedText.length === 0) {
-
-			evt.preventDefault();
-
-		}
+		if (additionalKeys.indexOf(evt.key) === -1 && display.value.length >= 3 && selectedText === "")  evt.preventDefault();
 
 	}
 
-	private handleDisplayKeyup = (evt: React.KeyboardEvent<HTMLDivElement>, display: HTMLDivElement, byteIndex: number): void => {
+	/**
+	 * Handles IP display key up.
+	 */
+	private handleDisplayKeyup = (evt: React.KeyboardEvent<HTMLInputElement>, display: HTMLInputElement, byteIndex: number): void => {
 				
 		let next = byteIndex < 3 ? this.ipDisplays[byteIndex + 1].current : undefined;
 
-		let selectedText = window.getSelection().anchorNode.parentNode == display && window.getSelection().toString();
+		let selectedText = window.getSelection().anchorNode == display.parentNode ? window.getSelection().toString() : "";
 
-		if (additionalKeys.indexOf(evt.key) === -1 && display.textContent.replace(HIDDENCHAR, "").length == 3 && selectedText.length === 0) {
+		if (additionalKeys.indexOf(evt.key) === -1 && display.value.length >= 3 && selectedText === "") {
 
 			if (next) {
 				next.focus();
@@ -287,14 +295,13 @@ class Ipbits extends Component {
 
 	}
 
-	private handleDisplayChange = (evt: ContentEditableEvent, display: HTMLDivElement, byteIndex: number): void => {
+	/**
+	 * Handles IP display input.
+	 */
+	private handleDisplayChange = (evt: ChangeEvent<HTMLInputElement>, display: HTMLInputElement, byteIndex: number): void => {
 		
-		console.log("[Change]");
-		console.log(display);
-
-		if (display.textContent === "") {
-			display.textContent = HIDDENCHAR;
-			
+		if (display.value === "") {
+						
 			let address = this.extractAddress();
 
 			let minByte = address.getIp()[byteIndex];
@@ -311,23 +318,7 @@ class Ipbits extends Component {
 		}
 		else {
 
-			if (display.textContent.indexOf(HIDDENCHAR) !== -1 && display.textContent.length > 1) {
-
-				display.textContent = display.textContent.replace(HIDDENCHAR, "");
-
-				let range, selection;
-				if (document.createRange) {
-					range = document.createRange();
-					range.selectNodeContents(display);
-					range.collapse(false);
-					selection = window.getSelection();
-					selection.removeAllRanges();
-					selection.addRange(range);
-				}
-
-			}
-
-			if (isStringNumeric(display.textContent)){
+			if (isStringNumeric(display.value)){
 
 				let address = this.extractAddress();
 
@@ -344,7 +335,7 @@ class Ipbits extends Component {
 
 				let value = new Byte(
 					clamp(
-						parseInt(display.textContent, 10),
+						parseInt(display.value, 10),
 						minByte.getDecimal(),
 						maxByte.getDecimal()
 					)
@@ -358,7 +349,7 @@ class Ipbits extends Component {
 		}
 
 	}
-
+	
 	constructor(props: any) {
 		
 		super(props);
@@ -435,15 +426,15 @@ class Ipbits extends Component {
 				)
 			}
 
-			let ipDisplay = <ContentEditable
+			let ipDisplay = <input
+								type="text"
 								className="display"
-								innerRef={this.ipDisplays[i]}
-								html="0"
+								ref={this.ipDisplays[i]}
 								onChange={(evt) => {this.handleDisplayChange(evt, this.ipDisplays[i].current, i)}}
 								onFocus={() => {this.handleDisplayFocus(this.ipDisplays[i].current, i)}}
 								onBlur={() => {this.handleDisplayBlur(i)}}
-								onKeyDown={(evt: React.KeyboardEvent<HTMLDivElement>) => {this.handleDisplayKeydown(evt, this.ipDisplays[i].current)}}
-								onKeyUp={(evt: React.KeyboardEvent<HTMLDivElement>) => {this.handleDisplayKeyup(evt, this.ipDisplays[i].current, i)}}
+								onKeyDown={(evt: React.KeyboardEvent<HTMLInputElement>) => {this.handleDisplayKeydown(evt, this.ipDisplays[i].current)}}
+								onKeyUp={(evt: React.KeyboardEvent<HTMLInputElement>) => {this.handleDisplayKeyup(evt, this.ipDisplays[i].current, i)}}
 								/>;
 
 			ipBox.push(
