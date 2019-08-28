@@ -1,7 +1,7 @@
 // Planner
 // +=========================+
 // Author: Henrique Colini
-// Version: 2.0 (2019-03-03)
+// Version: 3.1 (2019-08-29)
 
 import React, { Component, RefObject } from "react";
 import { Address, ERROR_NOT_NETWORK, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE } from "../../../wireworks/networking/layers/layer-3/address";
@@ -13,7 +13,13 @@ import "src/sass/pages/planner.scss";
 
 class Planner extends Component {
 
-	private addressDOM: RefObject<HTMLInputElement>;
+	/**
+	 * The reference to the address input.
+	 */
+	private txtAddress: RefObject<HTMLInputElement>;
+	/**
+	 * The reference to the generate button.
+	 */
 	private btnGenerate: RefObject<HTMLButtonElement>;
 
 	state = {
@@ -27,24 +33,21 @@ class Planner extends Component {
 		showTable: false
 	};
 
-	constructor(props: any) {
-		super(props);
-		this.addressDOM = React.createRef();
-		this.btnGenerate = React.createRef();
-	}
-
+	/**
+	 * Creates a networking plan.
+	 */
 	private createPlan = () => {
 
 		let errStr: string = undefined;
-		this.state.errorMessage = undefined;
+		this.setState({errorMessage: undefined});
 	
 		try {
 			
-			let address = new Address(this.addressDOM.current.value);
+			let address = new Address(this.txtAddress.current.value);
 	
 			try {
 	
-				address = new Address(this.addressDOM.current.value, undefined, true, true);
+				address = new Address(this.txtAddress.current.value, undefined, true, true);
 	
 			} catch (error) {
 	
@@ -97,18 +100,17 @@ class Planner extends Component {
 		}	
 			
 	}
-
-	private inputEnter = (ev: React.KeyboardEvent<HTMLInputElement>): void => {
-		if (ev.key === "Enter")
-			this.createPlan();
-	}
-
+	
 	componentDidMount() {
-
-		let c = this;
 
 		document.body.className = "theme-layer3";
 			
+	}	
+
+	constructor(props: any) {
+		super(props);
+		this.txtAddress = React.createRef();
+		this.btnGenerate = React.createRef();
 	}
 
     render() {
@@ -116,7 +118,7 @@ class Planner extends Component {
             <main>
 				<label htmlFor="address">Rede/Máscara</label>
 				<h1>
-					<input type="text" name="address" ref={this.addressDOM} placeholder="0.0.0.0/0" onKeyDown={this.inputEnter}/>
+					<input type="text" name="address" ref={this.txtAddress} placeholder="0.0.0.0/0" onKeyDown={(ev) => {if (ev.key === "Enter") this.createPlan()}}/>
 					<button type="button" ref={this.btnGenerate} onClick={this.createPlan}>Gerar plano</button>
 				</h1>
 				<ErrorBox errorMessage={this.state.errorMessage}/>
