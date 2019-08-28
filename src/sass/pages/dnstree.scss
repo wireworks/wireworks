@@ -9,6 +9,10 @@ $asset-root-path: '../../' !default;
 
 }
 
+.loading {
+	cursor: progress;
+}
+
 .domain-tree,
 .domain-tree ul,
 .domain-tree li {
