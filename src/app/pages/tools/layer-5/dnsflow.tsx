@@ -593,6 +593,8 @@ class DnsFlowCanvas extends Component<DnsFlowCanvasProps> {
 		this.inter.mode = props.interMode;
 	}
 
+
+
 	componentDidMount() {		
 		
 		this.client = { name: "Host Cliente", node: undefined, label: undefined, mode: undefined };
@@ -605,7 +607,6 @@ class DnsFlowCanvas extends Component<DnsFlowCanvasProps> {
 
 		this.resetCanvas();
 
-		setInterval(this.flowCanvas.current.draw, 2000);
 		serverImage.onload = this.flowCanvas.current.draw;
 		clientImage.onload = this.flowCanvas.current.draw;
 	}

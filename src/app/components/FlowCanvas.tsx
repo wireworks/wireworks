@@ -527,6 +527,10 @@ class FlowCanvas extends Component<FlowCanvasProps> {
 		this.canvas = React.createRef();
 	}	
 
+	componentWillUnmount() {
+		this.stopLineAnimations();
+	}
+
 	render() {
 		return <canvas width={this.props.width} height={this.props.height} ref={this.canvas} className="flow-canvas"></canvas>;
 	}
