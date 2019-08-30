@@ -343,6 +343,13 @@ class FlowCanvas extends Component<FlowCanvasProps> {
 	}
 
 	/**
+	 * Removes all drawables from this FlowCanvas.
+	 */
+	public clearDrawables = () => {
+		this.drawables = [];
+	}
+
+	/**
 	 * Returns the list of drawables of this FlowCanvas.
 	 */
 	public getDrawables = (): Drawable[] => {
@@ -378,6 +385,7 @@ class FlowCanvas extends Component<FlowCanvasProps> {
 		this.drawables.push(line);
 
 		let prevTime = Date.now();
+		let scope: FlowCanvas = this;
 
 		let interval = setInterval(function(){
 
@@ -393,12 +401,12 @@ class FlowCanvas extends Component<FlowCanvasProps> {
 
 			line.time = clamp(line.time + ((deltaTime/1000) * (speed/distance)), 0, 1);
 
-			this.draw();
+			scope.draw();
 			
 			if (line.time >= 1) {
 
 				line.time = 1;
-				this.draw();
+				scope.draw();
 
 				line.label = undefined;
 
@@ -426,7 +434,7 @@ class FlowCanvas extends Component<FlowCanvasProps> {
 		connections: NodeConnection[],
 		callback: Function = undefined) => {
 
-		function iterativeConnect(index: number) {
+		let iterativeConnect = (index: number) => {
 
 			if(index < connections.length){
 				let connection = connections[index];
