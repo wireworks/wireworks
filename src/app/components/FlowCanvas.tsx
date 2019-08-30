@@ -19,7 +19,6 @@ export interface Drawable {
 
 /**
  * A Drawable image that has special connecting points. Used to represent servers and clients in the canvas.
- * @author Henrique Colini
  */
 export class Node implements Drawable {
 	
@@ -120,7 +119,6 @@ export class Node implements Drawable {
 
 /**
  * A Drawable text box.
- * @author Henrique Colini
  */
 export class Label implements Drawable {
 	
@@ -382,7 +380,7 @@ class FlowCanvas extends Component<FlowCanvasProps> {
 		if (labelText) {
 			line.label = new Label({x:0,y:0}, labelText, "#000000", strokeStyle, 5, 10, "12px Monserrat, sans-serif", 10);
 		}
-		this.drawables.push(line);
+		this.addDrawable(line);
 
 		let prevTime = Date.now();
 		let scope: FlowCanvas = this;
@@ -430,9 +428,7 @@ class FlowCanvas extends Component<FlowCanvasProps> {
 	 * @param connections The list of connections to be made.
 	 * @param callback What do to when the last line finishes being drawn.
 	 */
-	public connectMultipleNodes = (
-		connections: NodeConnection[],
-		callback: Function = undefined) => {
+	public connectMultipleNodes = (connections: NodeConnection[], callback: Function = undefined) => {
 
 		let iterativeConnect = (index: number) => {
 
@@ -532,7 +528,7 @@ class FlowCanvas extends Component<FlowCanvasProps> {
 	}	
 
 	render() {
-		return <canvas width={this.props.width} height={this.props.height} ref={this.canvas}></canvas>;
+		return <canvas width={this.props.width} height={this.props.height} ref={this.canvas} className="flow-canvas"></canvas>;
 	}
 
 }

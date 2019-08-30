@@ -1,16 +1,13 @@
 // DNSFlow
 // +=========================+
 // Author: Henrique Colini
-// Version: 1.0 (2019-04-14)
+// Version: 2.0 (2019-08-30)
 
 import React, { Component, RefObject } from "react";
 
-import "src/sass/pages/dnsflow.scss"
-import { id } from "../../../wireworks/utils/dom";
 import FlowCanvas, { FlowCanvasProps, Node, Label, NodeConnection, Line } from "../../../components/FlowCanvas";
 import ErrorBox from "../../../components/ErrorBox";
 import { Domain, ERROR_INVALID_LABEL, ERROR_FULL_NAME_RANGE, ERROR_SMALL_DOMAIN } from "../../../wireworks/networking/layers/layer-5/domain";
-import { clamp } from "../../../wireworks/utils/math";
 
 // Images used in the canvas.
 
@@ -35,18 +32,19 @@ const normalSpeed = 100;
 const fastSpeed = 400;
 const veryFastSpeed = 600;
 
+type Speed = "veryslow" | "slow" | "normal" | "fast" | "veryfast";
+
 // Constants representing the mode of a DNS server.
 
 const ITERATIVE = "iterative";
 const RECURSIVE = "recursive";
 
-type Speed = "veryslow" | "slow" | "normal" | "fast" | "veryfast";
 type ServerMode = "iterative" | "recursive";
 
 /**
  * A data structure that represents servers and hosts.
  */
-type Machine = {
+type DNSMachine = {
 	name: string,
 	node: Node,
 	label: Label,
@@ -55,19 +53,21 @@ type Machine = {
 
 // +==============================================+
 
-// move somewhere better
-
-// serverImage.onload = draw;
-// clientImage.onload = draw;
-
 class DnsFlow extends Component {
 
+	/** The reference to the domain input. */
 	private txtDomain: RefObject<HTMLInputElement>;
+	/** The reference to the DnsFlowCanvas. */
 	private dnsCanvas: RefObject<DnsFlowCanvas>;
+	/** The reference to the speed select. */
 	private selectSpeed: RefObject<HTMLSelectElement>;
+	/** The reference to the Local server mode select. */
 	private selectLocalMode: RefObject<HTMLSelectElement>;
+	/** The reference to the Root server mode select. */
 	private selectRootMode: RefObject<HTMLSelectElement>;
+	/** The reference to the TLD server mode select. */
 	private selectTldMode: RefObject<HTMLSelectElement>;
+	/** The reference to the Intermediary server mode select. */
 	private selectInterMode: RefObject<HTMLSelectElement>;
 
 	state = {
@@ -80,6 +80,9 @@ class DnsFlow extends Component {
 		interMode: "iterative" as ServerMode
 	}
 
+	/**
+	 * Runs the simulation.
+	 */
 	public run = () => {
 
 		this.setState({errorMessage: null});
@@ -189,39 +192,39 @@ class DnsFlow extends Component {
 
 					<div>
 						<label>Local</label>
-						<h1>
+						<div>
 							<select id="local_mode" ref={this.selectLocalMode}>
 								<option value="iterative">Iterativo</option>
 								<option value="recursive" selected>Recursivo</option>
 							</select>
-						</h1>
+						</div>
 					</div>
 					<div>
 						<label>Root</label>
-						<h1>
+						<div>
 							<select id="root_mode" ref={this.selectRootMode}>
 								<option value="iterative" selected>Iterativo</option>
 								<option value="recursive">Recursivo</option>
 							</select>
-						</h1>
+						</div>
 					</div>
 					<div>
 						<label>TLD</label>
-						<h1>
+						<div>
 							<select id="tld_mode" ref={this.selectTldMode}>
 								<option value="iterative" selected>Iterativo</option>
 								<option value="recursive">Recursivo</option>
 							</select>
-						</h1>
+						</div>
 					</div>
 					<div>
 						<label>Intermediários</label>
-						<h1>
+						<div>
 							<select id="inter_mode" ref={this.selectInterMode}>
 								<option value="iterative" selected>Iterativos</option>
 								<option value="recursive">Recursivos</option>
 							</select>
-						</h1>
+						</div>
 					</div>
 
 				</div>
@@ -242,16 +245,32 @@ interface DnsFlowCanvasProps {
 	interMode: ServerMode
 }
 
+/**
+ * A component representing the DNSFlow FlowCanvas.
+ */
 class DnsFlowCanvas extends Component<DnsFlowCanvasProps> {
 
+	/** The reference to the FlowCanvas. */
 	private flowCanvas: RefObject<FlowCanvas>;
-	private client: Machine;
-	private local: Machine;
-	private root: Machine;
-	private tld: Machine;
-	private inter: Machine;
-	private admin: Machine;
-	private dest: Machine;
+	/** The origin client. */
+	private client: DNSMachine;
+	/** The local server. */
+	private local: DNSMachine;
+	/** The root server. */
+	private root: DNSMachine;
+	/** The TLD server. */
+	private tld: DNSMachine;
+	/** The intermediary server. */
+	private inter: DNSMachine;
+	/** The administrative server. */
+	private admin: DNSMachine;
+	/** The destination client. */
+	private dest: DNSMachine;
+	/** The configurations for the line maker. */
+	private makerConfigs = {
+		width: 0,
+		speed: 0
+	}
 
 	/**
 	 * Runs the simulation.
@@ -269,14 +288,14 @@ class DnsFlowCanvas extends Component<DnsFlowCanvasProps> {
 
 		this.flowCanvas.current.stopLineAnimations();
 
-		this.makerWidth = 10;
+		this.makerConfigs.width = 10;
 
 		switch (this.props.speed) {
-			case "veryslow": this.makerSpeed = verySlowSpeed; break;
-			case "slow": this.makerSpeed = slowSpeed; break;
-			case "normal": this.makerSpeed = normalSpeed; break;
-			case "fast": this.makerSpeed = fastSpeed; break;
-			case "veryfast": this.makerSpeed = veryFastSpeed; break;
+			case "veryslow": this.makerConfigs.speed = verySlowSpeed; break;
+			case "slow": this.makerConfigs.speed = slowSpeed; break;
+			case "normal": this.makerConfigs.speed = normalSpeed; break;
+			case "fast": this.makerConfigs.speed = fastSpeed; break;
+			case "veryfast": this.makerConfigs.speed = veryFastSpeed; break;
 		}
 
 		let cons = this.calculateConnections(this.props.domain);
@@ -492,30 +511,20 @@ class DnsFlowCanvas extends Component<DnsFlowCanvasProps> {
 	}
 
 	/**
-	 * The speed of the lines the line maker makes.
-	 */
-	private makerWidth = 0;
-
-	/**
-	 * The width of the lines the line maker makes.
-	 */
-	private makerSpeed = 0;
-
-	/**
 	 * Creates NodeConnections.
 	 * @param from What machine to start from.
 	 * @param to What machine to go to.
 	 * @param kind What kind of connection to create. Must be either "request", "partial" (responses) or "full" (responses).
 	 * @param msg What message to carry in the end of the line.
 	 */
-	public makeConnection = (from: Machine, to: Machine, kind: "request" | "partial" | "full", msg: string): NodeConnection => {
+	public makeConnection = (from: DNSMachine, to: DNSMachine, kind: "request" | "partial" | "full", msg: string): NodeConnection => {
 		let style: string;
 		switch (kind) {
 			case ("request"): style = yellowWire; break;
 			case ("partial"): style = redWire; break;
 			case ("full"): style = greenWire; break;
 		}
-		return { from: from.node, to: to.node, strokeStyle: style, lineWidth: this.makerWidth, speed: this.makerSpeed, labelText: msg };
+		return { from: from.node, to: to.node, strokeStyle: style, lineWidth: this.makerConfigs.width, speed: this.makerConfigs.speed, labelText: msg };
 	}
 
 	/**
@@ -597,6 +606,8 @@ class DnsFlowCanvas extends Component<DnsFlowCanvasProps> {
 		this.resetCanvas();
 
 		setInterval(this.flowCanvas.current.draw, 2000);
+		serverImage.onload = this.flowCanvas.current.draw;
+		clientImage.onload = this.flowCanvas.current.draw;
 	}
 
 	constructor(props: DnsFlowCanvasProps) {
