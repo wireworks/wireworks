@@ -5,6 +5,7 @@
 
 import React, { Component, RefObject } from "react";
 import "src/sass/pages/dnstree.scss";
+import failImage from "../../../../images/layers/5/unreachable.png";
 import { Address, ERROR_ADDRESS_PARSE } from "../../../wireworks/networking/layers/layer-3/address";
 import { Domain, ERROR_INVALID_LABEL, ERROR_FULL_NAME_RANGE } from "../../../wireworks/networking/layers/layer-5/domain";
 import { ERROR_BYTE_RANGE } from "../../../wireworks/networking/byte";
@@ -455,7 +456,7 @@ class FakeBrowser extends Component<FakeBrowserProps> {
 					{
 						this.state.pageStatus == "failed" &&
 						<div className="page">
-							<img src="../../../images/unreachable.png"/>
+							<img src={failImage}/>
 							<h2 className="font-bold">Não é possível acessar esse site</h2>
 							<h3 className="text-light">{this.state.failMessage}</h3>
 						</div>
