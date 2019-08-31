@@ -8,6 +8,7 @@ $asset-root-path: '..' !default;
 @import "layout/container";
 @import "layout/boxes";
 @import "layout/margins";
+@import "components/footer";
 @import "components/collections";
 @import "components/inputs";
 @import "components/links";
@@ -16,11 +17,14 @@ $asset-root-path: '..' !default;
 @import "components/errorbox";
 @import "components/breadcrumb";
 @import "components/loading";
+@import "components/materialicons";
 @import "components/flowcanvas";
 
-body {
+html {
+	height: 100%;
+}
 
-	background: $layer1-color-primary;
+body {
 
 	&.theme-wireworks {
 		--color-primary: #{$wireworks-color-primary};
@@ -71,5 +75,8 @@ body {
 	}
 
 	font-family: $font-family-base;
-	background: theme(primary-extralight);
+	background: theme(primary);
+	height: 100%;
+	transition: background-color 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+
 }

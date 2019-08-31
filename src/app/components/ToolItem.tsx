@@ -3,15 +3,26 @@ import { Link } from "react-router-dom";
 
 interface ToolItemProps {
 	name: string,
-	icon: string
+	awesomeIcon?: string,
+	materialIcon?: string,
 	description: string,
 	path: string
 }
 
-const ToolItem: FC<ToolItemProps> = ({name, icon, description, path}) =>
+const ToolItem: FC<ToolItemProps> = ({ name, awesomeIcon, materialIcon, description, path}) =>
 
-<li>
-	<h2><span className="font-bold"><Link to={path}><i className={icon}></i> {name}</Link></span></h2>
+<li className="spacer">
+	<div className="font-big">
+		<span className="">
+			<Link to={path}>
+				<span className="mr-2">
+					{awesomeIcon ? <i className={awesomeIcon}></i> : ""}
+					{materialIcon ? <i className="material-icons">{materialIcon}</i> : ""}
+				</span>
+				{name}
+			</Link>
+		</span>
+	</div>
 	<p>{description}</p>
 </li>
 

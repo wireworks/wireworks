@@ -2,21 +2,22 @@
 
 ul.collection {
 
-	border-radius: 10px;
-	border: 1px solid theme(gray-light);
+	// border-radius: 15px;
+	// border: 2px solid theme(gray-light);
 	margin-bottom: 1.5rem;
-
-	h1, h2, h3, h4, h5, h6, p {
-		margin-bottom: 1rem;
-	}
 
 	li {
 
-		padding: 20px;
+		padding: 20px 10px;
 		border-bottom: 1px solid theme(gray-light);
 
 		&:last-child {
 			border-bottom: none;
+			padding-bottom: 0;
+		}
+
+		&:first-child {
+			padding-top: 0;
 		}
 
 		*:last-child {

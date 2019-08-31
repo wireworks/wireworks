@@ -5,21 +5,27 @@ $asset-root-path: '../../' !default;
 
 .layer-5, .layer-4, .layer-3, .layer-2, .layer-1 {
 
-	width: 8em;
+	width: 7.5em;
 	color: white;
 	font-size: $font-size-big;
 	padding: 0.5em;
-	border-radius: 10px;
+	border-radius: 1em;
 	user-select: none;
-	box-shadow: 2px 2px 8px 0 rgba(#000000, 0);
-	transition: box-shadow 0.2s, width 0.2s;
+	box-shadow: 0 1px 5px 0px rgba(0, 0, 0, 0.2);
+	transition: box-shadow 1s, width 0.2s cubic-bezier(.64, .43, .42, 1.27);
 
 	&:hover {
 
 		color: white;
-		box-shadow: 0px 2px 16px 0 rgba(#000000, 0.2);
+		box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.01),
+					0 1px 10px 2px rgba(0, 0, 0, 0.1);
 		width: 10em;
 
+	}
+
+	.material-icons {
+		font-size: $font-size-big;
+		vertical-align: middle;
 	}
 
 }

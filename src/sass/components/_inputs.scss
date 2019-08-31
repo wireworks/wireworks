@@ -15,23 +15,24 @@ input[type="text"], select {
 	
 	padding: 0.25em;
 	border: 2px solid theme(secondary);
-	border-radius: 5px;
-	font-family: $font-family-mono;
+	border-radius: 7px;
+	font-family: $font-family-base;
 	font-weight: $font-weight-light;
 	color: $color-text;
 	margin-right: 0.5em;
 
 	&::placeholder {
-		color: $color-text-extralight;
+		color: $color-text-light;
 	}
 
 }
 
 button {
 
+	text-transform: uppercase;
 	color: white;
 	background: theme(secondary);
-	border-radius: 5px;
+	border-radius: 7px;
 	padding: 0.4em 0.8em;
 	cursor: pointer;
 
@@ -43,6 +44,7 @@ button {
 
 label {
 	
+	color: theme(text);
 	font-size: $font-size-medium;
 	margin-bottom: 0.6em;
 	display: block;
