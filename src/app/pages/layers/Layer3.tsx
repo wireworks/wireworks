@@ -5,26 +5,22 @@ import { RouteComponentProps } from "react-router";
 
 class Layer3 extends Component<RouteComponentProps> {
 
-    componentDidMount() {
-        document.body.className = "theme-layer3";
-    }
-
-    render () {
-        return <Menu title="Camada 3 • Camada de Rede">
+	render () {
+		return <Menu title="Camada 3" description="Camada de Rede" theme="layer3">
 
             <ToolItem 	name="IPBits"
                         path={`${this.props.match.path}/ipbits`}
-                        icon="far fa-dot-circle"
+                        materialIcon="radio_button_checked"
                         description="Conversor de binário-decimal para endereços de rede" />
             
             <ToolItem 	name="Planner"
                         path={`${this.props.match.path}/planner`}
-                        icon="fas fa-table"
+                        materialIcon="table_chart"
                         description="Gerador de planos de endereçamento" />
             
             <ToolItem 	name="Undernets"
                         path={`${this.props.match.path}/undernets`}
-                        icon="fas fa-cube"
+                        materialIcon="account_tree"
                         description="Visualizador de sub-redes" />
         </Menu>
     }

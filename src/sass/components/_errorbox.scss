@@ -4,14 +4,14 @@
 .errorbox {
 
 	width: 100%;
-	border-radius: 5px;
-	border: 1px solid theme(gray-light);
+	border-radius: 15px;
+	border: 1px solid theme(danger);
 	margin-bottom: 1.5rem;
 	border-collapse: separate;
 	overflow: hidden;
 	padding: 1em;
 	font-size: $font-size-medium;
-	color: $color-danger;
+	color: theme(danger);
 	font-family: $font-family-mono;
 	text-align: center;
 

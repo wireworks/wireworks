@@ -1,10 +1,12 @@
 @import "../utils/colors/theme";
 
-$font-family-base: 'Montserrat', sans-serif;
+$font-family-base: 'Work Sans', sans-serif;
+$font-family-title: 'Montserrat', 'Work Sans', sans-serif;
 $font-family-mono: 'Roboto Mono', monospace;
 
-$font-size-base: 16px;
+$font-size-base: 17px;
 $font-size-medium: 20px;
+$font-size-semibig: 24px;
 $font-size-big: 30px;
 
 $font-weight-light: 300;
@@ -13,6 +15,7 @@ $font-weight-bold: 700;
 
 h1, h2, h3, h4, h5, h6, p {
 	font-family: $font-family-base;
+	font-weight: $font-weight-light;
 	color: theme(text);
 	margin-bottom: 1.5rem;
 }
@@ -22,10 +25,14 @@ h1 {
 }
 
 h2 {
+	font-size: $font-size-semibig;
+}
+
+h3 {
 	font-size: $font-size-medium;
 }
 
-h3, h4, h5, h6, p {
+h4, h5, h6, p {
 	font-size: $font-size-base;
 }
 

@@ -548,13 +548,13 @@ class DnsFlowCanvas extends Component<DnsFlowCanvasProps> {
 		this.admin.node  = new Node({ x: w - pr, y: h - pb - 180 }, 60, 60, {l: 10, t: 10, r: 10, b: 10}, serverImage);
 		this.dest.node   = new Node({ x: w - pr, y: h - pb },       60, 60, {l: 10, t: 10, r: 10, b: 10}, clientImage);
 
-		this.client.label = new Label({x: 0, y: 0}, this.client.name, "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-		this.local.label  = new Label({x: 0, y: 0}, this.local.name,  "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-		this.root.label   = new Label({x: 0, y: 0}, this.root.name,   "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-		this.tld.label    = new Label({x: 0, y: 0}, this.tld.name,    "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-		this.inter.label  = new Label({x: 0, y: 0}, this.inter.name,  "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-		this.admin.label  = new Label({x: 0, y: 0}, this.admin.name,  "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
-		this.dest.label   = new Label({x: 0, y: 0}, this.dest.name,   "#505050", "transparent", 6, 0, "14px Montserrat, sans-serif", 14);
+		this.client.label = new Label({x: 0, y: 0}, this.client.name, "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 14);
+		this.local.label  = new Label({x: 0, y: 0}, this.local.name,  "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 14);
+		this.root.label   = new Label({x: 0, y: 0}, this.root.name,   "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 14);
+		this.tld.label    = new Label({x: 0, y: 0}, this.tld.name,    "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 14);
+		this.inter.label  = new Label({x: 0, y: 0}, this.inter.name,  "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 14);
+		this.admin.label  = new Label({x: 0, y: 0}, this.admin.name,  "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 14);
+		this.dest.label   = new Label({x: 0, y: 0}, this.dest.name,   "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 14);
 		
 		this.client.label.pos = this.flowCanvas.current.getAlignedPoint(this.client.node, this.client.label, "bottom", "center");
 		this.local.label.pos  = this.flowCanvas.current.getAlignedPoint(this.local.node, this.local.label, "bottom", "center");
