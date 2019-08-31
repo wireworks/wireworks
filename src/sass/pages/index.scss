@@ -5,7 +5,8 @@ $asset-root-path: '../../' !default;
 
 .layer-5, .layer-4, .layer-3, .layer-2, .layer-1 {
 
-	width: 7.5em;
+	width: 8em;
+	white-space: nowrap;
 	color: white;
 	font-size: $font-size-big;
 	padding: 0.5em;
