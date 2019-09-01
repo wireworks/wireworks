@@ -28,13 +28,15 @@ export class Node implements Drawable {
 	public width: number;
 	public height: number;
 	public image: HTMLImageElement;
+	public connectorOffset: number;
 
-	constructor(pos: Point, width: number, heigth: number, margins: { l: number, t: number, r: number, b: number }, image: HTMLImageElement) {
+	constructor(pos: Point, width: number, heigth: number, margins: { l: number, t: number, r: number, b: number }, image: HTMLImageElement, connectorOffset: number = 0.25) {
 		this.pos = pos;
 		this.width = width;
 		this.height = heigth;
 		this.image = image;
 		this.margins = margins;
+		this.connectorOffset = connectorOffset;
 	}
 
 	public draw(ctx: CanvasRenderingContext2D): void {
@@ -70,9 +72,8 @@ export class Node implements Drawable {
 	public getOutput(side: "top" | "bottom" | "left" | "right"): Point {
 
 		let p = this.getVertices();
-		let f = 0.25;
-		let fw = f * this.width;
-		let fh = f * this.height;
+		let fw = this.connectorOffset * this.width;
+		let fh = this.connectorOffset * this.height;
 
 		switch (side) {
 
@@ -96,9 +97,8 @@ export class Node implements Drawable {
 	public getInput(side: "top" | "bottom" | "left" | "right"): Point {
 
 		let p = this.getVertices();
-		let f = 0.25;
-		let fw = f * this.width;
-		let fh = f * this.height;
+		let fw = this.connectorOffset * this.width;
+		let fh = this.connectorOffset * this.height;
 
 		switch (side) {
 
