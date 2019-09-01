@@ -8,7 +8,10 @@ export const WireworksHeader: FC<RouteComponentProps> = ({match}) => {
     const reg = /\/layers\/(\d)(?:\/([a-z]*))?/;
 
     const toolNames : { [key:string]:string; } = {
-        'ipbits': 'IPBits',
+		
+		'macfetch': "MAC Fetch",
+		
+		'ipbits': 'IPBits',
         'planner': 'Planner',
         'undernets': 'Undernets',
 

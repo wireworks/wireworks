@@ -14,6 +14,8 @@ const Layer3 = lazy(() => import("./app/pages/layers/Layer3"));
 const Layer4 = lazy(() => import("./app/pages/layers/Layer4"));
 const Layer5 = lazy(() => import("./app/pages/layers/Layer5"));
 
+const MacFetch = lazy(() => import("./app/pages/tools/layer-2/macfetch"));
+
 const Ipbits = lazy(() => import("./app/pages/tools/layer-3/ipbits"));
 const Undernets = lazy(() => import("./app/pages/tools/layer-3/undernets"));
 const Planner = lazy(() => import("./app/pages/tools/layer-3/planner"));
@@ -53,6 +55,8 @@ const Wireworks: FC = () =>
 				{/* Main Menu */}
 				<Route path="/" exact component={MainMenu} />
 
+				{/* Layer 2*/}
+				<Route path="/layers/2/macfetch" component={MacFetch} />
 
 				{/* Layer 3 */}
 				<Route path="/layers/3/ipbits" component={Ipbits} />
