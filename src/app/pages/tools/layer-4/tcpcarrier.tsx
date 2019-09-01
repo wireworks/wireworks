@@ -1,7 +1,5 @@
-import React, { Component, FC, ChangeEvent } from "react";
+import React, { ChangeEvent, Component, FC } from "react";
 import "src/sass/pages/tcpcarrier.scss";
-import { arrayOf } from "prop-types";
-import { arrayPattern } from "@babel/types";
 
 
 
@@ -64,7 +62,12 @@ class TcpCarrier extends Component<{}, {progress: number[], speed: number}> {
 
                 {/* TCP animation */}
                 <div className="tcp-container">
-                    {this.state.progress.map((val, key) => <TcpPacket key={key} progress={val}/>)}
+                    <div>
+                        <div className="tcp-window-slider tcp-p-left">
+                            <div className="tcp-window"/>
+                        </div>
+                        {this.state.progress.map((val, key) => <TcpPacket key={key} progress={val}/>)}
+                    </div>
                 </div>
 
                 {/* Menu */}

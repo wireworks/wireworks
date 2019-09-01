@@ -1,19 +1,35 @@
-import React, { FC } from "react";
+import React, { Component } from "react";
 
 interface MenuProps {
-	title: string
+	title?: string,
+	description?: string,
+	theme?: string
 }
 
-const Menu: FC<MenuProps> = ({title, children}) =>
+class Menu extends Component<MenuProps> {
 
-<main>
-	<h2>{title}</h2>
+	componentDidMount() {
+		if (this.props.theme)
+			document.body.className = "theme-"+this.props.theme;
+	}
 
-	<ul className="collection">
-		{children}
-	</ul>
+	render() {
+		return(
+			<main>
 
-	<h3>Criado por Henrique Colini e Álvaro Dziadzio <span className="text-light font-light">• Info16 <i className="fas fa-code"></i></span></h3>
-</main>
+				<div className="hbox align-center">
+					{this.props.title ? <h1 className="mr-1" >{this.props.title} •</h1> : ""}
+					{this.props.description ? <h3>{this.props.description}</h3> : ""}
+				</div>
+
+				<ul className="collection">
+					{this.props.children}
+				</ul>
+				
+			</main>
+		);
+	}
+
+}
 
 export default Menu;

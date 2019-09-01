@@ -1,18 +1,18 @@
 @import "../base/typography";
-@import "../utils/colors/base";
+@import "../utils/colors/theme";
 
 table {
 
 	width: 100%;
 	border-radius: 5px;
-	border: 1px solid $color-gray-light;
+	border: 1px solid theme(gray-light);
 	margin-bottom: 1.5rem;
 	border-collapse: separate;
 	overflow: hidden;
 
 	tr {
 
-		border-bottom: 1px solid $color-gray-light;
+		border-bottom: 1px solid theme(gray-light);
 
 		&:last-child {
 			border-bottom: none;
@@ -31,14 +31,14 @@ table {
 
 		font-family: $font-family-mono;
 		font-weight: $font-weight-light;
-		color: $color-text;
+		color: theme(text);
 
 	}
 
 	th {
 
-		color: $color-text;
-		border-bottom: 1px solid $color-gray-light;
+		color: theme(text);
+		border-bottom: 1px solid theme(gray-light);
 		
 	}
 

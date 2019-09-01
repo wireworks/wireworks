@@ -7,15 +7,20 @@
 
 	&::before {
 
+		vertical-align: middle;
 		display: inline-block;
 		font-size: inherit;
 		width: 1em;
 		height: 1em;		
-		background: image("logo_small_transparent.png") center center no-repeat;
+		background: image("logo.svg") center center no-repeat;
 		background-size: contain;					
 		margin-right: 0.5em;
+		transition: background-image 1s;
 		content: '';
+	}
 
+	&:hover::before{
+		background-image: image("logo_shadow.svg");
 	}
 
 }

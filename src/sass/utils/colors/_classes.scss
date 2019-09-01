@@ -1,13 +1,13 @@
-@import "base";
+@import "theme";
 
 .text-light {
-	color: $color-text-light;
+	color: theme(text-light);
 }
 
 .text-extralight {
-	color: $color-text-extralight;
+	color: theme(text-extralight);
 }
 
 .text-danger {
-	color: $color-danger;
+	color: theme(danger);
 }

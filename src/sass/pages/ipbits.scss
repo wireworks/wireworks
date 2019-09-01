@@ -21,15 +21,28 @@ $asset-root-path: '../../' !default;
 
 		}
 
+		input {
+
+			border: none;
+			outline: none;
+			background: none;
+			padding: 0;
+			margin-right: 0;
+				
+		}
+
 		.display, .mask-display {
 
+			box-sizing: border-box;
+			width: 100%;
 			align-items:center;
-			border-radius:5px;
+			border-radius:10px;
 			box-shadow:inset 2px 3px 10px 0 rgba(0,0,0,0.1);
 			display:flex;
-			font-family:'Roboto Mono', monospace;
+			font-family: $font-family-mono;
 			font-size:80px;
 			height:1.4em;
+			max-height:1.4em;
 			justify-content:center;
 			outline:none;
 			text-align:center;

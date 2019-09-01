@@ -10,7 +10,7 @@ const LayerItem: FC<LayerItemProps> = ({num, name}) =>
 
 <li>
 	<div className="spacer">
-		<Link to={"layers/" + num} className={"layer-" + num}><i className="fas fa-layer-group"></i> Camada <span className="font-bold">{num}</span></Link>
+			<Link to={"layers/" + num} className={"layer-" + num}><span className="font-bold"><i className="material-icons">layers</i> Camada {num}</span></Link>
 		<span className="font-big text-extralight">{name}</span>
 	</div>
 </li>

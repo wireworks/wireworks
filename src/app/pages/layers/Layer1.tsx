@@ -3,16 +3,9 @@ import Menu from "../../components/Menu";
 
 class Layer1 extends Component {
 
-    componentDidMount() {
-        document.body.className = "theme-layer1";
-    }
-
     render () {
-        return <Menu title="Camada 1 • Camada de Rede">
-
-        </Menu>
+		return <Menu title="Camada 1" description="Camada Física" theme="layer1"></Menu>
     }
 }
-
 
 export default Layer1;

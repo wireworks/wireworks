@@ -1,0 +1,19 @@
+@import "../utils/colors/theme";
+
+footer {
+	color: theme(primary-extralight);
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	h4 {
+		color: inherit;
+		margin: 1.5em 0;
+	}
+	a {
+		color: inherit;
+		&:hover {
+			color: inherit;
+			text-decoration: underline;
+		}
+	}
+}

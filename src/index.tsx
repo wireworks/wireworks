@@ -1,10 +1,10 @@
-import React, { FC, lazy, Suspense, useState } from "react";
+import React, { FC, lazy, Suspense } from "react";
 import ReactDOM from "react-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import "src/sass/pages/index.scss";
+import Footer from "./app/components/Footer";
+import { WireworksHeader } from "./app/components/Header";
 import * as serviceWorker from "./serviceWorker";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { WireworksHeader, IHeader } from "./app/components/Header";
-import "src/sass/pages/index.scss"
-import { object, number } from "prop-types";
 
 
 const Layer1 = lazy(() => import("./app/pages/layers/Layer1"));
@@ -24,52 +24,70 @@ const DnsTree = lazy(() => import("./app/pages/tools/layer-5/dnstree"));
 
 const MainMenu = lazy(() => import("./app/pages/MainMenu"));
 
+const loader = <main>
+	<div className="vbox align-center px-6 py-6">
+		<div className="lds-ring">
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
+	</div>
+</main>
 
 const Wireworks: FC = () =>
 
 <Router>
 
-    <Route path="/" component={WireworksHeader} />
+    <div className="content">
+		
+		<Route path="/" component={WireworksHeader} />
 
-    <Suspense fallback={<div className="vbox align-center px-3 py-3"><div className="lds-dual-ring"></div></div>}>
-        <Switch>
+		<Suspense fallback={loader}>
 
-                {/* All possible Routes */}
+			<Switch>
 
-                {/* Main Menu */}
-                <Route path="/" exact component={MainMenu}/>
+				{/* All possible Routes */}
 
-
-                {/* Layer 3 */}
-                <Route path="/layers/3/ipbits"  component={Ipbits}/>
-                <Route path="/layers/3/undernets"  component={Undernets}/>
-                <Route path="/layers/3/planner"  component={Planner}/>
-
-                {/* Layer 4 */}
-                <Route path="/layers/4/tcpcarrier"  component={TcpCarrier}/>
-
-                {/* Layer 5 */}
-                <Route path="/layers/5/dnsflow"  component={DnsFlow}/>
-                <Route path="/layers/5/dnstree"  component={DnsTree}/>
+				{/* Main Menu */}
+				<Route path="/" exact component={MainMenu} />
 
 
-                {/* Layer Tools Menu */}
-                <Route path="/layers/1"  component={Layer1}/>
-                <Route path="/layers/2"  component={Layer2}/>
-                <Route path="/layers/3"  component={Layer3}/>
-                <Route path="/layers/4"  component={Layer4}/>
-                <Route path="/layers/5"  component={Layer5}/>
+				{/* Layer 3 */}
+				<Route path="/layers/3/ipbits" component={Ipbits} />
+				<Route path="/layers/3/undernets" component={Undernets} />
+				<Route path="/layers/3/planner" component={Planner} />
+
+				{/* Layer 4 */}
+				<Route path="/layers/4/tcpcarrier" component={TcpCarrier} />
+
+				{/* Layer 5 */}
+				<Route path="/layers/5/dnsflow" component={DnsFlow} />
+				<Route path="/layers/5/dnstree" component={DnsTree} />
 
 
-                {/* 404 */}
-                <Route component={() =>
-                    <main>
-                        <h2 className="font-big p-3">Nada aqui <span className="font-mono">¯\_(ツ)_/¯</span></h2>
-                    </main>
-                }/>
+				{/* Layer Tools Menu */}
+				<Route path="/layers/1" component={Layer1} />
+				<Route path="/layers/2" component={Layer2} />
+				<Route path="/layers/3" component={Layer3} />
+				<Route path="/layers/4" component={Layer4} />
+				<Route path="/layers/5" component={Layer5} />
 
-        </Switch>
-    </Suspense>
+
+				{/* 404 */}
+				<Route component={() =>
+					<main>
+						<h2 className="font-big p-3">Nada aqui <span className="font-mono">¯\_(ツ)_/¯</span></h2>
+					</main>
+				} />
+                
+			</Switch>
+		</Suspense>
+
+	</div>
+
+	<Route path="/" component={Footer}/>
+
 </Router>
 
 

@@ -1,12 +1,12 @@
 // Undernets
 // +=========================+
 // Author: Henrique Colini
-// Version: 2.0 (2019-03-03)
+// Version: 3.0 (2019-08-26)
 
-import React, { Component } from "react";
-import { id, clearChildren, make } from "../../../wireworks/utils/dom";
+import React, { Component, RefObject } from "react";
+import ErrorBox from "../../../components/ErrorBox";
 import { removeItem } from "../../../wireworks/utils/array";
-import { Address, ERROR_NOT_NETWORK, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE } from "../../../wireworks/networking/layers/layer-3/address";
+import { Address, ERROR_NOT_NETWORK, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE, Byte4Zero } from "../../../wireworks/networking/layers/layer-3/address";
 import { ERROR_BYTE_RANGE } from "../../../wireworks/networking/byte";
 import "src/sass/pages/undernets.scss"
 
@@ -14,224 +14,208 @@ import "src/sass/pages/undernets.scss"
  * A list of color classes used in the Visual Networks.
  */
 const COLORS = [];
+
 for (let i = 0; i < 10; i++) COLORS[i] = 'ss-'+i;
+
 /**
  * The queue of colors that will be applied to future subnets.
  */
 const COLOR_QUEUE = COLORS.slice();
 
-let errorWrapper = id("error_wrapper");
-let rootBlock = id("root_block");
-let rootTree = id("root_tree");
-let tooltip = id("tooltip");
-let rootNet: VisualNetwork = undefined;
-let firstTime = true;
+// +==============================================+
 
-export function init() {
-	errorWrapper = id("error_wrapper");
-	rootBlock = id("root_block");
-	rootTree = id("root_tree");
-	tooltip = id("tooltip");
-}
+class Undernets extends Component {
 
-/**
- * Resets the Visual Networks.
- */
-export function reset() {
+	/**
+	 * Whether it's the first time the user has created a network.
+	 */
+	private firstTime = true;
+	/**
+	 * The text input for the base address.
+	 */
+	private txtAddress: RefObject<HTMLInputElement>;
+	/**
+	 * A reference to the root colored block component.
+	 */
+	private rootBlockRef: RefObject<SubnetBlock>;
 
-	if (firstTime || window.confirm("Tem certeza de que quer visualizar uma nova rede?\nIsso irá excluir todas as sub-redes existentes.")) {
+	state = {
+		errorMessage: null,
+		showTree: false,
+		rootAddress: new Address(Byte4Zero())
+	};
 
-		let oldTable = id('error');
+	/**
+	 * Resets Undernets.
+	 */
+	private reset = () => {
 
-		if (oldTable !== null) {
-			oldTable.remove();
-		}
+		if (this.firstTime || window.confirm("Tem certeza de que quer visualizar uma nova rede?\nIsso irá excluir todas as sub-redes existentes.")) {
 
-		let errStr: string = undefined;
+			this.setState({errorMessage: null, showTree: false, rootAddress: undefined});
 
-		try {
-			
-			let rootAddress = new Address((id('address') as HTMLInputElement).value);
+			let errStr: string = undefined;
 
 			try {
+				
+				let rootAddress = new Address(this.txtAddress.current.value);
 
-				rootAddress = new Address((id("address") as HTMLInputElement).value, undefined, true, true);
+				try {
+
+					rootAddress = new Address(this.txtAddress.current.value, undefined, true, true);
+
+				} catch (error) {
+
+					if (error.name === ERROR_NOT_NETWORK) {
+						errStr = "Este não é um endereço de rede. Você quis dizer " + rootAddress.getNetworkAddress(true).toString() + "?";
+					}
+
+					throw error;
+
+				}				
+
+				this.setState({showTree: true, rootAddress: rootAddress});
+				this.firstTime = false;
 
 			} catch (error) {
+				
+				if (!errStr) {
 
-				if (error.name === ERROR_NOT_NETWORK) {
-					errStr = "Este não é um endereço de rede. Você quis dizer " + rootAddress.getNetworkAddress(true).toString() + "?";
+					switch (error.name) {
+						case ERROR_ADDRESS_PARSE:
+							errStr = "A entrada deve possuir o formato 0.0.0.0/0.";
+							break;
+						case ERROR_MASK_RANGE:
+							errStr = "O valor da máscara é alto demais (deve estar entre 0-32).";
+							break;
+						case ERROR_BYTE_RANGE:
+							errStr = "Um ou mais octetos possui um valor alto demais (deve estar entre 0-255).";
+							break;
+						default:
+							errStr = "Erro desconhecido (" + error.name + ")."
+							console.error(error);
+							break;
+					}
+
 				}
 
-				throw error;
+				this.setState({errorMessage: errStr});
 
 			}
-
-			if (firstTime) {
-				tooltip.style.display = 'inline-block';
-				tooltip.style.transform = "scaleY(0)";
-				tooltip.style.opacity = "0";
-				rootBlock.addEventListener("mouseleave", function () {
-					tooltip.style.opacity = "0";
-					tooltip.style.transform = "scaleY(0)";
-				});
-			}
-
-			clearChildren(rootBlock);
-			clearChildren(rootTree);
-
-			rootNet = new VisualNetwork(rootAddress, undefined, "ss-0");
-
-			rootNet.prepElements();
-
-			rootBlock.appendChild(rootNet.block);
-			rootTree.appendChild(rootNet.treeText);
-
-			firstTime = false;
-
-		} catch (error) {
-			
-			let table = make("table", "", "", "error");
-
-			if (!errStr) {
-
-				switch (error.name) {
-					case ERROR_ADDRESS_PARSE:
-						errStr = "A entrada deve possuir o formato 0.0.0.0/0.";
-						break;
-					case ERROR_MASK_RANGE:
-						errStr = "O valor da máscara é alto demais (deve estar entre 0-32).";
-						break;
-					case ERROR_BYTE_RANGE:
-						errStr = "Um ou mais octetos possui um valor alto demais (deve estar entre 0-255).";
-						break;
-					default:
-						errStr = "Erro desconhecido (" + error.name + ")."
-						console.error(error);
-						break;
-				}
-
-			}
-
-			table.innerHTML = `
-				<td>
-					<h2 class="font-mono text-danger">Entrada inválida. ${errStr}</h2>
-				</td>
-			`;
-
-			errorWrapper.appendChild(table);
 
 		}
 
 	}
+
+	constructor(props: any) {
+		super(props);
+		this.state.rootAddress = undefined;
+		this.txtAddress = React.createRef();
+		this.rootBlockRef = React.createRef();
+	}
+
+	componentDidMount() {
+
+		document.body.className = "theme-layer3";       
+
+	}
+
+	render() {
+		return (
+			<main>
+				<label htmlFor="address">Rede/Máscara</label>
+
+				<h1>
+					<input type="text" name="address" ref={this.txtAddress} onKeyDown={(evt) => { if (evt.key === "Enter") this.reset()}} placeholder="0.0.0.0/0"/>
+					<button type="button" onClick={this.reset}>Visualizar Rede</button>
+				</h1>
+
+				<ErrorBox errorMessage={this.state.errorMessage}/>
+
+				<SubnetStrip address={this.state.rootAddress} blockRef={this.rootBlockRef}/>
+
+				{
+					this.state.showTree &&
+						<SubnetTree address={this.state.rootAddress} blockRef={this.rootBlockRef}/>
+				}
+
+			</main>
+		);
+	}
+
+}
+
+interface SubnetTreeProps {
+	address: Address,
+	blockRef: RefObject<SubnetBlock>
 }
 
 /**
- * A binary tree that combines Addresses and DOM Elements. Used only by Undernets.
- * @author Henrique Colini
+ * Component representing the subnet tree.
  */
-class VisualNetwork {
+class SubnetTree extends Component<SubnetTreeProps> {
 
-	address: Address;
-	parent: VisualNetwork;
-	color: string;
-	subnets: [VisualNetwork, VisualNetwork];
-	block: HTMLElement;
-	treeText: HTMLElement
-
-	constructor(address: Address, parent: VisualNetwork, color: string = undefined, subnets: [VisualNetwork, VisualNetwork] = [undefined, undefined], block: HTMLElement = undefined, treeText: HTMLElement = undefined) {
-		this.address = address;
-		this.parent = parent;
-		this.color = color;
-		this.subnets = subnets;
-		this.block = block;
-		this.treeText = treeText;
+	constructor(props: SubnetTreeProps) {
+		super(props);		
 	}
+		
+	render() {
+		return (
+			<div className="subnet-tree">
+				<SubnetBranch address={this.props.address} parent={null} color="ss-0" blockRef={this.props.blockRef}/>
+			</div>
+		);
+	}
+
+}
+
+interface SubnetBranchProps {
+	address: Address,
+	parent: SubnetBranch,
+	color: string,
+	blockRef: RefObject<SubnetBlock>
+}
+
+/**
+ * A branch of the subnet tree. Usually contains other branches.
+ */
+class SubnetBranch extends Component<SubnetBranchProps> {
+
+	state = {
+		divided: false
+	};
 
 	/**
-	 * Returns whether this Visual Network has any subnets.
+	 * The calculated subnets of this branch's network.
 	 */
-	public hasSubnets(): boolean {
-		return this.subnets[0] !== undefined && this.subnets[1] !== undefined;
-	}
-
+	private subnets: [Address, Address];
 	/**
-	 * Prepares all the DOM elements.
+	 * The references to the subnet branch components child to this branch.
 	 */
-	public prepElements(): void {
-
-		if (this.block === undefined)
-			this.block = make("div");
-
-		if (this.treeText === undefined)
-			this.treeText = make("span");
-
-		this.block.className = "subnet-block " + this.color;
-
-		let desc = this.address.toString() + " (" + (this.address.numberOfHosts()).toLocaleString() + " host" + (this.address.numberOfHosts() == 1 ? '' : 's') + ")";
-
-		this.block.addEventListener("mouseover", function () {
-			tooltip.textContent = desc;
-			tooltip.style.opacity = "1";
-			tooltip.style.transform = "scaleY(1)";
-		});
-
-		this.treeText.textContent = desc;
-		this.treeText.className = "subnet-divide " + this.color;
-
-		if (this.address.getMaskShort() === 32) {
-			this.treeText.classList.add("disabled");
-		}
-
-		let net = this;
-
-		if (this.address.getMaskShort() != 32) {
-			
-			this.treeText.addEventListener("click", function () {
-				if (net.hasSubnets()) {
-					if ((!net.subnets[0].hasSubnets() && !net.subnets[1].hasSubnets()) ||
-						window.confirm("Tem certeza de quer fundir essas duas sub-redes?\nTodas as sub-redes dessas duas serão apagadas para sempre.")) {
-
-						if (!net.merge())
-							alert("Você não pode fundir essas sub-redes");
-					}
-				}
-				else {
-					if (!net.divide())
-						alert("Você não pode dividir essa rede");
-				}
-				net.block.classList.add("highlight");
-			});
-		}
-
-		this.treeText.addEventListener("mouseover", function () {
-			net.block.classList.add("highlight");
-		});
-
-		this.treeText.addEventListener("mouseleave", function () {
-			net.block.classList.remove("highlight");
-		});
-
-	}
+	private subnetComponents: [RefObject<SubnetBranch>, RefObject<SubnetBranch>];
+	/**
+	 * The color of the second child SubnetBranch.
+	 */
+	private nextColor: string;
 
 	/**
 	 * Recursively returns the first (non split) subnet in this network.
 	 */
-	public firstSubnet(): VisualNetwork {
+	public firstSubnet = (): SubnetBranch => {
 
-		if (this.subnets[0])
-			return this.subnets[0].firstSubnet();
+		if (this.subnetComponents[0].current)
+			return this.subnetComponents[0].current.firstSubnet();
 		else
 			return this;
 	}
-	
+
 	/**
 	 * Recursively returns the last (non split) subnet in this network.
 	 */
-	public lastSubnet(): VisualNetwork {
+	public lastSubnet = (): SubnetBranch => {
 
-		if (this.subnets[1])
-			return this.subnets[1].lastSubnet();
+		if (this.subnetComponents[1].current)
+			return this.subnetComponents[1].current.lastSubnet();
 		else
 			return this;
 	}
@@ -239,14 +223,14 @@ class VisualNetwork {
 	/**
 	 * Returns this network's previous sibling.
 	 */
-	public subnetBefore(): VisualNetwork {
+	public subnetBefore = (): SubnetBranch => {
 
-		if (this.parent) {
-			if (this.parent.subnets[0] === this) {
-				return this.parent.subnetBefore();
+		if (this.props.parent) {
+			if (this.props.parent.subnetComponents[0].current === this) {
+				return this.props.parent.subnetBefore();
 			}
 			else {
-				return this.parent.subnets[0].lastSubnet();
+				return this.props.parent.subnetComponents[0].current.lastSubnet();
 			}
 		}
 		else {
@@ -257,14 +241,14 @@ class VisualNetwork {
 	/**
 	 * Returns this network's next sibling.
 	 */
-	public subnetAfter(): VisualNetwork {
+	public subnetAfter = (): SubnetBranch => {
 
-		if (this.parent) {
-			if (this.parent.subnets[1] === this) {
-				return this.parent.subnetAfter();
+		if (this.props.parent) {
+			if (this.props.parent.subnetComponents[1].current === this) {
+				return this.props.parent.subnetAfter();
 			}
 			else {
-				return this.parent.subnets[1].firstSubnet();
+				return this.props.parent.subnetComponents[1].current.firstSubnet();
 			}
 		}
 		else {
@@ -273,11 +257,31 @@ class VisualNetwork {
 	}
 
 	/**
-	 * Splits this network into subnets. Returns false on failure.
+	 * Whether this branch's subnet can be further divided (i.e. mask is lower than 32).
 	 */
-	public divide(): boolean {
+	public canDivide = (): boolean =>  {
+		return (this.subnets[0] && true) && (this.subnets[1] && true);
+	}
 
-		if (this.address.getMaskShort() < 32 && !this.hasSubnets()) {
+	/**
+	 * Handles click events of this branch.
+	 */
+	private handleClick = () => {
+	
+		if (this.state.divided) {
+
+			if ((!this.subnetComponents[0].current.state.divided && !this.subnetComponents[1].current.state.divided) ||
+					window.confirm("Tem certeza de quer fundir essas duas sub-redes?\nTodas as sub-redes dessas duas serão apagadas para sempre.")) {
+				
+				COLOR_QUEUE.push(COLOR_QUEUE[0]);
+				COLOR_QUEUE.shift();
+				
+				this.props.blockRef.current.setState({divided: false, nextColor: "", subnets: undefined});
+				this.setState({divided: false});	
+			}
+
+		}
+		else if (this.canDivide()) {
 
 			COLOR_QUEUE.unshift(COLOR_QUEUE[COLOR_QUEUE.length - 1]);
 			COLOR_QUEUE.pop();
@@ -287,134 +291,181 @@ class VisualNetwork {
 			let before = this.subnetBefore();
 			let after = this.subnetAfter();
 
-			removeItem(colorList, this.color);
-			if (before) removeItem(colorList, before.color);
-			if (after) removeItem(colorList, after.color);
+			removeItem(colorList, this.props.color);
+			if (before) removeItem(colorList, before.props.color);
+			if (after) removeItem(colorList, after.props.color);
 
-			let color = colorList[0];
+			this.nextColor = colorList[0];
 
-			let subnetAddresses = this.address.subdivide();
+			this.props.blockRef.current.setState({divided: true, nextColor: this.nextColor, subnets: this.subnets});
+			this.setState({divided: !this.state.divided});
 
-			let sub1 = new VisualNetwork(subnetAddresses[0], this, this.color);
-			let sub2 = new VisualNetwork(subnetAddresses[1], this, color);
-
-			let tmpBlock = this.block.cloneNode(true) as HTMLElement;
-			this.block.parentNode.replaceChild(tmpBlock, this.block);
-			this.block = tmpBlock;
-
-			sub1.prepElements();
-			sub2.prepElements();
-
-			this.subnets[0] = sub1;
-			this.subnets[1] = sub2;
-
-			this.block.appendChild(sub1.block);
-			this.block.appendChild(sub2.block);
-
-			let ul = make("ul");
-			let li1 = make("li");
-			let li2 = make("li");
-
-			li1.appendChild(sub1.treeText);
-			li2.appendChild(sub2.treeText);
-
-			ul.appendChild(li1);
-			ul.appendChild(li2);
-
-			this.treeText.parentNode.appendChild(ul);
-
-			this.block.className = "subnet-block";
-			this.treeText.className = "subnet-merge";
-
-			return true;
 		}
-		return false;
+
 
 	}
 
 	/**
-	 * Merges this network's subnets. Returns false on failure.
+	 * Handles mouse entering events of this branch.
 	 */
-	public merge(): boolean {
+	private handleMouseEnter = () => {
+		if (this.props.parent)
+			this.props.blockRef.current.setState({highlighted: true});
+	}
 
-		if (this.hasSubnets()) {
+	/**
+	 * Handles mouse leaving events of this branch.
+	 */
+	private handleMouseLeave = () => {
+		if (this.props.parent)
+			this.props.blockRef.current.setState({highlighted: false});
+	}
 
-			COLOR_QUEUE.push(COLOR_QUEUE[0]);
-			COLOR_QUEUE.shift();
+	componentWillReceiveProps(props: SubnetBranchProps) {		
+		this.subnets = props.address.subdivide();
+		this.setState({divided: false});
+		props.blockRef.current.setState({divided: false});
+	}
 
-			this.subnets = [undefined, undefined];
+	constructor(props: SubnetBranchProps) {
+		super(props);		
+		this.subnets = props.address.subdivide();
+		this.subnetComponents = [React.createRef(), React.createRef()];
+	}	
 
-			clearChildren(this.block);
+	render() {
+		return (
+			<>
+				<span
+					onMouseEnter={this.handleMouseEnter}
+					onMouseLeave={this.handleMouseLeave}
+					className={this.props.color + " " + (this.state.divided ? "subnet-merge" : "subnet-divide") + (this.canDivide()? "" : " disabled")}
+					onClick={this.handleClick}>
 
-			let uls = (this.treeText.parentNode as HTMLElement).getElementsByTagName('ul');
-
-			for (let i = 0; i < uls.length; i++) {
-				clearChildren(uls[i]);
-				uls[i].remove();
-			}
-
-			let tmpBlock = this.block.cloneNode(true) as HTMLElement;
-			this.block.parentNode.replaceChild(tmpBlock, this.block);
-			this.block = tmpBlock;
-
-			let tmpTree = this.treeText.cloneNode(true) as HTMLElement;
-			this.treeText.parentNode.replaceChild(tmpTree, this.treeText);
-			this.treeText = tmpTree;
-
-			this.prepElements();
-			return true;
-		}
-		else {
-			return false;
-		}
+					{this.props.address.toString() + " (" + this.props.address.numberOfHosts() + " hosts)"}
+				</span>
+				{
+					this.state.divided && 
+						<ul>
+							<li><SubnetBranch blockRef={this.props.blockRef.current.subnetBlockComponents[0]} ref={this.subnetComponents[0]} address={this.subnets[0]} parent={this} color={this.props.color}/></li>
+							<li><SubnetBranch blockRef={this.props.blockRef.current.subnetBlockComponents[1]} ref={this.subnetComponents[1]} address={this.subnets[1]} parent={this} color={this.nextColor}/></li>
+						</ul>
+				}
+			</>
+		);
 	}
 
 }
 
-// +==============================================+
+interface SubnetStripProps {
+	address: Address,
+	blockRef: RefObject<SubnetBlock>
+}
 
-class Undernets extends Component {
+/**
+ * The component representing the strip of colored blocks.
+ */
+class SubnetStrip extends Component<SubnetStripProps> {
 
-    componentDidMount() {
+	/**
+	 * A reference to the tooltip of the colored strip.
+	 */
+	private tooltip: RefObject<HTMLSpanElement>;
 
-		document.body.className = "theme-layer3";
+	/**
+	 * Displays a certain text through the tooltip.
+	 */
+	private showTooltip = (text: string) => {
+		this.tooltip.current.textContent = text;
+		this.tooltip.current.style.opacity = "1";
+		this.tooltip.current.style.transform = "scaleY(1)";
+		this.tooltip.current.style.display = 'inline-block';
+	}
 
-        id("address").addEventListener("keydown", function (ev: KeyboardEvent): void {
-            if (ev.key === "Enter")
-                reset();
-        });
-        
-        id("button_generate").addEventListener("click", function (ev: MouseEvent): void {
-            reset();
-        });
+	/**
+	 * Hides the tooltip.
+	 */
+	private hideTooltip = () => {
+		this.tooltip.current.style.opacity = "0";
+		this.tooltip.current.style.transform = "scaleY(0)";
+	}
 
-        init()
+	componentWillReceiveProps(props: SubnetStripProps) {
+		if (!props.address) {
+			this.props.blockRef.current.setState({divided: false});
+		}
+	}
 
-    }
+	constructor(props) {
+		super(props);
+		this.tooltip = React.createRef();
+	}
 
-    render() {
-        return (
-            <main>
-                <label htmlFor="address">Rede/Máscara</label>
-                <h1>
-                    <input type="text" name="address" id="address" placeholder="0.0.0.0/0"/>
-                    <button type="button" id="button_generate">Visualizar Rede</button>
-                </h1>
-                <div id="error_wrapper"></div>
-                <div className="blocks-wrapper">
-                    <div className="subnet-block ss-0" id="root_block">
-                        <h1>Insira a sua rede</h1>
-                    </div>
-                    <div className="tooltip-wrapper">
-                        <span id="tooltip">Informações das suas sub-redes ficarão aqui</span>
-                    </div>
-                </div>
+	render() {
+		return (
+			<div className="blocks-wrapper " onMouseLeave={this.hideTooltip}>
+				<SubnetBlock ref={this.props.blockRef} address={this.props.address} color="ss-0" id="root_block" content={ !this.props.address? "Insira a sua rede" : ""} showTooltip={this.showTooltip}/>
+				<div className="tooltip-wrapper">
+					<span id="tooltip" ref={this.tooltip}>Informações das suas sub-redes ficarão aqui</span>
+				</div>
+			</div>
+		);
+	}
 
-                <div className="subnet-tree" id="root_tree"></div>
+}
 
-            </main>
-        );
-    }
+interface SubnetBlockProps {
+	address: Address,
+	color: string,
+	id?: string
+	content?: string
+	showTooltip: (string)=>void
+}
+
+/**
+ * The component representing a colored block.
+ */
+class SubnetBlock extends Component<SubnetBlockProps> {
+
+	/**
+	 * The references to the child blocks (subnets of this block's network).
+	 */
+	public subnetBlockComponents: [RefObject<SubnetBlock>, RefObject<SubnetBlock>];
+
+	state = {
+		highlighted: false,
+		divided: false,
+		subnets: [undefined, undefined],
+		nextColor: ""
+	}
+
+	/**
+	 * Handles mouse entering events.
+	 */
+	private handleMouseEnter = () => {
+		if (this.props.address && !this.state.divided)
+			this.props.showTooltip(this.props.address.toString() + " (" + this.props.address.numberOfHosts() + " hosts)");
+	}
+
+	constructor(props: SubnetBlockProps) {
+		super(props);
+		this.subnetBlockComponents = [React.createRef(), React.createRef()];
+	}
+	
+	render() {
+		return (
+			<div id={this.props.id} className={"subnet-block " + this.props.color + (this.state.highlighted? " highlight" : "")} onMouseEnter={this.handleMouseEnter}>
+				{ this.props.content? <h1>{this.props.content}</h1>:""}
+				{ 
+					this.state.divided &&
+					<>
+						<SubnetBlock address={this.state.subnets[0]} color={this.props.color} ref={this.subnetBlockComponents[0]} showTooltip={this.props.showTooltip}/>
+						<SubnetBlock address={this.state.subnets[1]} color={this.state.nextColor} ref={this.subnetBlockComponents[1]} showTooltip={this.props.showTooltip}/>
+					</>
+				}
+			</div>
+		);
+	}
 
 }
 
