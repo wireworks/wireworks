@@ -1,58 +1,26 @@
 import React, { ChangeEvent, Component, FC } from "react";
+import variables from "src/sass/pages/tcpcarrier.scss";
 import "src/sass/pages/tcpcarrier.scss";
 
 
 
-const TcpPacket: FC<{progress: number}> = (props) =>
+const TcpPacket: FC = () =>
 
-<div className="tcp-slider">
-    <div className="tcp-packet tcp-p-hint tcp-p-left"></div>
-    <div className="tcp-packet tcp-p-hint tcp-p-right"></div>
-    <div className="tcp-slider tcp-25padding" style={{width: props.progress + "%"}}>
-        <div className="tcp-packet tcp-p-real tcp-p-right"></div>
+<div className="tcp-p-rail">
+    <div className="tcp-p-slider">
+        <div className="tcp-p-ball"></div>
     </div>
+    <div className="tcp-p-ball tcp-p-hint tcp-left"></div>
+    <div className="tcp-p-ball tcp-p-hint tcp-right"></div>
 </div>
 
 
 
-class TcpCarrier extends Component<{}, {progress: number[], speed: number}> {
+class TcpCarrier extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            speed: 1.1,
-            progress: Array(10).fill(0)
-        }
+    test = () => {
+        document.getElementsByClassName("tcp-p-slider")[0].style.transform = "translateX(100%)";
     }
-
-    tick = () => {
-
-        this.setState((state) => {
-
-            let newProgress = state.progress;
-            let index = newProgress.findIndex((val) => val < 100);
-
-            if (index !== -1) {
-                newProgress[index] += this.state.speed;
-
-                if(newProgress[index] > 100)
-                    newProgress[index] = 100;
-
-                window.requestAnimationFrame(this.tick);
-            }
-
-            return {progress: newProgress}
-        });
-    }
-
-    reset = () => {
-        let zero = this.state.progress.fill(0);
-        this.setState({progress: zero});
-    }
-
-    changeSpeed = (newSpeed: ChangeEvent<HTMLInputElement>) => 
-        this.setState({speed: parseFloat(newSpeed.target.value)})
-
 
     //////////////////////////////////////////////////////////////////
 
@@ -61,23 +29,27 @@ class TcpCarrier extends Component<{}, {progress: number[], speed: number}> {
             <main id="tcp-carrier">
 
                 {/* TCP animation */}
-                <div className="tcp-container">
-                    <div>
-                        <div className="tcp-window-slider tcp-p-left">
-                            <div className="tcp-window"/>
+                <div className="tcp-cont-packet">
+
+                    <div className="tcp-cont-window">
+                        <div className="tcp-window-wrapper tcp-left">
+                            <div className="tcp-window"></div>
                         </div>
-                        {this.state.progress.map((val, key) => <TcpPacket key={key} progress={val}/>)}
+                        <div className="tcp-window-wrapper tcp-right">
+                            <div className="tcp-window"></div>
+                        </div>
+                        
                     </div>
+
+                    {Array(20).fill(<TcpPacket/>)}
                 </div>
 
                 {/* Menu */}
-                <div>
-
-                    <button onClick={this.tick}>Start</button>
-                    <button onClick={this.reset}>Reset</button>
-
-                    <input type="range" value={this.state.speed} min={0.1} max={2} step={0.1} onChange={this.changeSpeed}/>
-
+                <div className="tcp-cont-menu">
+                    <div>
+                        <button onClick={this.test}>Start</button>
+                        <button>Stop</button>
+                    </div>
                 </div>
                 
             </main>
