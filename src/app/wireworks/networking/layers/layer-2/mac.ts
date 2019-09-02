@@ -80,9 +80,9 @@ export default class MAC {
 		}
 
 		this.asString = "";
-
+		
 		for (let i = 0; i < 6; i++) {
-			const piece = str[i]+str[i+1];
+			const piece = str[i*2]+str[(i*2)+1];
 			this.bytes[i] = new Byte(parseInt(piece, 16));
 			this.asString += piece;
 			if (i < 6-1) this.asString += "-";
