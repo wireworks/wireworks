@@ -47,7 +47,6 @@ main#tcp-carrier {
 }
 
 .tcp-p-slider {
-    transition: all 1s;
     flex: 1;
     margin-right: $ball-size;
 }
@@ -79,6 +78,7 @@ main#tcp-carrier {
     position: absolute;
     width: $ball-size + $margin-size * 2;
     height: $ball-size + $margin-size * 2;
+    transition: all 1s;
 }
 
 .tcp-window {
