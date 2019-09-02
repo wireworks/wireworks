@@ -4,7 +4,7 @@
 // Version: 1.0 (2019-09-01)
 
 import React, { Component, RefObject } from "react";
-import FlowCanvas, { FlowCanvasProps, Node, Label, NodeConnection, Line } from "../../../components/FlowCanvas";
+import FlowCanvas, { Node, Label, NodeConnection, Line } from "../../../components/FlowCanvas";
 import { Address, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE } from "../../../wireworks/networking/layers/layer-3/address";
 import ErrorBox from "../../../components/ErrorBox";
 import { ERROR_BYTE_RANGE } from "../../../wireworks/networking/byte";
@@ -22,6 +22,16 @@ import("src/images/layers/2/router.png").then(res => routerImage.src = res.defau
 import("src/images/layers/2/internet.png").then(res => internetImage.src = res.default);
 import("src/images/layers/2/switch.png").then(res => switchImage.src = res.default);
 
+// Simulation speed constants.
+
+const verySlowSpeed = 10;
+const slowSpeed = 25;
+const normalSpeed = 100;
+const fastSpeed = 400;
+const veryFastSpeed = 600;
+
+type Speed = "veryslow" | "slow" | "normal" | "fast" | "veryfast";
+
 type MACMachine = {
 	ip: Address,
 	mac: MAC,
@@ -33,9 +43,15 @@ type MACMachine = {
 class MacFetch extends Component {
 
 	private txtTargetAddress: RefObject<HTMLInputElement>;
-
+	private selectOrigin: RefObject<HTMLSelectElement>;
+	private selectSpeed: RefObject<HTMLSelectElement>;
+	private macCanvas: RefObject<MacFetchCanvas>;
+	
 	state = {
-		errorMessage: null as string
+		errorMessage: null as string,
+		origin: undefined as "A"|"B"|"C",
+		target: undefined as Address,
+		speed: undefined as Speed
 	}
 
 	public run = () => {
@@ -51,7 +67,9 @@ class MacFetch extends Component {
 				errStr = "Este é um endereço de rede. Escolha outro endereço.";
 				throw Error;
 			}
-				
+
+			this.setState({origin: this.selectOrigin.current.value, target: address, speed: this.selectSpeed.current.value});
+			this.macCanvas.current.run();							
 		
 		} catch (error) {
 			
@@ -87,6 +105,9 @@ class MacFetch extends Component {
 	constructor(props: any) {
 		super(props);
 		this.txtTargetAddress = React.createRef();
+		this.selectSpeed = React.createRef();
+		this.selectOrigin = React.createRef();
+		this.macCanvas = React.createRef();
 	}
 	
 
@@ -97,7 +118,7 @@ class MacFetch extends Component {
 					<div>
 						<label htmlFor="origin">Host de Origem</label>
 						<div>
-							<select id="origin" defaultValue="A">
+							<select id="origin" ref={this.selectOrigin} defaultValue="A">
 								<option value="A">Computador A</option>
 								<option value="B">Computador B</option>
 								<option value="C">Computador C</option>
@@ -110,10 +131,22 @@ class MacFetch extends Component {
 							<input type="text" id="target_address" ref={this.txtTargetAddress} onKeyDown={ (ev) => { if(ev.key === "Enter") this.run() }} placeholder="0.0.0.1/0"/>
 						</div>
 					</div>
-					<button type="button" onClick={this.run}>Visualizar</button>
+					<div>
+						<label htmlFor="speed">Velocidade</label>
+						<div>
+							<select name="speed" id="speed" ref={this.selectSpeed} defaultValue="normal">
+								<option value="veryslow">Muito Lento</option>
+								<option value="slow">Lento</option>
+								<option value="normal">Normal</option>
+								<option value="fast">Rápido</option>
+								<option value="veryfast">Muito Rápido</option>
+							</select>
+							<button onClick={this.run}>Visualizar</button>
+						</div>
+					</div>
 				</div>
 				<ErrorBox errorMessage={this.state.errorMessage}/>
-				<MacFetchCanvas/>
+				<MacFetchCanvas ref={this.macCanvas} origin={this.state.origin} target={this.state.target} speed={this.state.speed}/>
 			</main>
 		);
 	}
@@ -122,71 +155,78 @@ class MacFetch extends Component {
 
 export default MacFetch;
 
-class MacFetchCanvas extends Component {
+interface MacFetchCanvasProps {
+	origin: "A"|"B"|"C",
+	target: Address,
+	speed: Speed
+}
+
+class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 
 	private flowCanvas: RefObject<FlowCanvas>;
-	//																								added in ctor
-	private mSwitch =  {ip: new Address("192.168.0.1/24"), mac: new MAC("00-00-00-00-00-00"), connections: [], isSwitch: true} as MACMachine;
-	private pcA =      {ip: new Address("192.168.0.1/24"), mac: new MAC("00-00-00-00-00-00"), connections: [this.mSwitch], isSwitch: false} as MACMachine;
-	private pcB =      {ip: new Address("192.168.0.1/24"), mac: new MAC("00-00-00-00-00-00"), connections: [this.mSwitch], isSwitch: false} as MACMachine;
-	private pcC =      {ip: new Address("192.168.0.1/24"), mac: new MAC("00-00-00-00-00-00"), connections: [this.mSwitch], isSwitch: false} as MACMachine;
-	private router =   {ip: new Address("192.168.0.1/24"), mac: new MAC("00-00-00-00-00-00"), connections: [this.mSwitch], isSwitch: false} as MACMachine;
+	
+	private mSwitch =  {ip: undefined, mac: undefined, connections: [], isSwitch: true} as MACMachine;
+	private pcA =      {ip: new Address("10.10.0.2/24"), mac: new MAC("00-00-00-AA-AA-AA"), connections: [this.mSwitch], isSwitch: false} as MACMachine;
+	private pcB =      {ip: new Address("10.10.0.3/24"), mac: new MAC("00-00-00-BB-BB-BB"), connections: [this.mSwitch], isSwitch: false} as MACMachine;
+	private pcC =      {ip: new Address("10.10.0.4/24"), mac: new MAC("00-00-00-CC-CC-CC"), connections: [this.mSwitch], isSwitch: false} as MACMachine;
+	private router =   {ip: new Address("10.10.0.1/24"), mac: new MAC("00-00-00-F0-F0-F0"), connections: [this.mSwitch], isSwitch: false} as MACMachine;
+
+	public run = () => {
+
+	}
 
 	resetCanvas = () => {
 
-		let pl = 80; // padding
-		let pr = 80;
+		let pl = 100; // padding
+		let pr = 100;
 		let pt = 40;
-		let pb = 70;
+		let pb = 90;
 
-		let w = this.flowCanvas.current.props.width;
-		let h = this.flowCanvas.current.props.height;
+		const fCanvas = this.flowCanvas.current;
+
+		let w = fCanvas.props.width;
+		let h = fCanvas.props.height;
 		
-		this.pcA.node  =     new Node({ x: pl, y: h - pb },                    60, 60, {l: 10, t: 10, r: 10, b: 10}, computerImage, 0.5);
-		this.pcB.node  =     new Node({ x: w/2, y: h - pb },                   60, 60, {l: 10, t: 10, r: 10, b: 10}, computerImage, 0.5);
-		this.pcC.node  =     new Node({ x: w-pr, y: h - pb },                  60, 60, {l: 10, t: 10, r: 10, b: 10}, computerImage, 0.5);
-		let internetNode =   new Node({ x: w/2, y: pt },                       60, 60, {l: 10, t: 10, r: 10, b: 10}, internetImage, 0.5);
-		this.router.node =   new Node({ x: w/2, y: internetNode.pos.y + 120 }, 60, 60, {l: 10, t: 10, r: 10, b: 10}, routerImage,   0.5);
-		this.mSwitch.node =  new Node({ x: w/2, y: (this.pcB.node.pos.y + this.router.node.pos.y)/2 }, 60, 30, {l: 10, t: 10, r: 10, b: 10}, switchImage,   0.5);
+		this.pcA.node  =    new Node({ x: pl, y: h - pb },                    60, 60, {l: 10, t: 10, r: 10, b: 10}, computerImage, 0.5);
+		this.pcB.node  =    new Node({ x: w/2, y: h - pb },                   60, 60, {l: 10, t: 10, r: 10, b: 10}, computerImage, 0.5);
+		this.pcC.node  =    new Node({ x: w-pr, y: h - pb },                  60, 60, {l: 10, t: 10, r: 10, b: 10}, computerImage, 0.5);
+		let internetNode =  new Node({ x: w/2, y: pt },                       60, 60, {l: 10, t: 10, r: 10, b: 10}, internetImage, 0.5);
+		this.router.node =  new Node({ x: w/2, y: internetNode.pos.y + 120 }, 60, 60, {l: 10, t: 10, r: 10, b: 10}, routerImage,   0.5);
+		this.mSwitch.node = new Node({ x: w/2, y: (this.pcB.node.pos.y + this.router.node.pos.y)/2 }, 60, 30, {l: 10, t: 10, r: 10, b: 10}, switchImage,   0.5);
 
-		let pcALabel =    new Label({x: 0, y: 0},   "Computador A", "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 14);
-		let pcBLabel =    new Label({x: 0, y: 0},   "Computador B", "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 14);
-		let pcCLabel =    new Label({x: 0, y: 0},   "Computador C", "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 14);
-		let routerLabel = new Label({x: 0, y: 0},   "Roteador",     "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 14);
-		let internetLabel = new Label({x: 0, y: 0}, "Internet",     "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 14);
+		let internetLabel = new Label({x: 0, y: 0}, "Internet",     "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 12);
+		internetLabel.pos = fCanvas.getAlignedPoint(internetNode, internetLabel, "center", "right");
 
-		pcALabel.pos =      this.flowCanvas.current.getAlignedPoint(this.pcA.node, pcALabel, "bottom", "center");
-		pcBLabel.pos =      this.flowCanvas.current.getAlignedPoint(this.pcB.node, pcBLabel, "bottom", "center");
-		pcCLabel.pos =      this.flowCanvas.current.getAlignedPoint(this.pcC.node, pcCLabel, "bottom", "center");
-		routerLabel.pos =   this.flowCanvas.current.getAlignedPoint(this.router.node, routerLabel, "center", "right");
-		internetLabel.pos = this.flowCanvas.current.getAlignedPoint(internetNode, internetLabel, "center", "right");
+		let pcALabel =    new Label({x: 0, y: 0}, "Computador A\n" + this.pcA.ip.toString() + "\n" + this.pcA.mac.toString(), "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 12, "center");
+		let pcBLabel =    new Label({x: 0, y: 0}, "Computador B\n" + this.pcB.ip.toString() + "\n" + this.pcB.mac.toString(), "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 12, "center");
+		let pcCLabel =    new Label({x: 0, y: 0}, "Computador C\n" + this.pcC.ip.toString() + "\n" + this.pcC.mac.toString(), "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 12, "center");
+		let routerLabel = new Label({x: 0, y: 0}, "Roteador\n" + this.router.ip.toString() + "\n" + this.router.mac.toString(),     "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 12);
 
-		let pcASwitchLine = new Line(this.pcA.node, this.mSwitch.node, 1, "#aaaaaa", 10);
-		let pcBSwitchLine = new Line(this.pcB.node, this.mSwitch.node, 1, "#aaaaaa", 10);
-		let pcCSwitchLine = new Line(this.pcC.node, this.mSwitch.node, 1, "#aaaaaa", 10);
-		let routerSwitchLine = new Line(this.router.node, this.mSwitch.node, 1, "#aaaaaa", 10);
-		let routerInternetLine = new Line(this.router.node, internetNode, 1, "#aaaaaa", 10);
+		pcALabel.pos =    fCanvas.getAlignedPoint(this.pcA.node,    pcALabel,    "bottom", "center");
+		pcBLabel.pos =    fCanvas.getAlignedPoint(this.pcB.node,    pcBLabel,    "bottom", "center");
+		pcCLabel.pos =    fCanvas.getAlignedPoint(this.pcC.node,    pcCLabel,    "bottom", "center");
+		routerLabel.pos = fCanvas.getAlignedPoint(this.router.node, routerLabel, "center", "right");
 
-		this.flowCanvas.current.clearDrawables();
+		fCanvas.clearDrawables();
 
-		this.flowCanvas.current.addDrawable(this.pcA.node);
-		this.flowCanvas.current.addDrawable(this.pcB.node);
-		this.flowCanvas.current.addDrawable(this.pcC.node);
-		this.flowCanvas.current.addDrawable(this.mSwitch.node);
-		this.flowCanvas.current.addDrawable(this.router.node);
-		this.flowCanvas.current.addDrawable(internetNode);
-		this.flowCanvas.current.addDrawable(pcALabel);
-		this.flowCanvas.current.addDrawable(pcBLabel);
-		this.flowCanvas.current.addDrawable(pcCLabel);
-		this.flowCanvas.current.addDrawable(routerLabel);
-		this.flowCanvas.current.addDrawable(internetLabel);
-		this.flowCanvas.current.addDrawable(pcASwitchLine);
-		this.flowCanvas.current.addDrawable(pcBSwitchLine);
-		this.flowCanvas.current.addDrawable(pcCSwitchLine);
-		this.flowCanvas.current.addDrawable(routerSwitchLine);
-		this.flowCanvas.current.addDrawable(routerInternetLine);
+		fCanvas.addDrawable(this.pcA.node);
+		fCanvas.addDrawable(this.pcB.node);
+		fCanvas.addDrawable(this.pcC.node);
+		fCanvas.addDrawable(this.mSwitch.node);
+		fCanvas.addDrawable(this.router.node);
+		fCanvas.addDrawable(internetNode);
+		fCanvas.addDrawable(pcALabel);
+		fCanvas.addDrawable(pcBLabel);
+		fCanvas.addDrawable(pcCLabel);
+		fCanvas.addDrawable(routerLabel);
+		fCanvas.addDrawable(internetLabel);
+		fCanvas.addDrawable(new Line(this.pcA.node, this.mSwitch.node, 1, "#aaaaaa", 10));
+		fCanvas.addDrawable(new Line(this.pcB.node, this.mSwitch.node, 1, "#aaaaaa", 10));
+		fCanvas.addDrawable(new Line(this.pcC.node, this.mSwitch.node, 1, "#aaaaaa", 10));
+		fCanvas.addDrawable(new Line(this.router.node, this.mSwitch.node, 1, "#aaaaaa", 10));
+		fCanvas.addDrawable(new Line(this.router.node, internetNode, 1, "#aaaaaa", 10));
 		
-		this.flowCanvas.current.draw();
+		fCanvas.draw();
 
 	}
 
