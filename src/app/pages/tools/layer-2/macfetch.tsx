@@ -24,13 +24,21 @@ import("src/images/layers/2/switch.png").then(res => switchImage.src = res.defau
 
 // Simulation speed constants.
 
-const verySlowSpeed = 10;
-const slowSpeed = 25;
-const normalSpeed = 100;
-const fastSpeed = 400;
-const veryFastSpeed = 600;
-
 type Speed = "veryslow" | "slow" | "normal" | "fast" | "veryfast";
+
+const speedValues = {
+	veryslow: 10,
+	slow: 25,
+	normal: 50,
+	fast: 400,
+	veryfast: 600
+};
+
+// Wire colors.
+
+const grayWire = "#aaaaaa";
+const greenWire = "#a9cc78";
+const yellowWire = "#e5c16e";
 
 type MACMachine = {
 	ip: Address,
@@ -68,8 +76,14 @@ class MacFetch extends Component {
 				throw Error;
 			}
 
-			this.setState({origin: this.selectOrigin.current.value, target: address, speed: this.selectSpeed.current.value});
-			this.macCanvas.current.run();							
+			this.setState(
+				{
+					origin: this.selectOrigin.current.value,
+					target: address,
+					speed: this.selectSpeed.current.value
+				},
+				this.macCanvas.current.run
+			);
 		
 		} catch (error) {
 			
@@ -110,7 +124,6 @@ class MacFetch extends Component {
 		this.macCanvas = React.createRef();
 	}
 	
-
 	render() {
 		return (
 			<main>
@@ -126,7 +139,7 @@ class MacFetch extends Component {
 						</div>
 					</div>
 					<div>
-						<label htmlFor="target_address">Endereço IP de Destino</label>
+						<label htmlFor="target_address">IP de Destino</label>
 						<div>
 							<input type="text" id="target_address" ref={this.txtTargetAddress} onKeyDown={ (ev) => { if(ev.key === "Enter") this.run() }} placeholder="0.0.0.1/0"/>
 						</div>
@@ -165,13 +178,99 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 
 	private flowCanvas: RefObject<FlowCanvas>;
 	
-	private mSwitch =  {ip: undefined, mac: undefined, connections: [], isSwitch: true} as MACMachine;
-	private pcA =      {ip: new Address("10.10.0.2/24"), mac: new MAC("00-00-00-AA-AA-AA"), connections: [this.mSwitch], isSwitch: false} as MACMachine;
-	private pcB =      {ip: new Address("10.10.0.3/24"), mac: new MAC("00-00-00-BB-BB-BB"), connections: [this.mSwitch], isSwitch: false} as MACMachine;
-	private pcC =      {ip: new Address("10.10.0.4/24"), mac: new MAC("00-00-00-CC-CC-CC"), connections: [this.mSwitch], isSwitch: false} as MACMachine;
-	private router =   {ip: new Address("10.10.0.1/24"), mac: new MAC("00-00-00-F0-F0-F0"), connections: [this.mSwitch], isSwitch: false} as MACMachine;
+	private mSwitch: MACMachine = {ip: undefined, mac: undefined, connections: [], isSwitch: true, node: undefined};
+	private pcA: MACMachine =     {ip: new Address("10.10.0.2/24"), mac: new MAC("00-00-00-AA-AA-AA"), connections: [this.mSwitch], isSwitch: false, node: undefined};
+	private pcB: MACMachine =     {ip: new Address("10.10.0.3/24"), mac: new MAC("00-00-00-BB-BB-BB"), connections: [this.mSwitch], isSwitch: false, node: undefined};
+	private pcC: MACMachine =     {ip: new Address("10.10.0.4/24"), mac: new MAC("00-00-00-CC-CC-CC"), connections: [this.mSwitch], isSwitch: false, node: undefined};
+	private router: MACMachine =  {ip: new Address("10.10.0.1/24"), mac: new MAC("00-00-00-F0-F0-F0"), connections: [this.mSwitch], isSwitch: false, node: undefined};
+	private fixedLines: Line[] = [];
+
+	private origins = {
+		A: this.pcA,
+		B: this.pcB,
+		C: this.pcC
+	}
 
 	public run = () => {
+
+		const speed = speedValues[this.props.speed];
+		const fCanvas = this.flowCanvas.current;
+		const router = this.router;
+
+		fCanvas.stopLineAnimations();
+
+		const drawables = fCanvas.getDrawables();
+		let drawIndex = drawables.length;
+
+		while(drawIndex--) {
+			if(drawables[drawIndex] instanceof Line && this.fixedLines.indexOf(drawables[drawIndex] as Line) < 0) {
+				fCanvas.removeDrawable(drawables[drawIndex]);
+			}
+		}
+
+		let lookingFor = this.props.target;
+
+		const response = function(path: MACMachine[]) {
+			
+			let macStr = path[path.length-1].mac.toString();
+			let connections: NodeConnection[] = [];
+
+			for (let i = path.length-1; i >= 1; i--) {
+				const machine = path[i];
+
+				connections.push({
+					from: machine.node,
+					to: path[i-1].node,
+					strokeStyle: greenWire,
+					lineWidth: 5,
+					speed: speed,
+					labelText: macStr
+				});
+				
+			}
+
+			fCanvas.connectMultipleNodes(connections);
+
+		}
+
+		const nextHop = function (previous: MACMachine, from: MACMachine, path: MACMachine[]) {
+		
+			path.push(from);
+
+			for (let i = 0; i < from.connections.length; i++) {
+
+				const to = from.connections[i];
+	
+				if (to != previous) {
+					let line = fCanvas.connectNodes(
+						from.node,
+						to.node,
+						yellowWire,
+						5,
+						speed,
+						"MAC de "+lookingFor.toString()+"?",
+						() => { 
+							fCanvas.removeDrawable(line);
+							// path.push(to);
+
+							if (to.connections.length > 1)
+								nextHop(from, to, path);
+							else {
+								if (to.ip.compare(lookingFor) || ((to === router) && !to.ip.getNetworkAddress().compare(lookingFor.getNetworkAddress()))) {
+									path.push(to);
+									response(path);
+								}
+							}
+
+						}
+					);
+				}
+				
+			}
+
+		}
+
+		nextHop(undefined, this.origins[this.props.origin], []);
 
 	}
 
@@ -179,7 +278,7 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 
 		let pl = 100; // padding
 		let pr = 100;
-		let pt = 40;
+		let pt = 50;
 		let pb = 90;
 
 		const fCanvas = this.flowCanvas.current;
@@ -187,15 +286,15 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 		let w = fCanvas.props.width;
 		let h = fCanvas.props.height;
 		
-		this.pcA.node  =    new Node({ x: pl, y: h - pb },                    60, 60, {l: 10, t: 10, r: 10, b: 10}, computerImage, 0.5);
-		this.pcB.node  =    new Node({ x: w/2, y: h - pb },                   60, 60, {l: 10, t: 10, r: 10, b: 10}, computerImage, 0.5);
-		this.pcC.node  =    new Node({ x: w-pr, y: h - pb },                  60, 60, {l: 10, t: 10, r: 10, b: 10}, computerImage, 0.5);
-		let internetNode =  new Node({ x: w/2, y: pt },                       60, 60, {l: 10, t: 10, r: 10, b: 10}, internetImage, 0.5);
-		this.router.node =  new Node({ x: w/2, y: internetNode.pos.y + 120 }, 60, 60, {l: 10, t: 10, r: 10, b: 10}, routerImage,   0.5);
-		this.mSwitch.node = new Node({ x: w/2, y: (this.pcB.node.pos.y + this.router.node.pos.y)/2 }, 60, 30, {l: 10, t: 10, r: 10, b: 10}, switchImage,   0.5);
+		let internetNode =  new Node({ x: pr,  y: pt },      60, 60, {l: 10, t: 10, r: 10, b: 10}, internetImage, 0.5);
+		this.router.node =  new Node({ x: w/2, y: pt },		 60, 60, {l: 10, t: 10, r: 10, b: 10}, routerImage,   0.5);
+		this.pcB.node  =    new Node({ x: w/2, y: h - pb },  60, 60, {l: 10, t: 10, r: 10, b: 10}, computerImage, 0.5);
+		this.mSwitch.node = new Node({ x: w/2,  y: (this.pcB.node.pos.y + this.router.node.pos.y)/2 },  60, 30, {l: 10, t: 10, r: 10, b: 10}, switchImage,   0.5);
+		this.pcA.node  =    new Node({ x: pl,   y: (this.mSwitch.node.pos.y + this.pcB.node.pos.y)/2 }, 60, 60, {l: 10, t: 10, r: 10, b: 10}, computerImage, 0.5);
+		this.pcC.node  =    new Node({ x: w-pr, y: (this.mSwitch.node.pos.y + this.pcB.node.pos.y)/2 }, 60, 60, {l: 10, t: 10, r: 10, b: 10}, computerImage, 0.5);
 
 		let internetLabel = new Label({x: 0, y: 0}, "Internet",     "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 12);
-		internetLabel.pos = fCanvas.getAlignedPoint(internetNode, internetLabel, "center", "right");
+		internetLabel.pos = fCanvas.getAlignedPoint(internetNode, internetLabel, "bottom", "center");
 
 		let pcALabel =    new Label({x: 0, y: 0}, "Computador A\n" + this.pcA.ip.toString() + "\n" + this.pcA.mac.toString(), "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 12, "center");
 		let pcBLabel =    new Label({x: 0, y: 0}, "Computador B\n" + this.pcB.ip.toString() + "\n" + this.pcB.mac.toString(), "#505050", "transparent", 6, 0, "14px Work Sans, Montserrat, sans-serif", 12, "center");
@@ -206,6 +305,14 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 		pcBLabel.pos =    fCanvas.getAlignedPoint(this.pcB.node,    pcBLabel,    "bottom", "center");
 		pcCLabel.pos =    fCanvas.getAlignedPoint(this.pcC.node,    pcCLabel,    "bottom", "center");
 		routerLabel.pos = fCanvas.getAlignedPoint(this.router.node, routerLabel, "center", "right");
+
+		this.fixedLines = [
+			new Line(this.pcA.node, this.mSwitch.node, 1, grayWire, 10),
+			new Line(this.pcB.node, this.mSwitch.node, 1, grayWire, 10),
+			new Line(this.pcC.node, this.mSwitch.node, 1, grayWire, 10),
+			new Line(this.router.node, this.mSwitch.node, 1, grayWire, 10),
+			new Line(this.router.node, internetNode, 1, grayWire, 10)
+		];
 
 		fCanvas.clearDrawables();
 
@@ -220,12 +327,11 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 		fCanvas.addDrawable(pcCLabel);
 		fCanvas.addDrawable(routerLabel);
 		fCanvas.addDrawable(internetLabel);
-		fCanvas.addDrawable(new Line(this.pcA.node, this.mSwitch.node, 1, "#aaaaaa", 10));
-		fCanvas.addDrawable(new Line(this.pcB.node, this.mSwitch.node, 1, "#aaaaaa", 10));
-		fCanvas.addDrawable(new Line(this.pcC.node, this.mSwitch.node, 1, "#aaaaaa", 10));
-		fCanvas.addDrawable(new Line(this.router.node, this.mSwitch.node, 1, "#aaaaaa", 10));
-		fCanvas.addDrawable(new Line(this.router.node, internetNode, 1, "#aaaaaa", 10));
-		
+
+		for (let i = 0; i < this.fixedLines.length; i++) {
+			fCanvas.addDrawable(this.fixedLines[i]);
+		}
+
 		fCanvas.draw();
 
 	}
