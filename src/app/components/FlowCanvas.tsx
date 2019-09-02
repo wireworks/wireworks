@@ -131,8 +131,10 @@ export class Label implements Drawable {
 	public borderRadius: number;
 	public font: string;
 	public textHeight: number;
+	public lineDistance: number;
+	public textAlign: "left"|"center"|"right";
 
-	constructor(pos: Point, text: string, textColor: string, backgroundColor: string, padding: number, borderRadius: number, font: string, textHeight: number) {
+	constructor(pos: Point, text: string, textColor: string, backgroundColor: string, padding: number, borderRadius: number, font: string, textHeight: number, textAlign:"left"|"center"|"right" = "left", lineDistance: number = 3) {
 		this.pos = pos;
 		this.text = text;
 		this.textColor = textColor;
@@ -141,9 +143,12 @@ export class Label implements Drawable {
 		this.borderRadius = borderRadius;
 		this.font = font;
 		this.textHeight = textHeight;
+		this.lineDistance = lineDistance;
+		this.textAlign = textAlign;
 	}
 
 	public draw(ctx: CanvasRenderingContext2D): void {
+		
 		if (this.visible) {
 			let width = this.getRealWidth(ctx);
 			let height = this.getRealHeight();
@@ -153,7 +158,26 @@ export class Label implements Drawable {
 
 			ctx.fillStyle = this.textColor;
 			ctx.font = this.font;
-			ctx.fillText(this.text, this.pos.x + this.padding - (width / 2), this.pos.y + this.padding + this.textHeight - (height / 2));
+
+			let lines = this.text.split("\n");
+			
+			for (let i = 0; i < lines.length; i++) {
+				const line = lines[i];
+				const lineWidth = ctx.measureText(line).width + (2*this.padding);
+				let spacer = width-lineWidth;
+
+				switch (this.textAlign) {
+					default:
+					case "left":
+						spacer = 0;
+						break;
+					case "center":
+						spacer /= 2;
+						break;
+				}
+
+				ctx.fillText(line, this.pos.x + this.padding - (width / 2) + spacer, this.pos.y + this.padding + ((i+1)*this.textHeight) + ((i)*this.lineDistance) - (height / 2));
+			}
 		}
 	}	
 	
@@ -161,15 +185,28 @@ export class Label implements Drawable {
 	 * Returns the width of this Label, considering the width of the text and the padding.
 	 */
 	public getRealWidth(ctx: CanvasRenderingContext2D): number {
+		
+		let biggest = 0;
 		ctx.font = this.font;
-		return ctx.measureText(this.text).width + (2*this.padding);
+
+		let lines = this.text.split('\n');
+		
+		for (let i = 0; i < lines.length; i++) {
+			const line = lines[i];
+			let w = ctx.measureText(line).width + (2*this.padding);
+			if (w > biggest) biggest = w;
+		}
+
+		return biggest;
 	}
 
 	/**
 	 * Returns the height of this Label, considering the height of the text and the padding.
 	 */
 	public getRealHeight(): number {
-		return this.textHeight + (2*this.padding);
+		// return this.textHeight + (2*this.padding);
+		let lines = this.text.split('\n').length;
+		return (lines * this.textHeight) + ((lines-1) * this.lineDistance) + (2*this.padding);
 	}
 
 }
@@ -499,8 +536,8 @@ class FlowCanvas extends Component<FlowCanvasProps> {
 		}
 
 		return {
-			x: from.pos.x + offX * (fromWidth + toWidth),
-			y: from.pos.y + offY * (fromHeight + toHeight)
+			x: from.pos.x + (offX * (fromWidth + toWidth)),
+			y: from.pos.y + (offY * (fromHeight + toHeight))
 		};
 
 	}
