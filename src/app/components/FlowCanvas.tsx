@@ -441,7 +441,6 @@ class FlowCanvas extends Component<FlowCanvasProps> {
 			if (line.time >= 1) {
 
 				line.time = 1;
-				scope.draw();
 
 				line.label = undefined;
 
@@ -450,6 +449,8 @@ class FlowCanvas extends Component<FlowCanvasProps> {
 				}
 
 				clearInterval(interval);
+				
+				scope.draw();
 			}
 
 		}, this.props.fixedDeltaTime);
