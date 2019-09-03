@@ -56,7 +56,10 @@ const Wireworks: FC = () =>
 				<Route path="/" exact component={MainMenu} />
 
 				{/* Layer 2*/}
-				<Route path="/layers/2/macfetch" component={MacFetch} />
+				<Route path="/layers/2/macfetch" render={() => {return <MacFetch ipFetch={false}/>;}} />
+
+				{/* Layer 2*/}
+				<Route path="/layers/2/ipfetch" render={() => { return <MacFetch ipFetch={true}/>;}} />				
 
 				{/* Layer 3 */}
 				<Route path="/layers/3/ipbits" component={Ipbits} />

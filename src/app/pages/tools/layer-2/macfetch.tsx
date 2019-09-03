@@ -8,7 +8,7 @@ import FlowCanvas, { Node, Label, NodeConnection, Line } from "../../../componen
 import { Address, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE } from "../../../wireworks/networking/layers/layer-3/address";
 import ErrorBox from "../../../components/ErrorBox";
 import { ERROR_BYTE_RANGE } from "../../../wireworks/networking/byte";
-import MAC from "../../../wireworks/networking/layers/layer-2/mac";
+import MAC, { ERROR_MAC_ADDRESS_PARSE } from "../../../wireworks/networking/layers/layer-2/mac";
 
 // Images used in the canvas.
 
@@ -53,10 +53,14 @@ type MACMachine = {
 
 // +==============================================+
 
-class MacFetch extends Component {
+interface MacFetchProps {
+	ipFetch: boolean
+}
+
+class MacFetch extends Component<MacFetchProps> {
 
 	/** The reference to the target IP input. */
-	private txtTargetIP: RefObject<HTMLInputElement>;
+	private txtTarget: RefObject<HTMLInputElement>;
 	/** The reference to the origin select. */
 	private selectOrigin: RefObject<HTMLSelectElement>;
 	/** The reference to the speed select. */
@@ -67,7 +71,7 @@ class MacFetch extends Component {
 	state = {
 		errorMessage: null as string,
 		origin: undefined as "A"|"B"|"C",
-		target: undefined as Address,
+		target: undefined as Address|MAC,
 		speed: undefined as Speed
 	}
 
@@ -81,17 +85,24 @@ class MacFetch extends Component {
 	
 		try {
 			
-			let address = new Address(this.txtTargetIP.current.value, undefined, true);
-			
-			if (address.isNetworkAddress()) {
-				errStr = "Este é um endereço de rede. Escolha outro endereço.";
-				throw Error;
+			let target: Address|MAC;
+
+			if (this.props.ipFetch) {
+				target = new MAC(this.txtTarget.current.value);
+			}
+			else {
+				target = new Address(this.txtTarget.current.value, undefined, true);
+				
+				if (target.isNetworkAddress()) {
+					errStr = "Este é um endereço de rede. Escolha outro endereço.";
+					throw Error;
+				}
 			}
 
 			this.setState(
 				{
 					origin: this.selectOrigin.current.value,
-					target: address,
+					target: target,
 					speed: this.selectSpeed.current.value
 				},
 				this.macCanvas.current.run
@@ -102,6 +113,9 @@ class MacFetch extends Component {
 			if(!errStr){
 				
 				switch (error.name) {
+					case ERROR_MAC_ADDRESS_PARSE:
+						errStr = "O MAC do destino deve possuir o formato 00-00-00-00-00-00.";
+						break;
 					case ERROR_ADDRESS_PARSE:
 						errStr = "O IP do destino deve possuir o formato 0.0.0.0/0.";
 						break;
@@ -130,7 +144,7 @@ class MacFetch extends Component {
 
 	constructor(props: any) {
 		super(props);
-		this.txtTargetIP = React.createRef();
+		this.txtTarget = React.createRef();
 		this.selectSpeed = React.createRef();
 		this.selectOrigin = React.createRef();
 		this.macCanvas = React.createRef();
@@ -151,9 +165,9 @@ class MacFetch extends Component {
 						</div>
 					</div>
 					<div>
-						<label htmlFor="target_address">IP de Destino</label>
+						<label htmlFor="target_address">{this.props.ipFetch? "MAC" : "IP"} de Destino</label>
 						<div>
-							<input type="text" id="target_address" ref={this.txtTargetIP} onKeyDown={ (ev) => { if(ev.key === "Enter") this.run() }} placeholder="0.0.0.1/0"/>
+							<input type="text" id="target_address" ref={this.txtTarget} onKeyDown={(ev) => { if (ev.key === "Enter") this.run() }} placeholder={this.props.ipFetch ? "00-00-00-00-00-00" : "0.0.0.1/0"}/>
 						</div>
 					</div>
 					<div>
@@ -171,7 +185,7 @@ class MacFetch extends Component {
 					</div>
 				</div>
 				<ErrorBox errorMessage={this.state.errorMessage}/>
-				<MacFetchCanvas ref={this.macCanvas} origin={this.state.origin} target={this.state.target} speed={this.state.speed}/>
+				<MacFetchCanvas ref={this.macCanvas} origin={this.state.origin} target={this.state.target} speed={this.state.speed} ipFetch={this.props.ipFetch}/>
 			</main>
 		);
 	}
@@ -182,8 +196,9 @@ export default MacFetch;
 
 interface MacFetchCanvasProps {
 	origin: "A"|"B"|"C",
-	target: Address,
-	speed: Speed
+	target: Address|MAC,
+	speed: Speed,
+	ipFetch: boolean
 }
 
 /**
@@ -220,6 +235,7 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 		const speed = speedValues[this.props.speed];
 		const fCanvas = this.flowCanvas.current;
 		const router = this.router;
+		const ipFetch = this.props.ipFetch;
 
 		fCanvas.stopLineAnimations();
 
@@ -236,7 +252,7 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 
 		const response = function(path: MACMachine[]) {
 			
-			let macStr = path[path.length-1].mac.toString();
+			let targetStr = (ipFetch? path[path.length-1].ip : path[path.length-1].mac).toString();
 			let connections: NodeConnection[] = [];
 
 			for (let i = path.length-1; i >= 1; i--) {
@@ -248,7 +264,7 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 					strokeStyle: greenWire,
 					lineWidth: 5,
 					speed: speed,
-					labelText: macStr
+					labelText: targetStr
 				});
 				
 			}
@@ -272,16 +288,24 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 						yellowWire,
 						5,
 						speed,
-						"MAC de "+lookingFor.toString()+"?",
+						(ipFetch ? "IP de " : "MAC de ")+lookingFor.toString()+"?",
 						() => { 
 							fCanvas.removeDrawable(line);
 							
 							if (to.connections.length > 1)
 								nextHop(from, to, path);
 							else {
-								if (!to.isSwitch && (to.ip.compare(lookingFor) || ((to === router) && !to.ip.getNetworkAddress().compare(lookingFor.getNetworkAddress())))) {
-									path.push(to);
-									response(path);
+								if (!to.isSwitch) {
+
+									let comparison: boolean;
+
+									if (ipFetch) comparison = to.mac.compare(lookingFor as MAC);
+									else comparison = to.ip.compare(lookingFor as Address) || ((to === router) && !to.ip.getNetworkAddress().compare((lookingFor as Address).getNetworkAddress()));
+
+									if (comparison) {
+										path.push(to);
+										response(path);
+									}
 								}
 							}
 
