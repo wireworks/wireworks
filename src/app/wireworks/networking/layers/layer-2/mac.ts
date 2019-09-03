@@ -90,6 +90,34 @@ export default class MAC {
 
 	}
 
+	/**
+	 * Returns true if this MAC address is the same as another.
+	 * @param {MAC} other the MAC address to be compared with.
+	 */
+	public compare(other: MAC): boolean {
+
+		if (!other) {
+			return false;
+		}
+
+		if (this === other)
+			return true;
+
+		if (this.bytes === other.bytes)
+			return true;
+
+		for (let i = 0; i < 6; i++) {
+			for (let j = 0; j < 8; j++) {
+				if (this.bytes[i].bit(j) !== other.bytes[i].bit(j)) {
+					return false;
+				}
+			}			
+		}
+
+		return true;
+
+	}
+
 	public setBytes(bytes: Byte6) {
 		this.bytes = bytes;
 		this.asString = "";

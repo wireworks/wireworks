@@ -9,7 +9,8 @@ export const WireworksHeader: FC<RouteComponentProps> = ({match}) => {
 
     const toolNames : { [key:string]:string; } = {
 		
-		'macfetch': "MAC Fetch",
+        'macfetch': "MAC Fetch",
+        'ipfetch': "IP Fetch",
 		
 		'ipbits': 'IPBits',
         'planner': 'Planner',

@@ -8,7 +8,7 @@ import FlowCanvas, { Node, Label, NodeConnection, Line } from "../../../componen
 import { Address, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE } from "../../../wireworks/networking/layers/layer-3/address";
 import ErrorBox from "../../../components/ErrorBox";
 import { ERROR_BYTE_RANGE } from "../../../wireworks/networking/byte";
-import MAC from "../../../wireworks/networking/layers/layer-2/mac";
+import MAC, { ERROR_MAC_ADDRESS_PARSE } from "../../../wireworks/networking/layers/layer-2/mac";
 
 // Images used in the canvas.
 
@@ -85,17 +85,24 @@ class MacFetch extends Component<MacFetchProps> {
 	
 		try {
 			
-			let address = new Address(this.txtTarget.current.value, undefined, true);
-			
-			if (address.isNetworkAddress()) {
-				errStr = "Este é um endereço de rede. Escolha outro endereço.";
-				throw Error;
+			let target: Address|MAC;
+
+			if (this.props.ipFetch) {
+				target = new MAC(this.txtTarget.current.value);
+			}
+			else {
+				target = new Address(this.txtTarget.current.value, undefined, true);
+				
+				if (target.isNetworkAddress()) {
+					errStr = "Este é um endereço de rede. Escolha outro endereço.";
+					throw Error;
+				}
 			}
 
 			this.setState(
 				{
 					origin: this.selectOrigin.current.value,
-					target: address,
+					target: target,
 					speed: this.selectSpeed.current.value
 				},
 				this.macCanvas.current.run
@@ -106,6 +113,9 @@ class MacFetch extends Component<MacFetchProps> {
 			if(!errStr){
 				
 				switch (error.name) {
+					case ERROR_MAC_ADDRESS_PARSE:
+						errStr = "O MAC do destino deve possuir o formato 00-00-00-00-00-00.";
+						break;
 					case ERROR_ADDRESS_PARSE:
 						errStr = "O IP do destino deve possuir o formato 0.0.0.0/0.";
 						break;
@@ -242,7 +252,7 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 
 		const response = function(path: MACMachine[]) {
 			
-			let macStr = path[path.length-1].mac.toString();
+			let targetStr = (ipFetch? path[path.length-1].ip : path[path.length-1].mac).toString();
 			let connections: NodeConnection[] = [];
 
 			for (let i = path.length-1; i >= 1; i--) {
@@ -254,7 +264,7 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 					strokeStyle: greenWire,
 					lineWidth: 5,
 					speed: speed,
-					labelText: macStr
+					labelText: targetStr
 				});
 				
 			}
@@ -278,7 +288,7 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 						yellowWire,
 						5,
 						speed,
-						"MAC de "+lookingFor.toString()+"?",
+						(ipFetch ? "IP de " : "MAC de ")+lookingFor.toString()+"?",
 						() => { 
 							fCanvas.removeDrawable(line);
 							
@@ -289,7 +299,7 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 
 									let comparison: boolean;
 
-									if (ipFetch) comparison = false;
+									if (ipFetch) comparison = to.mac.compare(lookingFor as MAC);
 									else comparison = to.ip.compare(lookingFor as Address) || ((to === router) && !to.ip.getNetworkAddress().compare((lookingFor as Address).getNetworkAddress()));
 
 									if (comparison) {
