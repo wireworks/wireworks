@@ -12,6 +12,11 @@ class Layer2 extends Component<RouteComponentProps> {
                         path={`${this.props.match.path}/macfetch`}
                         materialIcon="find_in_page"
                         description="Visualisador de consultas ARP de endereços MAC" />
+			
+      <ToolItem 	name="IP Fetch"
+                        path={`${this.props.match.path}/ipfetch`}
+                        materialIcon="find_in_page"
+                        description="Visualisador de consultas RARP de endereços IP" />
 
 		</Menu>
     }
