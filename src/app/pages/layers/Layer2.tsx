@@ -6,7 +6,7 @@ import { RouteComponentProps } from "react-router";
 class Layer2 extends Component<RouteComponentProps> {
 
     render () {
-		return <Menu title="Camada 2" description="Camada de Enlace" theme="layer2">
+		return <Menu title="Camada 2" description="Camada de Enlace">
 			
 			<ToolItem 	name="MAC Fetch"
                         path={`${this.props.match.path}/macfetch`}

@@ -138,10 +138,6 @@ class MacFetch extends Component<MacFetchProps> {
 		}
 	}
 
-	componentDidMount() {
-		document.body.className = "theme-layer2";
-	}
-
 	constructor(props: any) {
 		super(props);
 		this.txtTarget = React.createRef();

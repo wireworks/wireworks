@@ -186,12 +186,6 @@ class DnsTree extends Component {
 		domain.setAddress(undefined);
 		this.setState({rootDomain: this.state.rootDomain});
 	}
-
-    componentDidMount() {
-
-		document.body.className = "theme-layer5";
-
-	}
 	
 	constructor(props: any) {
 		super(props);

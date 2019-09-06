@@ -142,12 +142,6 @@ class DnsFlow extends Component {
 		}
 	}	
 
-	componentDidMount() {
-
-		document.body.className = "theme-layer5";
-
-	}
-
 	constructor(props: any) {
 		super(props);
 		this.txtDomain = React.createRef();

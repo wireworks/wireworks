@@ -378,11 +378,6 @@ class Ipbits extends Component {
 
 	}
 
-	componentDidMount() {
-		document.body.className = "theme-layer3";
-		this.updateDisplays();
-	}
-
 	render() {
 
 		let maskBox = [];

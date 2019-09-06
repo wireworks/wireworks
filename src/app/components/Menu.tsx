@@ -2,16 +2,10 @@ import React, { Component } from "react";
 
 interface MenuProps {
 	title?: string,
-	description?: string,
-	theme?: string
+	description?: string
 }
 
 class Menu extends Component<MenuProps> {
-
-	componentDidMount() {
-		if (this.props.theme)
-			document.body.className = "theme-"+this.props.theme;
-	}
 
 	render() {
 		return(

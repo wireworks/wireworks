@@ -29,9 +29,18 @@ export const WireworksHeader: FC<RouteComponentProps> = ({match}) => {
     if (regm) {
 
         layer = parseInt(regm[1]);
+        
         if (regm[2]) {
             toolname = toolNames[regm[2]];
         }
+        
+    }
+
+    if (layer <= 5 && layer >= 1) {
+        document.body.className = "theme-layer"+layer;
+    }
+    else {
+        document.body.className = "theme-wireworks";
     }
 
     return (

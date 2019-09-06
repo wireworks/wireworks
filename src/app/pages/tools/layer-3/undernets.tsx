@@ -114,12 +114,6 @@ class Undernets extends Component {
 		this.rootBlockRef = React.createRef();
 	}
 
-	componentDidMount() {
-
-		document.body.className = "theme-layer3";       
-
-	}
-
 	render() {
 		return (
 			<main>

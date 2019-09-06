@@ -101,12 +101,6 @@ class Planner extends Component {
 			
 	}
 	
-	componentDidMount() {
-
-		document.body.className = "theme-layer3";
-			
-	}	
-
 	constructor(props: any) {
 		super(props);
 		this.txtAddress = React.createRef();
