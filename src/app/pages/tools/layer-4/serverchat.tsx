@@ -51,7 +51,7 @@ class ChatPanel extends Component<ChatPanelProps> {
         for (let i=0; i<this.props.chat.length; i++) {
 
             const msg = this.props.chat[i];
-            messages[i] = <div className={msg.from === this.props.name? "self" : "other"}>{ msg.message }</div>
+            messages[i] = <div className={"message " + (msg.from === this.props.name? "self" : "other")}>{ msg.message }</div>
 
         }
 
@@ -64,6 +64,9 @@ class ChatPanel extends Component<ChatPanelProps> {
                 <div className="content">
                     <div className="messages">
                         {messages}
+                    </div>
+                    <div className="input">
+
                     </div>
                 </div>
             </div>

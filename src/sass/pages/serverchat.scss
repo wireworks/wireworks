@@ -29,9 +29,23 @@ $asset-root-path: '../../' !default;
         
         padding: 1rem;
         height: 20rem;
+        display: flex;
+        flex-direction: column;
 
         .messages {
             overflow-y: auto;
+            flex: 1;
+            .message {
+                background: theme(secondary);
+                margin: 10px 0;
+            }
+        }
+
+        .input {
+            min-height: 1em;
+            border: 2px solid theme(gray);
+            border-radius: 15px;
+            margin-top: 15px;
         }
         
     }
