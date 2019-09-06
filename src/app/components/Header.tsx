@@ -17,7 +17,8 @@ export const WireworksHeader: FC<RouteComponentProps> = ({match}) => {
         'undernets': 'Undernets',
 
         'tcptransmission': 'TCP Carrier',
-
+        'serverchat': 'Server Chat',
+        
         'dnsflow': 'DNS Flow',
         'dnstree': 'DNS Tree'
     };

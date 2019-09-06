@@ -13,6 +13,11 @@ class Layer4 extends Component<RouteComponentProps> {
                         materialIcon="swap_horizontal_circle"
                         description="Simulador do protocolo TCP" />
 
+            <ToolItem 	name="Server Chat"
+                        path={`${this.props.match.path}/serverchat`}
+                        materialIcon="chat"
+                        description="Visualização do Three-Way-Handshake" />
+
         </Menu>
     }
 }

@@ -1,0 +1,32 @@
+$asset-root-path: '../../' !default;
+
+@import "../main";
+
+.chat-panel {
+
+    flex: 1;
+    border: 2px solid theme(gray);
+    border-radius: 15px;
+    margin-left: 15px;
+
+    &:first-child {
+        margin-left: 0;
+    }
+
+    header {
+        padding: 1rem;
+        border-bottom: 2px solid theme(gray);
+        .subtitle {
+            color: #808080;
+        }
+        .name {
+            color: theme(text);
+            font-size: $font-size-big;
+        }
+    }
+
+    .content {
+        padding: 1rem;
+    }
+
+}
