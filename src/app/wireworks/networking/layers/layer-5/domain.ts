@@ -336,7 +336,7 @@ export class Domain {
 		let interStr = "";
 		let adminStr = "";
 
-		if (domainParts.length == 2 || destStr !== "www") {
+		if (domainParts.length === 2 || destStr !== "www") {
 			domainParts.unshift("www");
 			destStr = "www";
 		}

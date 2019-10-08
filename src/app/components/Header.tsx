@@ -1,4 +1,4 @@
-import React, { createContext, FC, useState, Component } from "react";
+import React, { FC } from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
 
 export interface IHeader {layer: number, toolname: string}
@@ -66,10 +66,3 @@ export const WireworksHeader: FC<RouteComponentProps> = ({match}) => {
     );
 
 }
-
-{/* <header>
-    <div class="spacer">
-        <a href="../../" class="logo">wireworks</a>
-        <a href="./">Camada 5</a>
-    </div>
-</header> */}

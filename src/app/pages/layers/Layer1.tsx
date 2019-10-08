@@ -1,4 +1,4 @@
-import React, { FC, Component } from "react";
+import React, { Component } from "react";
 import Menu from "../../components/Menu";
 
 class Layer1 extends Component {

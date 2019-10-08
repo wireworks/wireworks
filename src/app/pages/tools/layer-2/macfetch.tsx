@@ -277,7 +277,7 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 
 				const to = from.connections[i];
 	
-				if (to != previous) {
+				if (to !== previous) {
 					let line = fCanvas.connectNodes(
 						from.node,
 						to.node,

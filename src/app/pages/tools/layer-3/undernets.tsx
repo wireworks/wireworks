@@ -148,10 +148,6 @@ interface SubnetTreeProps {
  * Component representing the subnet tree.
  */
 class SubnetTree extends Component<SubnetTreeProps> {
-
-	constructor(props: SubnetTreeProps) {
-		super(props);		
-	}
 		
 	render() {
 		return (

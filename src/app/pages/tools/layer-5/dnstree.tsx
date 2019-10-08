@@ -329,7 +329,7 @@ class FakeBrowser extends Component<FakeBrowserProps> {
 					tmpCurr = tmpCurr.getSubdomains()[0];
 					curr = curr.getSubdomain(tmpCurr.getLabel());
 	
-					if (!curr || curr.getFullName() == domain.getFullName()) {
+					if (!curr || curr.getFullName() === domain.getFullName()) {
 						exit = true;
 					}
 	
@@ -401,9 +401,7 @@ class FakeBrowser extends Component<FakeBrowserProps> {
 			}
 	
 		} catch (error) {
-	
-			console.error(error);
-	
+		
 			this.setState({
 				loading: false,
 				addressError: true
@@ -439,7 +437,7 @@ class FakeBrowser extends Component<FakeBrowserProps> {
 				<div className="browser-content">
 					
 					{ 
-						this.state.pageStatus == "loaded" && 
+						this.state.pageStatus === "loaded" && 
 						<div className="page">
 							<h1 className={this.state.pageStyle}>{this.state.pageTitle}</h1>
 							<div className="separator"></div>
@@ -448,9 +446,9 @@ class FakeBrowser extends Component<FakeBrowserProps> {
 					}
 
 					{
-						this.state.pageStatus == "failed" &&
+						this.state.pageStatus === "failed" &&
 						<div className="page">
-							<img src={failImage}/>
+							<img src={failImage} alt=""/>
 							<h2 className="font-bold">Não é possível acessar esse site</h2>
 							<h3 className="text-light">{this.state.failMessage}</h3>
 						</div>
@@ -535,7 +533,7 @@ class DomainTree extends Component<DomainTreeProps> {
 	}
 
 	render() {
-		if (this.props.rootDomain.getSubdomains().length == 0) return null;
+		if (this.props.rootDomain.getSubdomains().length === 0) return null;
 		return <div className="domain-tree" id="root_tree">{this.renderBranch(this.props.rootDomain)}</div>;
 	}
 

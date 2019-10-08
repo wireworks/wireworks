@@ -158,13 +158,13 @@ class Ipbits extends Component {
 	 */
 	private selectMaskBit = (index: number): void => {
 
-		let { bitIndex: bitIndex, byteIndex: byteIndex } = splitBitIndex(index);
+		let { bitIndex, byteIndex } = splitBitIndex(index);
 
 		index += this.MASK[byteIndex][bitIndex].current.checked ? 1 : 0;
 
 		for (let byte4Index = 0; byte4Index < 32; byte4Index++) {
 			
-			let { bitIndex: bitIndex, byteIndex: byteIndex } = splitBitIndex(byte4Index);
+			let { bitIndex, byteIndex } = splitBitIndex(byte4Index);
 			let on = byte4Index < index;
 
 			this.MASK[byteIndex][bitIndex].current.checked = on;
@@ -270,7 +270,7 @@ class Ipbits extends Component {
 			return;
 		}
 
-		let selectedText = window.getSelection().anchorNode == display.parentNode ? window.getSelection().toString() : "";
+		let selectedText = window.getSelection().anchorNode === display.parentNode ? window.getSelection().toString() : "";
 
 		if (additionalKeys.indexOf(evt.key) === -1 && display.value.length >= 3 && selectedText === "")  evt.preventDefault();
 
@@ -283,7 +283,7 @@ class Ipbits extends Component {
 				
 		let next = byteIndex < 3 ? this.ipDisplays[byteIndex + 1].current : undefined;
 
-		let selectedText = window.getSelection().anchorNode == display.parentNode ? window.getSelection().toString() : "";
+		let selectedText = window.getSelection().anchorNode === display.parentNode ? window.getSelection().toString() : "";
 
 		if (additionalKeys.indexOf(evt.key) === -1 && display.value.length >= 3 && selectedText === "") {
 
@@ -378,6 +378,11 @@ class Ipbits extends Component {
 
 	}
 
+	componentDidMount() {		
+		this.updateDisplays();
+		this.updateIPShort();
+	}
+
 	render() {
 
 		let maskBox = [];
@@ -446,14 +451,14 @@ class Ipbits extends Component {
 			<main>
 				<div className="spacer">
 					<h2>Máscara <i className="far fa-clipboard copy-icon" ref={this.copyMaskButton} onClick={this.copyMaskToClipboard}></i> <span className="copy-text" ref={this.copyMaskText}>Máscara copiada</span></h2>
-					<h2 className="text-light font-light" ref={this.maskDisplayShort}></h2>
+					<h2 className="text-light font-light" ref={this.maskDisplayShort}>/0</h2>
 				</div>
 				
 				<div className="box"> {maskBox} </div>
 				
 				<div className="spacer">
 					<h2>IP <i className="far fa-clipboard copy-icon" ref={this.copyIPButton} onClick={this.copyIPToClipboard}></i> <span className="copy-text" ref={this.copyIPText}>IP Copiado</span></h2>
-					<h2 className="text-light font-light" ref={this.ipDisplayShort}></h2>
+					<h2 className="text-light font-light" ref={this.ipDisplayShort}>0.0.0.0</h2>
 				</div>
 				
 				<div className="box"> {ipBox} </div>

@@ -118,6 +118,7 @@ class Planner extends Component {
 				<ErrorBox errorMessage={this.state.errorMessage}/>
 				{ this.state.showTable &&
 					<table>
+						<tbody>
 						<tr>
 							<th>Rede</th>
 							<th>Máscara</th>
@@ -134,6 +135,7 @@ class Planner extends Component {
 							<td>{this.state.broadcastStr}</td>
 							<td>{this.state.hostsStr}</td>
 						</tr>
+						</tbody>
 					</table>
 				}
 			</main>

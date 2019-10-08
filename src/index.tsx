@@ -1,11 +1,10 @@
-import React, { FC, lazy, Suspense, useState } from "react";
+import React, { FC, lazy, Suspense } from "react";
 import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { WireworksHeader, IHeader } from "./app/components/Header";
+import { WireworksHeader } from "./app/components/Header";
 import Footer from "./app/components/Footer";
 import "src/sass/pages/index.scss"
-import { object, number } from "prop-types";
 
 
 const Layer1 = lazy(() => import("./app/pages/layers/Layer1"));

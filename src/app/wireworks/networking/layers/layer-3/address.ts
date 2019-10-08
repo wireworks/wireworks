@@ -256,9 +256,9 @@ export class Address {
 			throw err;
 		}
 
-		if (this.maskShort == 31)
+		if (this.maskShort === 31)
 			return 2;
-		if (this.maskShort == 32)
+		if (this.maskShort === 32)
 			return 1;
 		return (Math.pow(2, 32 - this.maskShort) - 2);
 
