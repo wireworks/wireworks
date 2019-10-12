@@ -1,19 +1,40 @@
 import React, { Component } from "react";
+import "src/sass/pages/bitflux.scss";
+
 
 class BitFlux extends Component {
 
 	bin_start = [true, false, true, false]
 	bin_stop = [false, false, false, false, false, false, false, false];
 	bin_arr = new Array<boolean>(12).fill(false);
+	intervalID;
 	open = false;
 
 	state = {
-		btn: true
+		btn: true,
+		clColor: false
 	};
 
-	clock = (val: boolean) => {
-		this.bin_arr.unshift(val);
+	clock = () => {
+		this.bin_arr.unshift(this.state.btn);
 		this.bin_arr.pop();
+		this.setState((st: {clColor: boolean}) => {return {clColor: !st.clColor}});
+		this.plot();
+	}
+
+	toggleAuto = () => {
+		if (this.intervalID) {
+			clearInterval(this.intervalID);
+			this.intervalID = 0;
+		} else {
+			this.intervalID = setInterval(this.clock, 500);
+		}
+	}
+
+	toggle = () => {
+		this.setState((st: {btn: boolean}) => {
+			return {btn: !st.btn}
+		});
 	}
 
 	plot = () => {
@@ -56,13 +77,15 @@ class BitFlux extends Component {
 	render () {
 		return (
 			<main>
-				<div id="flux-clock"></div>
-				<button onClick={() => {this.clock(this.state.btn);this.plot()}}>Clock</button>
-				<button onClick={() => {
-					this.setState((st: {btn: boolean}) => {
-						return {btn: !st.btn}
-					})
-				}}>{this.state.btn ? "1" : "0"}</button>
+
+				<div id="flux-clock" style={this.state.clColor ? {backgroundColor: "#7d7d7d"} : {backgroundColor: "#ed2d4d"}}></div>
+
+				<input id="flux-auto" type="checkbox" onChange={this.toggleAuto}/>
+				<label htmlFor="flux-auto">auto clock</label>
+
+				<button onClick={this.clock}>Clock</button>
+				<button onClick={this.toggle}>{this.state.btn ? "1" : "0"}</button>
+
 				<canvas height="200" width="900" id="flux-canvas"></canvas>
 			</main>
 		);
