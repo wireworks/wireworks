@@ -4,22 +4,33 @@ import "src/sass/pages/bitflux.scss";
 
 class BitFlux extends Component {
 
-	bin_start = [true, false, true, false]
-	bin_stop = [false, false, false, false, false, false, false, false];
-	bin_arr = new Array<boolean>(12).fill(false);
+	readonly bin_start = [true, false, true, false]
+	readonly bin_stop = [false, false, false, false, false, false, false, false];
+	readonly toShow = 12;
+	bin_arr = new Array<boolean>(22).fill(false);
 	intervalID;
 	open = false;
 
 	state = {
 		btn: true,
-		clColor: false
+		clColor: false,
+		logArr: []
 	};
+
+	componentDidMount() {
+		this.plot();
+	}
+
+	componentWillUnmount() {
+		clearInterval(this.intervalID);
+	}
 
 	clock = () => {
 		this.bin_arr.unshift(this.state.btn);
 		this.bin_arr.pop();
-		this.setState((st: {clColor: boolean}) => {return {clColor: !st.clColor}});
 		this.plot();
+		this.setState((st: {clColor: boolean}) => {return {clColor: !st.clColor}});
+		this.setState({logArr: this.bin_arr.slice(this.toShow, this.bin_arr.length)});
 	}
 
 	toggleAuto = () => {
@@ -27,7 +38,7 @@ class BitFlux extends Component {
 			clearInterval(this.intervalID);
 			this.intervalID = 0;
 		} else {
-			this.intervalID = setInterval(this.clock, 500);
+			this.intervalID = setInterval(this.clock, 1000);
 		}
 	}
 
@@ -45,7 +56,7 @@ class BitFlux extends Component {
 		
 		//////////////
 		const vOffset = 10;
-		const lineSize = canvas.width/arr.length;
+		const lineSize = canvas.width/this.toShow;
 		const drawVerticalSize = canvas.height - (vOffset*2);
 
 		ctx.lineCap = "round";
@@ -64,11 +75,10 @@ class BitFlux extends Component {
 		ctx.beginPath();
 		ctx.lineWidth = 5;
 		ctx.strokeStyle = '#2b2b2b';
-		for (const it in arr) {
-			const val = arr[it] ? 0 : 1;
-			const index = parseInt(it);
-			ctx.lineTo(lineSize * index, vOffset + (drawVerticalSize * val));
-			ctx.lineTo(lineSize * (index + 1), vOffset + (drawVerticalSize * val));
+		for (let i=0; i<this.toShow; i++) {
+			const val = arr[i] ? 0 : 1;
+			ctx.lineTo(lineSize * i, vOffset + (drawVerticalSize * val));
+			ctx.lineTo(lineSize * (i + 1), vOffset + (drawVerticalSize * val));
 		}
 		ctx.stroke();
 
@@ -87,6 +97,13 @@ class BitFlux extends Component {
 				<button onClick={this.toggle}>{this.state.btn ? "1" : "0"}</button>
 
 				<canvas height="200" width="900" id="flux-canvas"></canvas>
+
+				<ul>
+					{this.state.logArr.map((el, index) => {
+						return <li key={index}>{el ? "1" : "0"}</li>
+					})}
+				</ul>
+
 			</main>
 		);
 	}
