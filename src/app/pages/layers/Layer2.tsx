@@ -13,10 +13,10 @@ class Layer2 extends Component<RouteComponentProps> {
                         materialIcon="find_in_page"
                         description="Visualisador de consultas ARP de endereços MAC" />
 			
-      <ToolItem 	name="IP Fetch"
-                        path={`${this.props.match.path}/ipfetch`}
-                        materialIcon="find_in_page"
-                        description="Visualisador de consultas RARP de endereços IP" />
+			<ToolItem 	name="IP Fetch"
+						path={`${this.props.match.path}/ipfetch`}
+						materialIcon="find_in_page"
+						description="Visualisador de consultas RARP de endereços IP" />
 
 		</Menu>
     }
