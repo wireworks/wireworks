@@ -40,7 +40,7 @@ const loader = <main>
 
 const Wireworks: FC = () =>
 
-<Router basename="build/">
+<Router basename="build/#/">
 
     <div className="content">
 		
