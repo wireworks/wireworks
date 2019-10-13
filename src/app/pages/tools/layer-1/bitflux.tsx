@@ -11,6 +11,8 @@ class BitFlux extends Component {
 	intervalID;
 	open = false;
 
+	mustHold = false;
+
 	state = {
 		btn: true,
 		clColor: false,
@@ -41,6 +43,11 @@ class BitFlux extends Component {
 		} else {
 			this.intervalID = setInterval(this.clock, 1000);
 		}
+	}
+
+	toggleHold = () => {
+		this.mustHold = !this.mustHold;
+		this.setState({btn: false});
 	}
 
 	toggle = () => {
@@ -94,7 +101,10 @@ class BitFlux extends Component {
 				</div>
 
 				<div className="flux-panel">
-					<button onClick={this.toggle}>{this.state.btn ? "1" : "0"}</button>
+					<button 
+						onMouseDown={this.toggle}
+						onMouseUp={()=>{if(this.mustHold)this.toggle()}}
+						onMouseLeave={()=>{if(this.mustHold && this.state.btn)this.toggle()}}>{this.state.btn ? "1" : "0"}</button>
 
 					<canvas height="260" width="900" id="flux-canvas"></canvas>
 
@@ -108,6 +118,11 @@ class BitFlux extends Component {
 				<div className="checkbox">
 					<input id="flux-auto" type="checkbox" onChange={this.toggleAuto} defaultChecked/>
 					<label htmlFor="flux-auto">Clock automático</label>				
+				</div>
+
+				<div className="checkbox">
+					<input id="flux-press" type="checkbox" onChange={this.toggleHold}/>
+					<label htmlFor="flux-press">Segurar botão</label>				
 				</div>
 
 			</main>
