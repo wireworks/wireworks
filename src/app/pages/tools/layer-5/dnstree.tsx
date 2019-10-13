@@ -6,7 +6,7 @@
 import React, { Component, RefObject } from "react";
 import "src/sass/pages/dnstree.scss";
 import failImage from "../../../../images/layers/5/unreachable.png";
-import { Address, ERROR_ADDRESS_PARSE } from "../../../wireworks/networking/layers/layer-3/address";
+import { IP, ERROR_ADDRESS_PARSE } from "../../../wireworks/networking/layers/layer-3/ip";
 import { Domain, ERROR_INVALID_LABEL, ERROR_FULL_NAME_RANGE } from "../../../wireworks/networking/layers/layer-5/domain";
 import { ERROR_BYTE_RANGE } from "../../../wireworks/networking/byte";
 import ErrorBox from "../../../components/ErrorBox";
@@ -16,7 +16,7 @@ import ErrorBox from "../../../components/ErrorBox";
  */
 type Site = {
 	name: string,
-	address: Address,
+	address: IP,
 	style: string
 };
 
@@ -53,7 +53,7 @@ class DnsTree extends Component {
 				throw Error();
 			}
 
-			let address = new Address(this.txtSiteAddress.current.value);
+			let address = new IP(this.txtSiteAddress.current.value);
 
 			for (let i = 0; i < this.sites.length; i++) {
 				if (this.sites[i].address.compare(address)) {
@@ -125,7 +125,7 @@ class DnsTree extends Component {
 				let addressStr = this.txtDomainAddress.current.value.trim();
 
 				if (addressStr !== "") {
-					let address = new Address(addressStr);
+					let address = new IP(addressStr);
 					domain.setAddress(address);
 				} else {
 					domain.setAddress(undefined);
@@ -284,7 +284,7 @@ class FakeBrowser extends Component<FakeBrowserProps> {
 
 		try {
 
-			let foundAddress: Address = undefined;
+			let foundAddress: IP = undefined;
 			let domain: Domain = undefined;
 			let alreadyLoaded: boolean = false;
 		
@@ -311,7 +311,7 @@ class FakeBrowser extends Component<FakeBrowserProps> {
 	
 					}, 2000);
 				} else {
-					foundAddress = new Address(str);
+					foundAddress = new IP(str);
 				}
 	
 			} catch (error) {

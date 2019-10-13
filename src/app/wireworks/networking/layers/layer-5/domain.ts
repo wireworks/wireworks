@@ -1,4 +1,4 @@
-import { Address } from "../layer-3/address";
+import { IP } from "../layer-3/ip";
 
 /**
  * Error name for when a root Domain has a label that isn't "." or undefined.
@@ -54,7 +54,7 @@ export class Domain {
 	/**
 	 * The IP address this Domain refers to. Undefined if this is not a hostname.
 	 */
-	private address: Address = undefined;
+	private address: IP = undefined;
 
 	/**
 	 * This Domain's text label.
@@ -65,9 +65,9 @@ export class Domain {
 	 * Constructs a Domain, provided its label, parent and optionally an Address.
 	 * @param  {string} label The label of this Domain. Must follow naming conventions.
 	 * @param  {Domain} parent The parent of this Domain. If undefined, this is a root domain.
-	 * @param  {Address} address The address of this Domain, if it's a hostname. Optional. Defaults to undefined. Must not exist if this is a root domain.
+	 * @param  {IP} address The address of this Domain, if it's a hostname. Optional. Defaults to undefined. Must not exist if this is a root domain.
 	 */
-	constructor(label: string, parent: Domain, address: Address = undefined) {
+	constructor(label: string, parent: Domain, address: IP = undefined) {
 
 		this.setParent(parent, false);
 		this.setAddress(address);
@@ -231,9 +231,9 @@ export class Domain {
 		
 	/**
 	 * Sets the address of this Domain, making it a hostname.
-	 * @param  {Address} address The address to be set. If the parent is undefined, this must be undefined as well.
+	 * @param  {IP} address The address to be set. If the parent is undefined, this must be undefined as well.
 	 */
-	public setAddress(address: Address): void {
+	public setAddress(address: IP): void {
 		if (address && !this.parent) {
 			let err = new Error("The root domain must not have an Address.");
 			err.name = ERROR_ROOT_ADDRESS;
@@ -266,7 +266,7 @@ export class Domain {
 	/**
 	 * Returns this Domain's address if this is a hostname.
 	 */
-	public getAddress(): Address {
+	public getAddress(): IP {
 		return this.address;
 	}
 	

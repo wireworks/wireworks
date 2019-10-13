@@ -5,7 +5,7 @@
 
 import React, { Component, RefObject } from "react";
 import FlowCanvas, { Node, Label, NodeConnection, Line } from "../../../components/FlowCanvas";
-import { Address, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE } from "../../../wireworks/networking/layers/layer-3/address";
+import { IP, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE } from "../../../wireworks/networking/layers/layer-3/ip";
 import ErrorBox from "../../../components/ErrorBox";
 import { ERROR_BYTE_RANGE } from "../../../wireworks/networking/byte";
 import MAC, { ERROR_MAC_ADDRESS_PARSE } from "../../../wireworks/networking/layers/layer-2/mac";
@@ -44,7 +44,7 @@ const yellowWire = "#e5c16e";
  * Helper data structure used to refer to MACFetch's computers and other network devices.
  */
 type MACMachine = {
-	ip: Address,
+	ip: IP,
 	mac: MAC,
 	node: Node,
 	connections: MACMachine[],
@@ -71,7 +71,7 @@ class MacFetch extends Component<MacFetchProps> {
 	state = {
 		errorMessage: null as string,
 		origin: undefined as "A"|"B"|"C",
-		target: undefined as Address|MAC,
+		target: undefined as IP|MAC,
 		speed: undefined as Speed
 	}
 
@@ -85,13 +85,13 @@ class MacFetch extends Component<MacFetchProps> {
 	
 		try {
 			
-			let target: Address|MAC;
+			let target: IP|MAC;
 
 			if (this.props.ipFetch) {
 				target = new MAC(this.txtTarget.current.value);
 			}
 			else {
-				target = new Address(this.txtTarget.current.value, undefined, true);
+				target = new IP(this.txtTarget.current.value, undefined, true);
 				
 				if (target.isNetworkAddress()) {
 					errStr = "Este é um endereço de rede. Escolha outro endereço.";
@@ -161,9 +161,9 @@ class MacFetch extends Component<MacFetchProps> {
 						</div>
 					</div>
 					<div>
-						<label htmlFor="target_address">{this.props.ipFetch? "MAC" : "IP"} de Destino</label>
+						<label htmlFor="target_ip">{this.props.ipFetch? "MAC" : "IP"} de Destino</label>
 						<div>
-							<input type="text" id="target_address" ref={this.txtTarget} onKeyDown={(ev) => { if (ev.key === "Enter") this.run() }} placeholder={this.props.ipFetch ? "00-00-00-00-00-00" : "0.0.0.1/0"}/>
+							<input type="text" id="target_ip" ref={this.txtTarget} onKeyDown={(ev) => { if (ev.key === "Enter") this.run() }} placeholder={this.props.ipFetch ? "00-00-00-00-00-00" : "0.0.0.1/0"}/>
 						</div>
 					</div>
 					<div>
@@ -192,7 +192,7 @@ export default MacFetch;
 
 interface MacFetchCanvasProps {
 	origin: "A"|"B"|"C",
-	target: Address|MAC,
+	target: IP|MAC,
 	speed: Speed,
 	ipFetch: boolean
 }
@@ -208,10 +208,10 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 	// MACFetch's network devices and computers.
 
 	private mSwitch: MACMachine = {ip: undefined, mac: undefined, connections: [], isSwitch: true, node: undefined};
-	private pcA: MACMachine =     {ip: new Address("10.10.0.2/24"), mac: new MAC("00-00-00-AA-AA-AA"), connections: [this.mSwitch], isSwitch: false, node: undefined};
-	private pcB: MACMachine =     {ip: new Address("10.10.0.3/24"), mac: new MAC("00-00-00-BB-BB-BB"), connections: [this.mSwitch], isSwitch: false, node: undefined};
-	private pcC: MACMachine =     {ip: new Address("10.10.0.4/24"), mac: new MAC("00-00-00-CC-CC-CC"), connections: [this.mSwitch], isSwitch: false, node: undefined};
-	private router: MACMachine =  {ip: new Address("10.10.0.1/24"), mac: new MAC("00-00-00-F0-F0-F0"), connections: [this.mSwitch], isSwitch: false, node: undefined};
+	private pcA: MACMachine =     {ip: new IP("10.10.0.2/24"), mac: new MAC("00-00-00-AA-AA-AA"), connections: [this.mSwitch], isSwitch: false, node: undefined};
+	private pcB: MACMachine =     {ip: new IP("10.10.0.3/24"), mac: new MAC("00-00-00-BB-BB-BB"), connections: [this.mSwitch], isSwitch: false, node: undefined};
+	private pcC: MACMachine =     {ip: new IP("10.10.0.4/24"), mac: new MAC("00-00-00-CC-CC-CC"), connections: [this.mSwitch], isSwitch: false, node: undefined};
+	private router: MACMachine =  {ip: new IP("10.10.0.1/24"), mac: new MAC("00-00-00-F0-F0-F0"), connections: [this.mSwitch], isSwitch: false, node: undefined};
 	
 	/** A list of fixed lines that shouldn't be removed upon simulation resetting. */
 	private fixedLines: Line[] = [];
@@ -296,7 +296,7 @@ class MacFetchCanvas extends Component<MacFetchCanvasProps> {
 									let comparison: boolean;
 
 									if (ipFetch) comparison = to.mac.compare(lookingFor as MAC);
-									else comparison = to.ip.compare(lookingFor as Address) || ((to === router) && !to.ip.getNetworkAddress().compare((lookingFor as Address).getNetworkAddress()));
+									else comparison = to.ip.compare(lookingFor as IP) || ((to === router) && !to.ip.getNetworkAddress().compare((lookingFor as IP).getNetworkAddress()));
 
 									if (comparison) {
 										path.push(to);

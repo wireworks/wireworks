@@ -4,7 +4,7 @@
 // Version: 3.1 (2019-08-29)
 
 import React, { Component, RefObject } from "react";
-import { Address, ERROR_NOT_NETWORK, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE } from "../../../wireworks/networking/layers/layer-3/address";
+import { IP, ERROR_NOT_NETWORK, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE } from "../../../wireworks/networking/layers/layer-3/ip";
 import { ERROR_BYTE_RANGE } from "../../../wireworks/networking/byte";
 import ErrorBox from "../../../components/ErrorBox";
 import "src/sass/pages/planner.scss";
@@ -43,11 +43,11 @@ class Planner extends Component {
 	
 		try {
 			
-			let address = new Address(this.txtAddress.current.value);
+			let address = new IP(this.txtAddress.current.value);
 	
 			try {
 	
-				address = new Address(this.txtAddress.current.value, undefined, true, true);
+				address = new IP(this.txtAddress.current.value, undefined, true, true);
 	
 			} catch (error) {
 	

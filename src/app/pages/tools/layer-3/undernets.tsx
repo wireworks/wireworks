@@ -6,7 +6,7 @@
 import React, { Component, RefObject } from "react";
 import ErrorBox from "../../../components/ErrorBox";
 import { removeItem } from "../../../wireworks/utils/array";
-import { Address, ERROR_NOT_NETWORK, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE, Byte4Zero } from "../../../wireworks/networking/layers/layer-3/address";
+import { IP, ERROR_NOT_NETWORK, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE, Byte4Zero } from "../../../wireworks/networking/layers/layer-3/ip";
 import { ERROR_BYTE_RANGE } from "../../../wireworks/networking/byte";
 import "src/sass/pages/undernets.scss"
 
@@ -42,7 +42,7 @@ class Undernets extends Component {
 	state = {
 		errorMessage: null,
 		showTree: false,
-		rootAddress: new Address(Byte4Zero())
+		rootAddress: new IP(Byte4Zero())
 	};
 
 	/**
@@ -58,11 +58,11 @@ class Undernets extends Component {
 
 			try {
 				
-				let rootAddress = new Address(this.txtAddress.current.value);
+				let rootAddress = new IP(this.txtAddress.current.value);
 
 				try {
 
-					rootAddress = new Address(this.txtAddress.current.value, undefined, true, true);
+					rootAddress = new IP(this.txtAddress.current.value, undefined, true, true);
 
 				} catch (error) {
 
@@ -140,7 +140,7 @@ class Undernets extends Component {
 }
 
 interface SubnetTreeProps {
-	address: Address,
+	address: IP,
 	blockRef: RefObject<SubnetBlock>
 }
 
@@ -160,7 +160,7 @@ class SubnetTree extends Component<SubnetTreeProps> {
 }
 
 interface SubnetBranchProps {
-	address: Address,
+	address: IP,
 	parent: SubnetBranch,
 	color: string,
 	blockRef: RefObject<SubnetBlock>
@@ -178,7 +178,7 @@ class SubnetBranch extends Component<SubnetBranchProps> {
 	/**
 	 * The calculated subnets of this branch's network.
 	 */
-	private subnets: [Address, Address];
+	private subnets: [IP, IP];
 	/**
 	 * The references to the subnet branch components child to this branch.
 	 */
@@ -348,7 +348,7 @@ class SubnetBranch extends Component<SubnetBranchProps> {
 }
 
 interface SubnetStripProps {
-	address: Address,
+	address: IP,
 	blockRef: RefObject<SubnetBlock>
 }
 
@@ -405,7 +405,7 @@ class SubnetStrip extends Component<SubnetStripProps> {
 }
 
 interface SubnetBlockProps {
-	address: Address,
+	address: IP,
 	color: string,
 	id?: string
 	content?: string
