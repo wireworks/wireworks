@@ -1,7 +1,7 @@
 import React, { FC, lazy, Suspense } from "react";
 import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { WireworksHeader } from "./app/components/Header";
 import Footer from "./app/components/Footer";
 import "src/sass/pages/index.scss"
@@ -19,8 +19,6 @@ const MacFetch = lazy(() => import("./app/pages/tools/layer-2/macfetch"));
 const Ipbits = lazy(() => import("./app/pages/tools/layer-3/ipbits"));
 const Undernets = lazy(() => import("./app/pages/tools/layer-3/undernets"));
 const Planner = lazy(() => import("./app/pages/tools/layer-3/planner"));
-
-const TcpCarrier = lazy(() => import("./app/pages/tools/layer-4/tcpcarrier"));
 
 const DnsFlow = lazy(() => import("./app/pages/tools/layer-5/dnsflow"));
 const DnsTree = lazy(() => import("./app/pages/tools/layer-5/dnstree"));
@@ -67,9 +65,6 @@ const Wireworks: FC = () =>
 				<Route path="/layers/3/undernets" component={Undernets} />
 				<Route path="/layers/3/planner" component={Planner} />
 
-				{/* Layer 4 */}
-				<Route path="/layers/4/tcpcarrier" component={TcpCarrier} />
-
 				{/* Layer 5 */}
 				<Route path="/layers/5/dnsflow" component={DnsFlow} />
 				<Route path="/layers/5/dnstree" component={DnsTree} />
@@ -86,7 +81,10 @@ const Wireworks: FC = () =>
 				{/* 404 */}
 				<Route component={() =>
 					<main>
-						<h2 className="font-big p-3">Nada aqui <span className="font-mono">¯\_(ツ)_/¯</span></h2>
+						<h1 className="hbox align-center justify-center font-mono">404</h1>
+						<h2 className="hbox align-center justify-center">Não há nada por aqui.</h2>
+						<h2 className="hbox align-center justify-center">¯\_(ツ)_/¯</h2>
+						<Link className="hbox align-center justify-center" to="/">Menu inicial</Link>
 					</main>
 				} />
 
