@@ -50,3 +50,63 @@ label {
 	display: block;
 
 }
+
+.checkbox {
+	
+	margin-bottom: 0.6em;
+
+	label {
+		
+		margin-bottom: 0;
+
+		&:hover::before {
+			background:#ececec;
+		}
+		
+		&::before {
+		
+			margin-right: 0.5em;
+			border: 2px solid #adadad;
+			border-radius: 4px;
+			height: 26px;
+			width: 26px;
+			display: inline-flex;
+			align-items:center;
+			justify-content:center;
+			color:#333;
+			background: transparent;
+			font-size: $font-size-base;
+			font-family: "Font Awesome 5 Free";
+			content: "\f00c";
+			color: transparent;
+			transition: background 0.4s;
+		}
+
+	}
+
+	input[type=checkbox] {
+
+		position: fixed;
+		opacity: 0;
+		cursor: pointer;
+		height: 0;
+		width: 0;
+		top: -100000px; // ¯\_(ツ)_/¯
+		left: -100000px;
+
+		&:checked + label {
+						
+			&::before {
+				font-weight: $font-weight-bold;
+				color: $color-text;
+			}
+
+		}
+
+		&:disabled {
+			& + label { cursor: not-allowed; }
+		}
+
+	}
+
+}

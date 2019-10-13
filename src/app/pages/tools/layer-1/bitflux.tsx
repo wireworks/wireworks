@@ -6,8 +6,8 @@ class BitFlux extends Component {
 
 	readonly bin_start = [true, false, true, false]
 	readonly bin_stop = [false, false, false, false, false, false, false, false];
-	readonly toShow = 12;
-	bin_arr = new Array<boolean>(22).fill(false);
+	readonly toShow = 10;
+	bin_arr = new Array<boolean>(18).fill(false);
 	intervalID;
 	open = false;
 
@@ -19,6 +19,7 @@ class BitFlux extends Component {
 
 	componentDidMount() {
 		this.plot();
+		this.toggleAuto();
 	}
 
 	componentWillUnmount() {
@@ -88,21 +89,26 @@ class BitFlux extends Component {
 		return (
 			<main>
 
-				<div id="flux-clock" style={this.state.clColor ? {backgroundColor: "#7d7d7d"} : {backgroundColor: "#ed2d4d"}}></div>
+				<div className="flux-clock-wrapper">
+					<div id="flux-clock" className={this.state.clColor ? "toggled" : ""} onClick={this.clock}>Clock</div>
+				</div>
 
-				<input id="flux-auto" type="checkbox" onChange={this.toggleAuto}/>
-				<label htmlFor="flux-auto">auto clock</label>
+				<div className="flux-panel">
+					<button onClick={this.toggle}>{this.state.btn ? "1" : "0"}</button>
 
-				<button onClick={this.clock}>Clock</button>
-				<button onClick={this.toggle}>{this.state.btn ? "1" : "0"}</button>
+					<canvas height="260" width="900" id="flux-canvas"></canvas>
 
-				<canvas height="200" width="900" id="flux-canvas"></canvas>
+					<ul>
+						{this.state.logArr.map((el, index) => {
+							return <li key={index}>{el ? "1" : "0"}</li>
+						})}
+					</ul>
+				</div>
 
-				<ul>
-					{this.state.logArr.map((el, index) => {
-						return <li key={index}>{el ? "1" : "0"}</li>
-					})}
-				</ul>
+				<div className="checkbox">
+					<input id="flux-auto" type="checkbox" onChange={this.toggleAuto} defaultChecked/>
+					<label htmlFor="flux-auto">Clock automático</label>				
+				</div>
 
 			</main>
 		);

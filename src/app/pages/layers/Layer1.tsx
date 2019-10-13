@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import Menu from "../../components/Menu";
 import ToolItem from "../../components/ToolItem";
+import { RouteComponentProps } from "react-router";
 
-class Layer1 extends Component {
+class Layer1 extends Component<RouteComponentProps> {
 
     render () {
 		return <Menu title="Camada 1" description="Camada Física">
@@ -10,7 +11,7 @@ class Layer1 extends Component {
 			<ToolItem 	name="Bit Flux"
 						path={`${this.props.match.path}/bitflux`}
 						materialIcon="find_in_page"
-						description="Visualisador do transito de informações em binario" />
+						description="Visualizador do trânsito de informações em binário" />
     	</Menu>
     }
 }
