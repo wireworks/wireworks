@@ -32,7 +32,21 @@ rootCases.push(
 						from: "client",
 						flag: "ACK",
 						message: "Ok, conexão estabelecida.",
-						cases: []
+						cases: [
+							{
+								from: "client",
+								flag: "RST",
+								message: "Vamos recomeçar.",
+								cases: [
+									{
+										from: "server",
+										flag: "RST",
+										message: "Tudo bem, recomece.",
+										cases: rootCases
+									}
+								]
+							}
+						]
 					}
 				]
 			},
@@ -48,7 +62,14 @@ rootCases.push(
 		from: "client",
 		flag: "RST",
 		message: "Vamos recomeçar.",
-		cases: rootCases
+		cases: [
+			{
+				from: "server",
+				flag: "RST",
+				message: "Não sei o que exatamente, mas recomece.",
+				cases: rootCases
+			}
+		]
 	}
 )
 
