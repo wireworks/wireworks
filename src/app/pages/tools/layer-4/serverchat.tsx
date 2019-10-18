@@ -68,9 +68,7 @@ class ServerChat extends Component {
 	public nextChart = (selected: Flowchart, from: "client"|"server") => {
 		let history = this.state.history;
 		history.push(selected);
-		this.setState({ history: history, currentChart: selected });
-		// console.log(selected);
-		
+		this.setState({ history: history, currentChart: selected });		
 	}
 
 	render() {
@@ -107,7 +105,20 @@ interface ChatPanelProps {
 }
 
 class ChatPanel extends Component<ChatPanelProps> {
+
+	private bottomRef: RefObject<HTMLDivElement>;
+
+	constructor(props) {
+		super(props);
+		this.bottomRef = React.createRef();
+	}
+
+	componentDidUpdate() {	
+		this.bottomRef.current.scrollBy(0, this.bottomRef.current.clientHeight);
+	}
+
 	render() {
+
 		let messages = [];
 
 		for (let i = 0; i < this.props.history.length; i++) {
@@ -120,9 +131,6 @@ class ChatPanel extends Component<ChatPanelProps> {
 		}
 
 		let options = [];
-
-		console.log(this.props.name);
-		console.log(this.props.currentChart)
 
 		for (let i = 0; i < this.props.currentChart.cases.length; i++) {
 			const caseI = this.props.currentChart.cases[i];
@@ -140,17 +148,13 @@ class ChatPanel extends Component<ChatPanelProps> {
 		}
 
 		return (
-			<div
-				className={
-					"chat-panel " + (this.props.className ? this.props.className : "")
-				}
-			>
+			<div className={ "chat-panel " + (this.props.className ? this.props.className : "") }>
 				<header>
 					<div className="subtitle">Visão do</div>
 					<div className="name">{this.props.displayName}</div>
 				</header>
 				<div className="content">
-					<div className="messages">{messages}</div>
+					<div className="messages" ref={this.bottomRef} >{messages}</div>
 					<div className="input">{options}</div>
 				</div>
 			</div>
