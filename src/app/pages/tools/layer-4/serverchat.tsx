@@ -136,7 +136,7 @@ class ChatPanel extends Component<ChatPanelProps> {
 			const caseI = this.props.currentChart.cases[i];
 			if (caseI.from === this.props.name || caseI.from === "any") {
 				options[i] = (
-					<span key={"caseI_"+this.props.name+"_"+i} style={{background: "yellow", margin: "5px"}} onClick={
+					<span key={"caseI_"+this.props.name+"_"+i} className="flag" onClick={
 						() => {
 							this.props.nextChartEvent(caseI, this.props.name);
 						}

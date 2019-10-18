@@ -3,6 +3,7 @@ $asset-root-path: "../../" !default;
 @import "../main";
 
 .chat-panel {
+
 	flex: 1;
 	border: 2px solid theme(gray);
 	border-radius: 15px;
@@ -43,6 +44,8 @@ $asset-root-path: "../../" !default;
 					padding: 10px;
 					background: theme(gray-light);
 					border-radius: 20px;
+					animation-name: grow;
+					animation-duration: 0.06s;
 				}
 				&.self {
 					flex-direction: row-reverse;
@@ -57,8 +60,28 @@ $asset-root-path: "../../" !default;
 		.input {
 			min-height: 1em;
 			border: 2px solid theme(gray);
-			border-radius: 15px;
+			border-radius: 2em;
 			margin-top: 15px;
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap-reverse;
+			justify-content: flex-end;
+			padding: 0 5px;
+			.flag {				
+				background: theme(secondary);
+				color: white;
+				font-size: ($font-size-medium + $font-size-base) / 2;
+				margin: 5px 0 5px 5px;
+				padding: 0.3em 0.6em;
+				border-radius: 0.8em;
+				user-select: none;
+				cursor: pointer;
+			}
 		}
 	}
+}
+
+@keyframes grow {
+	from {transform: scaleY(0.6)}
+	to {transform: scaleY(1)}
 }
