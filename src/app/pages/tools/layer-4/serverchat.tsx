@@ -6,24 +6,71 @@
 import React, { Component, RefObject } from "react";
 import "src/sass/pages/serverchat.scss";
 
-type ChatMessage = { from: string; message: string };
+type ChatMessage = { from: "server"|"client"; message: string };
+
+type Flowchart = {
+	flag: string,
+	message: string
+	cases: Flowchart[],
+	from: "server"|"client"|"any"
+}
+
+const rootCases: Flowchart[] = []
+
+rootCases.push(
+	{
+		from: "client",
+		flag: "SYN",
+		message: "Olá servidor! Podemos começar uma conexão?",
+		cases: [
+			{
+				from: "server",
+				flag: "SYN ACK",
+				message: "Podemos sim. Vamos começar?",
+				cases: [
+					{
+						from: "client",
+						flag: "ACK",
+						message: "Ok, conexão estabelecida.",
+						cases: []
+					}
+				]
+			},
+			{
+				from: "server",
+				flag: "RST",
+				message: "Calma lá, volte do início.",
+				cases: rootCases
+			}
+		]
+	},
+	{
+		from: "client",
+		flag: "RST",
+		message: "Vamos recomeçar.",
+		cases: rootCases
+	}
+)
 
 class ServerChat extends Component {
+	
 	state = {
-		chat: [] as ChatMessage[]
+		history: [] as Flowchart[],
+		flagHistory: [] as string[],
+		currentChart: {
+			flag: undefined,
+			message: undefined,
+			from: undefined,
+			cases: rootCases
+		} as Flowchart
 	};
 
-	componentDidMount() {
-		this.setState({
-			chat: [
-				{
-					from: "client",
-					message: "Olá servidor! Podemos começar uma conexão?"
-				},
-				{ from: "server", message: "Claro, cliente! Vamos começar?" },
-				{ from: "client", message: "Tudo bem, conexão iniciada..." }
-			]
-		});
+	public nextChart = (selected: Flowchart, from: "client"|"server") => {
+		let history = this.state.history;
+		history.push(selected);
+		this.setState({ history: history, currentChart: selected });
+		// console.log(selected);
+		
 	}
 
 	render() {
@@ -33,12 +80,16 @@ class ServerChat extends Component {
 					<ChatPanel
 						displayName="Cliente"
 						name="client"
-						chat={this.state.chat}
+						history={this.state.history}
+						currentChart={this.state.currentChart}
+						nextChartEvent={this.nextChart}
 					/>
 					<ChatPanel
 						displayName="Servidor"
 						name="server"
-						chat={this.state.chat}
+						history={this.state.history}
+						currentChart={this.state.currentChart}
+						nextChartEvent={this.nextChart}
 					/>
 				</div>
 			</main>
@@ -49,21 +100,43 @@ class ServerChat extends Component {
 interface ChatPanelProps {
 	className?: string;
 	displayName: string;
-	name: string;
-	chat: ChatMessage[];
+	name: "client"|"server";
+	history: Flowchart[];
+	currentChart: Flowchart,
+	nextChartEvent: (selected: Flowchart, from: "client"|"server") => void
 }
 
 class ChatPanel extends Component<ChatPanelProps> {
 	render() {
 		let messages = [];
 
-		for (let i = 0; i < this.props.chat.length; i++) {
-			const msg = this.props.chat[i];
+		for (let i = 0; i < this.props.history.length; i++) {
+			const msg = this.props.history[i];
 			messages[i] = (
-				<div className={"message-wrapper " + (msg.from === this.props.name ? "self" : "other")}>
+				<div key={"msg_"+this.props.name+"_"+i} className={"message-wrapper " + ((msg.from === this.props.name || msg.from === "any") ? "self" : "other")}>
 					<div className="message">{msg.message}</div>
 				</div>
 			);
+		}
+
+		let options = [];
+
+		console.log(this.props.name);
+		console.log(this.props.currentChart)
+
+		for (let i = 0; i < this.props.currentChart.cases.length; i++) {
+			const caseI = this.props.currentChart.cases[i];
+			if (caseI.from === this.props.name || caseI.from === "any") {
+				options[i] = (
+					<span key={"caseI_"+this.props.name+"_"+i} style={{background: "yellow", margin: "5px"}} onClick={
+						() => {
+							this.props.nextChartEvent(caseI, this.props.name);
+						}
+					}>
+						{ caseI.flag }	
+					</span>
+				);
+			}
 		}
 
 		return (
@@ -78,7 +151,7 @@ class ChatPanel extends Component<ChatPanelProps> {
 				</header>
 				<div className="content">
 					<div className="messages">{messages}</div>
-					<div className="input"></div>
+					<div className="input">{options}</div>
 				</div>
 			</div>
 		);
