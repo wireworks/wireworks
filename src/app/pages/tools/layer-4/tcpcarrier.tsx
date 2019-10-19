@@ -100,6 +100,7 @@ class TcpCarrier extends Component {
     //////////////////////////////////////////////////////////////////
 
     test = () => {
+        this.changeWindow("left", 2, 4);
     }
 
     send = (to: "left"|"right", index: number, content: string, hoverText: string, onClick?: () => void, onArrive?: () => void) => {
@@ -110,6 +111,14 @@ class TcpCarrier extends Component {
             prog: 0,
         };
         this.state.arr[index].progress.push(p);
+    }
+
+    changeWindow = (side: "left"|"right", toIndex: number, toSize: number) => {
+        if (side == "left") {
+            this.setState({lWindow: toIndex, lWindowSize: toSize});
+        } else {
+            this.setState({rWindow: toIndex, rWindowSize: toSize});
+        }
     }
 
     //////////////////////////////////////////////////////////////////
