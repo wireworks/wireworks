@@ -1,104 +1,120 @@
-import React, { ChangeEvent, Component, FC } from "react";
-import variables from "src/sass/pages/tcpcarrier.scss";
+import React, { Component, FC } from "react";
 import "src/sass/pages/tcpcarrier.scss";
-import anime, { AnimeAnimParams, AnimeInstance } from "animejs";
+import { ballSize, marginSize } from "src/sass/pages/tcpcarrier.scss";
 
 
-enum TcpFlags {
-    none = 0,
-    NS   = 1 << 0,
-    CWR  = 1 << 1,
-    ECE  = 1 << 2,
-    URG  = 1 << 3,
-    ACK  = 1 << 4,
-    PSH  = 1 << 5,
-    RST  = 1 << 6,
-    SYN  = 1 << 7,
-    FIN  = 1 << 8,
+interface Pkg {
+    content: string
+    // state: "ok"|"waiting"|"blank",
+    progress: Array<{
+        onClick?: () => void,
+        onArrive?: () => void,
+        toSide: "left"|"right",
+        prog: number
+    }>
 }
 
-class TcpHeader {
-    sequence: number;
-    acknowledgment: number;
-    flags: number;
-    windowSize: number;
-    data: string;
-}
-
-
-const TcpPacket: FC<{id: number}> = (props) =>
+const TcpPacket: FC<Pkg> = (props) =>
 
 <div className="tcp-p-rail">
-    <div className="tcp-p-slider">
-        <div className="tcp-p-ball"></div>
+    {props.progress.map((el, ind) => {
+        return (
+            <div key={ind} className="tcp-p-slider" style={{transform: `translateX(${el.toSide === "left" ? 100 - el.prog : el.prog}%)`}}>
+                <div className="tcp-p-ball" onClick={el.onClick}> <span >{props.content}</span> </div>
+            </div>
+        );
+    })}
+    
+    <div className="tcp-p-asd">
+        <div className="tcp-p-ball"> <span>{props.content}</span> </div>
+        <div className="tcp-p-ball"> <span>{props.content}</span> </div>
     </div>
-    <div className="tcp-p-ball tcp-p-hint tcp-left">{props.id}</div>
-    <div className="tcp-p-ball tcp-p-hint tcp-right">{props.id}</div>
 </div>
 
 
-interface ITcpCarrier {
-    progress: Array<number>
-}
+class TcpCarrier extends Component {
 
-class TcpCarrier extends Component<{}, ITcpCarrier> {
+    running = true;
 
     state = {
-        progress: Array<number>(3).fill(2)
-    };
+        lWindow: 0,
+        rWindow: 0,
 
-    animation: AnimeInstance;
+        lWindowSize: 1,
+        rWindowSize: 1,
 
-    addProgress = (index: number) => {
-        let p = this.state.progress;
-        p[index]--;
-        this.setState({progress: p});
+        speed: 0.5,
+        arr: new Array<Pkg>(),
+        message: "hello world"
     }
 
-    step = () => {
-
-        let reverse = true;
-        let ind = this.state.progress.findIndex((value) => value == 1);
-
-        if (ind == -1) {
-            ind = this.state.progress.findIndex((value) => value == 2);
-            reverse = false;
+    componentDidMount() {
+        const msg = this.state.message;
+        const arr = new Array<Pkg>();
+        for (let f of msg) {
+            const p = {
+                content: f,
+                progress: new Array<{prog: 0, toSide: "left"}>()
+            }
+            arr.push(p);
         }
-        
-        if (ind != -1) {
-            let el = document.getElementsByClassName("tcp-p-slider")[ind];
-            anime({
-                targets: el,
-                translateX: ["0%", "100%"],
-                duration: 2000,
-                easing: "linear",
-                direction: reverse ? "reverse" : "normal",
+        this.setState({arr: arr});
+        window.requestAnimationFrame(this.update);
+    }
 
-                complete: () => {
-                    this.addProgress(ind);
-                    let wind = document.getElementsByClassName("tcp-window-wrapper")[this.state.progress[ind]] as HTMLElement;
-                    wind.style.transform = `translateY(${(ind+1) * 100}%)`;
-                    this.step();
+    componentWillUnmount() {
+        this.running = false;
+    }
+
+    private clamp = (n: number) => {
+        if (n > 100)
+            return 100
+        if (n < 0)
+            return 0
+        return n;
+    }
+
+    update = () => {
+        if (this.running) {
+
+            const arr = this.state.arr;
+
+            for (let i of arr) {
+                for (let o of i.progress) {
+                    if (o.prog != 100) {
+                        let newVal = o.prog + this.state.speed;
+                        if (newVal >= 100) {
+                            newVal = 100;
+                            o.onArrive();
+                        }
+                        o.prog = newVal;
+                    }
                 }
+            }
 
-            });
+            this.setState({arr: arr});
+            window.requestAnimationFrame(this.update);
         }
     }
 
-    start = () => {
-        this.step();
-        
+    //////////////////////////////////////////////////////////////////
+
+    test = () => {
+    }
+
+    send = (to: "left"|"right", index: number, content: string, hoverText: string, onClick?: () => void, onArrive?: () => void) => {
+        const p = {
+            toSide: to,
+            onClick: onClick,
+            onArrive: onArrive,
+            prog: 0,
+        };
+        this.state.arr[index].progress.push(p);
     }
 
     //////////////////////////////////////////////////////////////////
 
     render() {
-
-
-        let arr = Array(20);
-        for (let i = 0; i < 20; i++) {
-            arr[i] = <TcpPacket id={i}/>
-        }
 
         return (
             <main id="tcp-carrier">
@@ -106,23 +122,25 @@ class TcpCarrier extends Component<{}, ITcpCarrier> {
                 {/* TCP animation */}
                 <div className="tcp-cont-packet">
 
-                    <div className="tcp-cont-window">
-                        <div className="tcp-window-wrapper tcp-left">
-                            <div className="tcp-window"></div>
+                    <div className="tcp-cont-window"> 
+                        <div style={{transform: `translateY(${this.state.lWindow*100}%)`}} className="tcp-window-wrapper tcp-left">
+                            <div style={{minHeight: ((parseInt(ballSize) + parseInt(marginSize) * 2) * this.state.lWindowSize) + "px"}} className="tcp-window"></div>
                         </div>
-                        <div className="tcp-window-wrapper tcp-right">
-                            <div className="tcp-window"></div>
+                        <div style={{transform: `translateY(${this.state.rWindow*100}%)`}} className="tcp-window-wrapper tcp-right">
+                            <div style={{height: ((parseInt(ballSize) + parseInt(marginSize) * 2) * this.state.rWindowSize)}} className="tcp-window"></div>
                         </div>
-                        
                     </div>
 
-                    {arr}
+                    {this.state.arr.map((el, ind) => {
+                        return <TcpPacket key={ind} content={el.content} progress={el.progress}/>
+                    })}
+
                 </div>
 
                 {/* Menu */}
                 <div className="tcp-cont-menu">
                     <div>
-                        <button onClick={this.start}>Start</button>
+                        <button onClick={this.test}>Start</button>
                         <button>Stop</button>
                     </div>
                 </div>

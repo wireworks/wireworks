@@ -40,6 +40,8 @@ main#tcp-carrier {
     }
 }
 
+////////////////////////////////////////////////////
+
 .tcp-p-rail {
     margin: $margin-size;
     display: flex;
@@ -48,8 +50,16 @@ main#tcp-carrier {
 }
 
 .tcp-p-slider {
+    width: calc(100% - #{$ball-size});
+    position: absolute;
+}
+
+.tcp-p-asd {
     flex: 1;
-    margin-right: $ball-size;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    z-index: 100;
 }
 
 .tcp-p-ball {
@@ -57,11 +67,12 @@ main#tcp-carrier {
     height: $ball-size;
     border-radius: $ball-size/2;
     background-color: chocolate;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.tcp-p-hint {
-    position: absolute;
-}
+////////////////////////////////////////////////////
 
 .tcp-left {
     left: 0;
@@ -79,7 +90,7 @@ main#tcp-carrier {
     position: absolute;
     width: $ball-size + $margin-size * 2;
     height: $ball-size + $margin-size * 2;
-    transition: all 150ms;
+    transition: all 550ms;
 }
 
 .tcp-window {
@@ -88,6 +99,8 @@ main#tcp-carrier {
     border-radius: 15px;
     border: 3px solid rgb(58, 49, 66);
 }
+
+////////////////////////////////////////////////////
 
 :export {
     ballSize: $ball-size;
