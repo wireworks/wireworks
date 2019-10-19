@@ -121,7 +121,7 @@ class TcpCarrier extends Component {
         }
     }
 
-    send = (to: "left"|"right", index: number, content: string, hoverText: string, onClick?: () => void, onArrive?: () => void) => {
+    send = (to: "left"|"right", index: number, onClick?: () => void, onArrive?: () => void) => {
         const p = {
             toSide: to,
             onClick: onClick,
