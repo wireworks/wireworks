@@ -10,12 +10,104 @@ type ChatMessage = { from: "server"|"client"; message: string };
 
 type Flowchart = {
 	flag: string,
+	customLog?: {text: string, from?: "server"|"client"}[],
 	message: string
 	cases: Flowchart[],
 	from: "server"|"client"|"any"
 }
 
+const DUMMY_DATA_FLAG = "@";
 const rootCases: Flowchart[] = []
+const connectedCases: Flowchart[] = [];
+
+connectedCases.push(
+	{
+		from: "server",
+		flag: DUMMY_DATA_FLAG,
+		customLog: [
+			{ from: "server", text: "ACK" },
+			{ from: "client", text: "ACK" },
+			{ text: "..." },
+			{ from: "client", text: "ACK" }
+		],
+		message: "Enviando dados... 📤",
+		cases: connectedCases
+	},
+	{
+		from: "client",
+		flag: DUMMY_DATA_FLAG,
+		customLog: [
+			{ from: "client", text: "ACK" },
+			{ from: "server", text: "ACK" },
+			{ text: "..." },
+			{ from: "server", text: "ACK" }
+		],
+		message: "Enviando dados... 📤",
+		cases: connectedCases
+	},
+	{
+		from: "server",
+		flag: "FIN ACK",
+		message: "Ok, acho que terminamos por aqui.",
+		cases: [
+			{
+				from: "client",
+				flag: "ACK",
+				message: "Entendido.",
+				cases: [
+					{
+						from: "client",
+						flag: "FIN ACK",
+						message: "Tchau, servidor.",
+						cases: [
+							{
+								from: "server",
+								flag: "ACK",
+								message: "Tchau, cliente.",
+								customLog: [
+									{ from: "client", text: "ACK" },
+									{ text: "-- Conexão Encerrada --" }
+								],
+								cases: rootCases
+							}
+						]
+					}
+				]
+			}
+		]
+	},
+	{
+		from: "client",
+		flag: "FIN ACK",
+		message: "Ok, acho que terminamos por aqui.",
+		cases: [
+			{
+				from: "server",
+				flag: "ACK",
+				message: "Entendido.",
+				cases: [
+					{
+						from: "server",
+						flag: "FIN ACK",
+						message: "Tchau, cliente.",
+						cases: [
+							{
+								from: "client",
+								flag: "ACK",
+								message: "Tchau, servidor.",
+								customLog: [
+									{ from: "server", text: "ACK" },
+									{ text: "-- Conexão Encerrada --" }
+								],
+								cases: rootCases
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+);
 
 rootCases.push(
 	{
@@ -26,47 +118,43 @@ rootCases.push(
 			{
 				from: "server",
 				flag: "SYN ACK",
-				message: "Podemos sim. Vamos começar?",
+				message: "Podemos sim!",
 				cases: [
 					{
 						from: "client",
 						flag: "ACK",
-						message: "Ok, conexão estabelecida.",
-						cases: [
-							{
-								from: "client",
-								flag: "RST",
-								message: "Vamos recomeçar.",
-								cases: [
-									{
-										from: "server",
-										flag: "RST",
-										message: "Tudo bem, recomece.",
-										cases: rootCases
-									}
-								]
-							}
-						]
+						customLog: [
+							{ from: "client", text: "ACK" },
+							{ text: "-- Conexão Estabelecida --" }
+						],
+						message: "Entendi, conexão estabelecida.",
+						cases: connectedCases
+					},
+					{
+						from: "client",
+						flag: "RST",
+						message: "Opa, deu algo errado por aqui. Vou tentar do início.",
+						cases: rootCases
 					}
 				]
 			},
 			{
 				from: "server",
 				flag: "RST",
-				message: "Calma lá, volte do início.",
+				message: "Calma, alguma coisa deu errada. Tente novamente.",
 				cases: rootCases
 			}
 		]
 	},
 	{
 		from: "client",
-		flag: "RST",
-		message: "Vamos recomeçar.",
+		flag: "ACK",
+		message: "Olá servidor! Conexão estabelecida!",
 		cases: [
 			{
 				from: "server",
 				flag: "RST",
-				message: "Não sei o que exatamente, mas recomece.",
+				message: "O quê? Não, isso está errado. Recomece.",
 				cases: rootCases
 			}
 		]
@@ -88,7 +176,13 @@ class ServerChat extends Component {
 
 	public nextChart = (selected: Flowchart, from: "client"|"server") => {
 		let history = this.state.history;
-		history.push(selected);
+		history.push({
+			flag: selected.flag,
+			customLog: selected.customLog,
+			message: selected.message,
+			from: from,
+			cases: []
+		});
 		this.setState({ history: history, currentChart: selected });		
 	}
 
@@ -162,7 +256,7 @@ class ChatPanel extends Component<ChatPanelProps> {
 							this.props.nextChartEvent(caseI, this.props.name);
 						}
 					}>
-						{ caseI.flag }	
+						{ caseI.flag === DUMMY_DATA_FLAG ? "Enviar dados" : caseI.flag }	
 					</span>
 				);
 			}
