@@ -5,7 +5,8 @@ import { ballSize, marginSize } from "src/sass/pages/tcpcarrier.scss";
 
 interface Pkg {
     content: string
-    // state: "ok"|"waiting"|"blank",
+    lState: "ok" | "waiting"| "blank",
+    rState: "ok" | "waiting" | "blank",
     progress: Array<{
         onClick?: () => void,
         onArrive?: () => void,
@@ -26,8 +27,8 @@ const TcpPacket: FC<Pkg> = (props) =>
     })}
     
     <div className="tcp-p-asd">
-        <div className="tcp-p-ball"> <span>{props.content}</span> </div>
-        <div className="tcp-p-ball"> <span>{props.content}</span> </div>
+        <div className={`tcp-p-ball tcp-state-${props.lState}`}> <span>{props.content}</span> </div>
+        <div className={`tcp-p-ball tcp-state-${props.rState}`}> <span>{props.content}</span> </div>
     </div>
 </div>
 
@@ -54,7 +55,9 @@ class TcpCarrier extends Component {
         for (let f of msg) {
             const p = {
                 content: f,
-                progress: new Array<{prog: 0, toSide: "left"}>()
+                lState: "waiting",
+                rState: "waiting",
+                progress: new Array<{prog: number, toSide: "left"|"right"}>()
             }
             arr.push(p);
         }
@@ -100,7 +103,16 @@ class TcpCarrier extends Component {
     //////////////////////////////////////////////////////////////////
 
     test = () => {
-        this.changeWindow("left", 2, 4);
+        this.setPkgState("left", 1, "ok")
+    }
+
+    setPkgState = (side: "left"|"right", index: number, state: "ok"|"waiting"|"blank") => {
+        const arr = this.state.arr;
+        if (side == "left") {
+            arr[index].lState = state;
+        } else {
+            arr[index].rState = state;
+        }
     }
 
     send = (to: "left"|"right", index: number, content: string, hoverText: string, onClick?: () => void, onArrive?: () => void) => {
@@ -141,7 +153,7 @@ class TcpCarrier extends Component {
                     </div>
 
                     {this.state.arr.map((el, ind) => {
-                        return <TcpPacket key={ind} content={el.content} progress={el.progress}/>
+                        return <TcpPacket key={ind} rState={el.rState} lState={el.lState} content={el.content} progress={el.progress}/>
                     })}
 
                 </div>

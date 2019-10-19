@@ -72,6 +72,10 @@ main#tcp-carrier {
     align-items: center;
 }
 
+.tcp-state-waiting {
+    background-color: rgb(138, 56, 8);
+}
+
 ////////////////////////////////////////////////////
 
 .tcp-left {
