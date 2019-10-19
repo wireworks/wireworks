@@ -98,6 +98,10 @@ class TcpCarrier extends Component {
         return this.state.arr.length;
     }
 
+    set speed(spd: number) {
+        this.setState({speed: spd});
+    }
+
     reset = (msg: string) => {
         const arr = new Array<Pkg>();
         for (let f of msg) {
