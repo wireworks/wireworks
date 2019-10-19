@@ -9,6 +9,11 @@ class Layer4 extends Component<RouteComponentProps> {
 		return <Menu title="Camada 4" description="Camada de Transporte">
             
 
+            <ToolItem 	name="Server Chat"
+                        path={`${this.props.match.path}/serverchat`}
+                        materialIcon="chat"
+                        description="Visualização do Three-Way-Handshake" />
+
         </Menu>
     }
 }
