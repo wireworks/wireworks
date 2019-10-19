@@ -6,7 +6,7 @@
 import React, { Component, RefObject } from "react";
 import "src/sass/pages/dnstree.scss";
 import failImage from "../../../../images/layers/5/unreachable.png";
-import { Address, ERROR_ADDRESS_PARSE } from "../../../wireworks/networking/layers/layer-3/address";
+import { IP, ERROR_ADDRESS_PARSE } from "../../../wireworks/networking/layers/layer-3/ip";
 import { Domain, ERROR_INVALID_LABEL, ERROR_FULL_NAME_RANGE } from "../../../wireworks/networking/layers/layer-5/domain";
 import { ERROR_BYTE_RANGE } from "../../../wireworks/networking/byte";
 import ErrorBox from "../../../components/ErrorBox";
@@ -16,7 +16,7 @@ import ErrorBox from "../../../components/ErrorBox";
  */
 type Site = {
 	name: string,
-	address: Address,
+	address: IP,
 	style: string
 };
 
@@ -53,7 +53,7 @@ class DnsTree extends Component {
 				throw Error();
 			}
 
-			let address = new Address(this.txtSiteAddress.current.value);
+			let address = new IP(this.txtSiteAddress.current.value);
 
 			for (let i = 0; i < this.sites.length; i++) {
 				if (this.sites[i].address.compare(address)) {
@@ -125,7 +125,7 @@ class DnsTree extends Component {
 				let addressStr = this.txtDomainAddress.current.value.trim();
 
 				if (addressStr !== "") {
-					let address = new Address(addressStr);
+					let address = new IP(addressStr);
 					domain.setAddress(address);
 				} else {
 					domain.setAddress(undefined);
@@ -284,7 +284,7 @@ class FakeBrowser extends Component<FakeBrowserProps> {
 
 		try {
 
-			let foundAddress: Address = undefined;
+			let foundAddress: IP = undefined;
 			let domain: Domain = undefined;
 			let alreadyLoaded: boolean = false;
 		
@@ -311,7 +311,7 @@ class FakeBrowser extends Component<FakeBrowserProps> {
 	
 					}, 2000);
 				} else {
-					foundAddress = new Address(str);
+					foundAddress = new IP(str);
 				}
 	
 			} catch (error) {
@@ -329,7 +329,7 @@ class FakeBrowser extends Component<FakeBrowserProps> {
 					tmpCurr = tmpCurr.getSubdomains()[0];
 					curr = curr.getSubdomain(tmpCurr.getLabel());
 	
-					if (!curr || curr.getFullName() == domain.getFullName()) {
+					if (!curr || curr.getFullName() === domain.getFullName()) {
 						exit = true;
 					}
 	
@@ -401,9 +401,7 @@ class FakeBrowser extends Component<FakeBrowserProps> {
 			}
 	
 		} catch (error) {
-	
-			console.error(error);
-	
+		
 			this.setState({
 				loading: false,
 				addressError: true
@@ -439,7 +437,7 @@ class FakeBrowser extends Component<FakeBrowserProps> {
 				<div className="browser-content">
 					
 					{ 
-						this.state.pageStatus == "loaded" && 
+						this.state.pageStatus === "loaded" && 
 						<div className="page">
 							<h1 className={this.state.pageStyle}>{this.state.pageTitle}</h1>
 							<div className="separator"></div>
@@ -448,9 +446,9 @@ class FakeBrowser extends Component<FakeBrowserProps> {
 					}
 
 					{
-						this.state.pageStatus == "failed" &&
+						this.state.pageStatus === "failed" &&
 						<div className="page">
-							<img src={failImage}/>
+							<img src={failImage} alt=""/>
 							<h2 className="font-bold">Não é possível acessar esse site</h2>
 							<h3 className="text-light">{this.state.failMessage}</h3>
 						</div>
@@ -535,7 +533,7 @@ class DomainTree extends Component<DomainTreeProps> {
 	}
 
 	render() {
-		if (this.props.rootDomain.getSubdomains().length == 0) return null;
+		if (this.props.rootDomain.getSubdomains().length === 0) return null;
 		return <div className="domain-tree" id="root_tree">{this.renderBranch(this.props.rootDomain)}</div>;
 	}
 

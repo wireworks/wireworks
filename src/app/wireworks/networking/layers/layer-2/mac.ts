@@ -64,7 +64,7 @@ export default class MAC {
 		
 		str = str.toUpperCase().replace(/[:.-]/g, "");
 
-		if (str.length != 12) {
+		if (str.length !== 12) {
 			let err = new Error("Invalid MAC address string");
 			err.name = ERROR_MAC_ADDRESS_PARSE;
 			throw err;
@@ -72,7 +72,7 @@ export default class MAC {
 		
 		for (let i = 0; i < str.length; i++) {
 			const c = str[i];
-			if (allowedChars.indexOf(c) == -1) {
+			if (allowedChars.indexOf(c) === -1) {
 				let err = new Error("Invalid MAC address string");
 				err.name = ERROR_MAC_ADDRESS_PARSE;
 				throw err;

@@ -1,6 +1,7 @@
 {
   "name": "wireworks",
   "version": "0.1.0",
+  "homepage": "/build/#/",
   "private": true,
   "dependencies": {
     "@csstools/normalize.css": "^10.1.0",

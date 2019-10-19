@@ -48,7 +48,7 @@ export const ERROR_MASK_RANGE = "MaskRangeError";
  */
 export const ERROR_ADDRESS_PARSE = "AddressParseError";
 /**
- * Error name for a when an Address should be a Network Address, but isn't.
+ * Error name for a when an IP Address should be a network address, but isn't.
  */
 export const ERROR_NOT_NETWORK = "NotNetworkError";
 
@@ -85,36 +85,36 @@ export function splitBitIndex(byte4Index: number): { byteIndex: number, bitIndex
  * A full IP/Mask address.
  * @author Henrique Colini
  */
-export class Address {
+export class IP {
 	
 	/**
-	 * This Address' IP.
+	 * This IP address's IP octets.
 	 */
 	private ip: Byte4;
 
 	/**
-	 * This Address' mask.
+	 * This IP address' mask.
 	 */
 	private mask: Byte4;
 
 	/**
-	 * The numerical representation of this Address' mask.
+	 * The numerical representation of this IP address' mask.
 	 */
 	private maskShort: number;
 
 	
 	/**
-	 * Constructs an Address, given an IP and a mask.
+	 * Constructs an IP address, given an IP and a mask.
 	 * @constructor
-	 * @param  {Byte4|string} ip The IP of this Address. May be a Byte4 or a formatted string.
-	 * @param  {Byte4|number} mask Optional. The mask of this Address. May be a Byte4 or its numerical representation. If not given, defaults to /0.
+	 * @param  {Byte4|string} ip The IP of this address. May be a Byte4 or a formatted string.
+	 * @param  {Byte4|number} mask Optional. The mask of this address. May be a Byte4 or its numerical representation. If not given, defaults to /0.
 	 * @param  {boolean} requireMask Optional. If set to true, the mask becomes a required parameter in the formatted string.
-	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
+	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a network address. Defaults to false.
 	 */
 	constructor(ip: Byte4 | string, mask?: Byte4 | number, requireMask: boolean = false, requireNetwork: boolean = false) {
 
 		if (typeof ip === "string") {
-			this.parseAddress(ip, requireMask);
+			this.parseIP(ip, requireMask);
 		}
 		else {
 			this.ip = ip;
@@ -143,10 +143,10 @@ export class Address {
 	}
 
 	/**
-	 * Returns the Network Address of this Address.
+	 * Returns the network address of this IP Address.
 	 * @param {boolean} allowAbove30 Optional. If false, returns undefined if the mask is greater than 30. Defaults to false.
 	 */
-	public getNetworkAddress(allowAbove30: boolean = false): Address {
+	public getNetworkAddress(allowAbove30: boolean = false): IP {
 
 		if (!allowAbove30 && this.maskShort > 30) return undefined;
 
@@ -167,15 +167,15 @@ export class Address {
 
 		}
 
-		return new Address(bytes, cloneByte4(this.mask));
+		return new IP(bytes, cloneByte4(this.mask));
 
 	}
 
 	/**
-	 * Returns the Broadcast Address of this Address' network.
+	 * Returns the broadcast address of this IP Address' network.
 	 * @param {boolean} allowAbove30 Optional. If false, returns undefined if the mask is greater than 30. Defaults to false.
 	 */
-	public getBroadcastAddress(allowAbove30: boolean = false): Address {
+	public getBroadcastAddress(allowAbove30: boolean = false): IP {
 
 		if (!allowAbove30 && this.maskShort > 30) return undefined;
 
@@ -196,12 +196,12 @@ export class Address {
 
 		}
 
-		return new Address(bytes, cloneByte4(this.mask));
+		return new IP(bytes, cloneByte4(this.mask));
 
 	}
 	
 	/**
-	 * Returns whether this Address is a Network Address.
+	 * Returns whether this IP Address is a network address.
 	 * @param {boolean} allowAbove30 Optional. If false, returns false if the mask is greater than 30. Defaults to false.
 	 */
 	public isNetworkAddress(allowAbove30: boolean = false): boolean {
@@ -209,7 +209,7 @@ export class Address {
 	};
 
 	/**
-	 * Returns whether this Address is a Broadcast Address.
+	 * Returns whether this IP Address is a broadcast address.
 	 * @param {boolean} allowAbove30 Optional. If false, returns false if the mask is greater than 30. Defaults to false.
 	 */
 	public isBroadcastAddress(allowAbove30: boolean = false): boolean {
@@ -217,10 +217,10 @@ export class Address {
 	};
 	
 	/**
-	 * Returns true if this Address is the same as another.
-	 * @param {Address} other the Address to be compared with.
+	 * Returns true if this IP Address is the same as another.
+	 * @param {IP} other the IP Address to be compared with.
 	 */
-	public compare(other: Address): boolean {
+	public compare(other: IP): boolean {
 
 		if (!other) {
 			return false;
@@ -245,33 +245,33 @@ export class Address {
 	}
 	
 	/**
-	 * Returns the amount of hosts that this Address' network has.
-	 * @param {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
+	 * Returns the amount of hosts that this IP Address' network has.
+	 * @param {boolean} requireNetwork Optional. If true, throws an error if this is not a network address. Defaults to false.
 	 */
 	public numberOfHosts(requireNetwork: boolean = false): number {
 
 		if(requireNetwork && !this.isNetworkAddress(true)) {
-			let err = new Error("Not a Network Address");
+			let err = new Error("Not a network address");
 			err.name = ERROR_NOT_NETWORK;
 			throw err;
 		}
 
-		if (this.maskShort == 31)
+		if (this.maskShort === 31)
 			return 2;
-		if (this.maskShort == 32)
+		if (this.maskShort === 32)
 			return 1;
 		return (Math.pow(2, 32 - this.maskShort) - 2);
 
 	}
 
 	/**
-	 * Returns the first valid host Address of this network.
-	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
+	 * Returns the first valid host IP Address of this network.
+	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a network address. Defaults to false.
 	 */
-	public firstHost(requireNetwork: boolean = false): Address {
+	public firstHost(requireNetwork: boolean = false): IP {
 
 		if (requireNetwork && !this.isNetworkAddress(true)) {
-			let err = new Error("Not a Network Address");
+			let err = new Error("Not a network address");
 			err.name = ERROR_NOT_NETWORK;
 			throw err;
 		}
@@ -293,15 +293,15 @@ export class Address {
 			ipBytes[3].setDecimal(ipBytes[3].getDecimal() + 1);
 		}
 
-		return new Address(ipBytes, maskBytes);
+		return new IP(ipBytes, maskBytes);
 
 	}
 
 	/**
-	 * Returns the last valid host Address of this network.
-	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
+	 * Returns the last valid host IP Address of this network.
+	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a network address. Defaults to false.
 	 */
-	public lastHost(requireNetwork: boolean = false): Address {
+	public lastHost(requireNetwork: boolean = false): IP {
 
 		if (requireNetwork && !this.isNetworkAddress(true)) {
 			let err = new Error("Not a Network Address");
@@ -320,15 +320,15 @@ export class Address {
 			ipBytes[3].setDecimal(ipBytes[3].getDecimal() - 1);
 		}
 
-		return new Address(ipBytes, maskBytes);
+		return new IP(ipBytes, maskBytes);
 
 	}
 
 	/**
-	 * Divides this Address into two subnets.
-	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a Network Address. Defaults to false.
+	 * Divides this IP Address into two subnets.
+	 * @param  {boolean} requireNetwork Optional. If true, throws an error if this is not a network address. Defaults to false.
 	 */
-	public subdivide(requireNetwork: boolean = false): [Address, Address] {
+	public subdivide(requireNetwork: boolean = false): [IP, IP] {
 
 		if (requireNetwork && !this.isNetworkAddress(true)) {
 			let err = new Error("Not a Network Address");
@@ -336,7 +336,7 @@ export class Address {
 			throw err;
 		}
 
-		let subnets: [Address, Address] = [undefined, undefined];
+		let subnets: [IP, IP] = [undefined, undefined];
 
 		if (this.maskShort === 32) {
 			return subnets;
@@ -352,20 +352,20 @@ export class Address {
 			ipBytes = net.ip;
 		}
 
-		subnets[0] = new Address(cloneByte4(ipBytes), this.maskShort+1);
+		subnets[0] = new IP(cloneByte4(ipBytes), this.maskShort+1);
 		
 		let secondIpBytes: Byte4 = cloneByte4(ipBytes);
 		let {byteIndex, bitIndex} = splitBitIndex(this.maskShort);
 		secondIpBytes[byteIndex].bit(bitIndex, true);
 
-		subnets[1] = new Address(secondIpBytes, this.maskShort+1);
+		subnets[1] = new IP(secondIpBytes, this.maskShort+1);
 
 		return subnets;
 
 	}
 	
 	/**
-	 * Sets this Address' mask.
+	 * Sets this IP Address' mask.
 	 * @param  {Byte4} mask The Byte4 mask to be set.
 	 */
 	public setMask(mask: Byte4): void {
@@ -398,7 +398,7 @@ export class Address {
 	}
 
 	/**
-	 * Sets this Address' mask, given its numerical representation (0-32).
+	 * Sets this IP Address' mask, given its numerical representation (0-32).
 	 * @param  {number} maskShort The numerical mask to be set.
 	 */
 	public setMaskShort(maskShort: number): void {
@@ -428,7 +428,7 @@ export class Address {
 	}
 
 	/**
-	 * Sets this Address' IP value.
+	 * Sets this IP Address' IP value.
 	 * @param  {Byte4} ip
 	 */
 	public setIp(ip: Byte4): void {
@@ -436,32 +436,32 @@ export class Address {
 	}
 
 	/**
-	 * Returns this Address' mask.
+	 * Returns this IP Address' mask.
 	 */
 	public getMask(): Byte4 {
 		return this.mask;
 	}
 
 	/**
-	 * Returns the numerical representation of this Address' mask.
+	 * Returns the numerical representation of this IP Address' mask.
 	 */
 	public getMaskShort(): number {
 		return this.maskShort;
 	}
 	
 	/**
-	 * Returns this Address' IP value.
+	 * Returns this IP Address' IP value.
 	 */
 	public getIp(): Byte4 {
 		return this.ip;
 	}
 
 	/**
-	 * Sets this Address IP/Mask values from a parsed string.
+	 * Sets this IP Address IP/Mask values from a parsed string.
 	 * @param  {string} address The full address, in the X.X.X.X/X format. If requireMask is false, the mask can be ommited and defaults to /0.
 	 * @param  {boolean=true} requireMask Whether the address requires the mask to be given.
 	 */
-	public parseAddress(address: string, requireMask: boolean = true): void {
+	public parseIP(address: string, requireMask: boolean = true): void {
 
 		address = address.trim();
 		const fullRegex = /^(\d+)\.(\d+)\.(\d+)\.(\d+)\/(\d+)$/;
@@ -514,7 +514,7 @@ export class Address {
 
 	
 	/**
-	 * Returns the string representation of this Address in the X.X.X.X/X format.
+	 * Returns the string representation of this IP Address in the X.X.X.X/X format.
 	 * @param  {boolean} omitMask Whether the mask should be ommited. Defaults to false.
 	 */
 	toString(omitMask: boolean = false): string {

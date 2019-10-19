@@ -1,11 +1,11 @@
-import React, { FC, lazy, Suspense, useState } from "react";
+import React, { FC, lazy, Suspense } from "react";
 import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { WireworksHeader, IHeader } from "./app/components/Header";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { WireworksHeader } from "./app/components/Header";
 import Footer from "./app/components/Footer";
 import "src/sass/pages/index.scss"
-import { object, number } from "prop-types";
+import BitFlux from "./app/pages/tools/layer-1/bitflux";
 
 
 const Layer1 = lazy(() => import("./app/pages/layers/Layer1"));
@@ -20,7 +20,6 @@ const Ipbits = lazy(() => import("./app/pages/tools/layer-3/ipbits"));
 const Undernets = lazy(() => import("./app/pages/tools/layer-3/undernets"));
 const Planner = lazy(() => import("./app/pages/tools/layer-3/planner"));
 
-const TcpCarrier = lazy(() => import("./app/pages/tools/layer-4/tcpcarrier"));
 const ServerChat = lazy(() => import("./app/pages/tools/layer-4/serverchat"));
 
 const DnsFlow = lazy(() => import("./app/pages/tools/layer-5/dnsflow"));
@@ -41,7 +40,7 @@ const loader = <main>
 
 const Wireworks: FC = () =>
 
-<Router>
+<Router basename="build/#/">
 
     <div className="content">
 		
@@ -56,10 +55,11 @@ const Wireworks: FC = () =>
 				{/* Main Menu */}
 				<Route path="/" exact component={MainMenu} />
 
-				{/* Layer 2*/}
-				<Route path="/layers/2/macfetch" render={() => {return <MacFetch ipFetch={false}/>;}} />
+				{/* Layer 1 */}
+				<Route path="/layers/1/bitflux" component={BitFlux} />
 
 				{/* Layer 2*/}
+				<Route path="/layers/2/macfetch" render={() => {return <MacFetch ipFetch={false}/>;}} />
 				<Route path="/layers/2/ipfetch" render={() => { return <MacFetch ipFetch={true}/>;}} />				
 
 				{/* Layer 3 */}
@@ -67,8 +67,6 @@ const Wireworks: FC = () =>
 				<Route path="/layers/3/undernets" component={Undernets} />
 				<Route path="/layers/3/planner" component={Planner} />
 
-				{/* Layer 4 */}
-				<Route path="/layers/4/tcpcarrier" component={TcpCarrier} />
 				{/* Layer 4 */}
 				<Route path="/layers/4/serverchat" component={ServerChat} />
 
@@ -88,7 +86,10 @@ const Wireworks: FC = () =>
 				{/* 404 */}
 				<Route component={() =>
 					<main>
-						<h2 className="font-big p-3">Nada aqui <span className="font-mono">¯\_(ツ)_/¯</span></h2>
+						<h1 className="hbox align-center justify-center font-mono">404</h1>
+						<h2 className="hbox align-center justify-center">Não há nada por aqui.</h2>
+						<h2 className="hbox align-center justify-center">¯\_(ツ)_/¯</h2>
+						<Link className="hbox align-center justify-center" to="/">Menu inicial</Link>
 					</main>
 				} />
 
