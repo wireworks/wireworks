@@ -93,3 +93,19 @@ $asset-root-path: "../../" !default;
 	from {transform: scaleY(0.7)}
 	to {transform: scaleY(1)}
 }
+
+.log-wrapper {
+	border-radius: 15px;
+	padding: 1rem;
+	color: white;
+	background: #585858;
+	ul {
+		font-family: $font-family-mono;
+		height: 10em;
+		max-height: 10em;
+		overflow: auto;
+		li {
+			margin: 6px 0;
+		}
+	}
+}

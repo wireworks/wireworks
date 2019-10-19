@@ -26,7 +26,6 @@ connectedCases.push(
 		flag: DUMMY_DATA_FLAG,
 		customLog: [
 			{ from: "server", text: "ACK" },
-			{ from: "client", text: "ACK" },
 			{ text: "..." },
 			{ from: "client", text: "ACK" }
 		],
@@ -38,7 +37,6 @@ connectedCases.push(
 		flag: DUMMY_DATA_FLAG,
 		customLog: [
 			{ from: "client", text: "ACK" },
-			{ from: "server", text: "ACK" },
 			{ text: "..." },
 			{ from: "server", text: "ACK" }
 		],
@@ -65,7 +63,7 @@ connectedCases.push(
 								flag: "ACK",
 								message: "Tchau, cliente.",
 								customLog: [
-									{ from: "client", text: "ACK" },
+									{ from: "server", text: "ACK" },
 									{ text: "-- Conexão Encerrada --" }
 								],
 								cases: rootCases
@@ -96,7 +94,7 @@ connectedCases.push(
 								flag: "ACK",
 								message: "Tchau, servidor.",
 								customLog: [
-									{ from: "server", text: "ACK" },
+									{ from: "client", text: "ACK" },
 									{ text: "-- Conexão Encerrada --" }
 								],
 								cases: rootCases
@@ -189,7 +187,7 @@ class ServerChat extends Component {
 	render() {
 		return (
 			<main>
-				<div className="hbox">
+				<div className="hbox mb-3">
 					<ChatPanel
 						displayName="Cliente"
 						name="client"
@@ -205,13 +203,13 @@ class ServerChat extends Component {
 						nextChartEvent={this.nextChart}
 					/>
 				</div>
+				<ConnectionLog history={this.state.history}/>
 			</main>
 		);
 	}
 }
 
 interface ChatPanelProps {
-	className?: string;
 	displayName: string;
 	name: "client"|"server";
 	history: Flowchart[];
@@ -221,21 +219,20 @@ interface ChatPanelProps {
 
 class ChatPanel extends Component<ChatPanelProps> {
 
-	private bottomRef: RefObject<HTMLDivElement>;
+	private panelRef: RefObject<HTMLDivElement>;
 
 	constructor(props) {
 		super(props);
-		this.bottomRef = React.createRef();
+		this.panelRef = React.createRef();
 	}
 
 	componentDidUpdate() {	
-		this.bottomRef.current.scrollBy(0, this.bottomRef.current.clientHeight);
+		this.panelRef.current.scrollBy(0, this.panelRef.current.scrollHeight);
 	}
 
 	render() {
 
 		let messages = [];
-		let last = "";
 
 		for (let i = 0; i < this.props.history.length; i++) {
 			const msg = this.props.history[i];
@@ -264,18 +261,67 @@ class ChatPanel extends Component<ChatPanelProps> {
 		}
 
 		return (
-			<div className={ "chat-panel " + (this.props.className ? this.props.className : "") }>
+			<div className="chat-panel">
 				<header>
 					<div className="subtitle">Visão do</div>
 					<div className="name">{this.props.displayName}</div>
 				</header>
 				<div className="content">
-					<div className="messages" ref={this.bottomRef} >{messages}</div>
+					<div className="messages" ref={this.panelRef} >{messages}</div>
 					<div className="input">{options}</div>
 				</div>
 			</div>
 		);
 	}
+}
+
+interface ConnectionLogProps {
+	history: Flowchart[];
+}
+
+class ConnectionLog extends Component<ConnectionLogProps> {
+
+	private listRef: RefObject<HTMLUListElement>;
+
+	componentDidUpdate() {
+		this.listRef.current.scrollBy(0, this.listRef.current.scrollHeight);
+	}
+
+	constructor(props) {
+		super(props);
+		this.listRef = React.createRef();
+	}
+
+	render() {
+		let lis = [];
+
+		for (let i = 0; i < this.props.history.length; i++) {
+			const msg = this.props.history[i];
+			let lines = [] as {from?: "server"|"client", text: string}[];
+			if (msg.customLog) {
+				lines = msg.customLog;
+			}
+			else {
+				lines = [{
+					from: msg.from === "any" ? undefined : msg.from,
+					text: msg.flag
+				}];
+			}
+			for (let j = 0; j < lines.length; j++) {
+				const line = lines[j];
+				lis.push(
+					<li key={"li_" + i + "_" + j}>
+						{ line.from ? (line.from == "client" ? "Cliente -> Servidor " : "Servidor -> Cliente ") : ""}
+						{ line.from ? "[" + line.text + "]" : line.text }
+					</li>
+				);
+			}
+		}
+
+		return <div className="log-wrapper"><ul ref={this.listRef}>{lis}</ul></div>
+
+	}
+
 }
 
 export default ServerChat;
