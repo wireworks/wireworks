@@ -32,7 +32,8 @@ $asset-root-path: "../../" !default;
 		flex-direction: column;
 
 		.messages {
-			overflow-y: auto;
+			overflow-y: scroll;
+			padding-right: 1rem;
 			flex: 1;
 			.message-wrapper {
 				margin: 10px 0;
