@@ -45,23 +45,11 @@ class TcpCarrier extends Component {
         rWindowSize: 1,
 
         speed: 0.5,
-        arr: new Array<Pkg>(),
-        message: "hello world"
+        arr: new Array<Pkg>()
     }
 
     componentDidMount() {
-        const msg = this.state.message;
-        const arr = new Array<Pkg>();
-        for (let f of msg) {
-            const p = {
-                content: f,
-                lState: "waiting",
-                rState: "waiting",
-                progress: new Array<{prog: number, toSide: "left"|"right"}>()
-            }
-            arr.push(p);
-        }
-        this.setState({arr: arr});
+        this.reset("Hello World");
         window.requestAnimationFrame(this.update);
     }
 
@@ -103,7 +91,25 @@ class TcpCarrier extends Component {
     //////////////////////////////////////////////////////////////////
 
     test = () => {
-        this.setPkgState("left", 1, "ok")
+        this.reset("time to die!!!");
+    }
+
+    get length() {
+        return this.state.arr.length;
+    }
+
+    reset = (msg: string) => {
+        const arr = new Array<Pkg>();
+        for (let f of msg) {
+            const p = {
+                content: f,
+                lState: "waiting",
+                rState: "waiting",
+                progress: new Array<{prog: number, toSide: "left"|"right"}>()
+            }
+            arr.push(p);
+        }
+        this.setState({arr: arr});
     }
 
     setPkgState = (side: "left"|"right", index: number, state: "ok"|"waiting"|"blank") => {
