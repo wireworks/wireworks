@@ -235,11 +235,12 @@ class ChatPanel extends Component<ChatPanelProps> {
 	render() {
 
 		let messages = [];
+		let last = "";
 
 		for (let i = 0; i < this.props.history.length; i++) {
 			const msg = this.props.history[i];
 			messages[i] = (
-				<div key={"msg_"+this.props.name+"_"+i} className={"message-wrapper " + ((msg.from === this.props.name || msg.from === "any") ? "self" : "other")}>
+				<div key={"msg_"+this.props.name+"_"+i} className={"message-wrapper " + ((msg.from === this.props.name) ? "self" : "other")}>
 					<div className="message">{msg.message}</div>
 				</div>
 			);

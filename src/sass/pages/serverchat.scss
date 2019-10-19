@@ -46,7 +46,7 @@ $asset-root-path: "../../" !default;
 					background: theme(gray-light);
 					border-radius: 20px;
 					animation-name: grow;
-					animation-duration: 0.06s;
+					animation-duration: 0.3s;
 				}
 				&.self {
 					flex-direction: row-reverse;
@@ -59,7 +59,7 @@ $asset-root-path: "../../" !default;
 		}
 
 		.input {
-			min-height: 1em;
+			height: 2.7em;
 			border: 2px solid theme(gray);
 			border-radius: 2em;
 			margin-top: 15px;
@@ -67,8 +67,11 @@ $asset-root-path: "../../" !default;
 			flex-direction: row;
 			flex-wrap: wrap-reverse;
 			justify-content: flex-end;
+			align-items: stretch;
 			padding: 0 5px;
-			.flag {				
+			.flag {		
+				display: flex;	
+				align-items: center;
 				background: theme(secondary);
 				color: white;
 				font-size: ($font-size-medium + $font-size-base) / 2;
@@ -77,12 +80,16 @@ $asset-root-path: "../../" !default;
 				border-radius: 0.8em;
 				user-select: none;
 				cursor: pointer;
+				transition: padding 0.4s;
+				&:hover	{
+					padding-right: 1.2em;
+				}
 			}
 		}
 	}
 }
 
 @keyframes grow {
-	from {transform: scaleY(0.6)}
+	from {transform: scaleY(0.7)}
 	to {transform: scaleY(1)}
 }
