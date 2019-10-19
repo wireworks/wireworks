@@ -162,7 +162,6 @@ class ServerChat extends Component {
 	
 	state = {
 		history: [] as Flowchart[],
-		flagHistory: [] as string[],
 		currentChart: {
 			flag: undefined,
 			message: undefined,
@@ -196,6 +195,18 @@ class ServerChat extends Component {
 		this.setState({ history: history, currentChart: selected });		
 	}
 
+	public reset = () => {
+		this.setState({
+			history: [],
+			currentChart: {
+				flag: undefined,
+				message: undefined,
+				from: undefined,
+				cases: rootCases
+			} as Flowchart
+		});
+	}
+
 	render() {
 		return (
 			<main>
@@ -216,6 +227,7 @@ class ServerChat extends Component {
 					/>
 				</div>
 				<ConnectionLog history={this.state.history}/>
+				<button onClick={this.reset} className="mt-3">Reiniciar simulação</button>
 			</main>
 		);
 	}
