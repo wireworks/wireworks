@@ -10,7 +10,7 @@ type ChatMessage = { from: "server"|"client"; message: string };
 
 type Flowchart = {
 	flag: string,
-	customLog?: {text: string, from?: "server"|"client"}[],
+	customLog?: {text: string, from?: "server"|"client"|"any"|"other"}[],
 	message: string
 	cases: Flowchart[],
 	from: "server"|"client"|"any"
@@ -22,26 +22,25 @@ const connectedCases: Flowchart[] = [];
 
 connectedCases.push(
 	{
-		from: "server",
+		from: "any",
 		flag: DUMMY_DATA_FLAG,
 		customLog: [
-			{ from: "server", text: "ACK" },
+			{ from: "any", text: "ACK" },
 			{ text: "..." },
-			{ from: "client", text: "ACK" }
+			{ from: "other", text: "ACK" }
 		],
-		message: "Enviando dados... 📤",
+		message: "Dados enviados! 📤",
 		cases: connectedCases
 	},
 	{
-		from: "client",
-		flag: DUMMY_DATA_FLAG,
+		from: "any",
+		flag: "RST",
 		customLog: [
-			{ from: "client", text: "ACK" },
-			{ text: "..." },
-			{ from: "server", text: "ACK" }
+			{ from: "any", text: "RST" },
+			{ text: "-- Conexão Encerrada --" }
 		],
-		message: "Enviando dados... 📤",
-		cases: connectedCases
+		message: "Algo não está certo na conexão. Teremos que recomeçar.",
+		cases: rootCases
 	},
 	{
 		from: "server",
@@ -174,9 +173,22 @@ class ServerChat extends Component {
 
 	public nextChart = (selected: Flowchart, from: "client"|"server") => {
 		let history = this.state.history;
+		let customLog = undefined;
+		if (selected.customLog) {
+			customLog = [];
+			for (let i = 0; i < selected.customLog.length; i++) {
+				const line = selected.customLog[i];
+				customLog[i] = {
+					text: line.text,
+					from: line.from
+				}
+				if (line.from === "any") customLog[i].from = from;
+				if (line.from === "other") customLog[i].from = from === "client" ? "server" : "client";
+			}
+		}
 		history.push({
 			flag: selected.flag,
-			customLog: selected.customLog,
+			customLog: customLog,
 			message: selected.message,
 			from: from,
 			cases: []
@@ -254,7 +266,7 @@ class ChatPanel extends Component<ChatPanelProps> {
 							this.props.nextChartEvent(caseI, this.props.name);
 						}
 					}>
-						{ caseI.flag === DUMMY_DATA_FLAG ? "Enviar dados" : caseI.flag }	
+						{caseI.flag === DUMMY_DATA_FLAG ? "Enviar dados 📦" : caseI.flag }	
 					</span>
 				);
 			}
@@ -297,7 +309,7 @@ class ConnectionLog extends Component<ConnectionLogProps> {
 
 		for (let i = 0; i < this.props.history.length; i++) {
 			const msg = this.props.history[i];
-			let lines = [] as {from?: "server"|"client", text: string}[];
+			let lines = [] as {from?: "server"|"client"|"any"|"other", text: string}[];
 			if (msg.customLog) {
 				lines = msg.customLog;
 			}
