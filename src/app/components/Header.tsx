@@ -5,7 +5,7 @@ export interface IHeader {layer: number, toolname: string}
 
 export const WireworksHeader: FC<RouteComponentProps> = ({match}) => {
 
-    const reg = /#\/layers\/(\d)(?:\/([a-z]*))?/;
+    const reg = /\/layers\/(\d)(?:\/([a-z]*))?/;
 
     const toolNames : { [key:string]:string; } = {
 		
@@ -28,7 +28,7 @@ export const WireworksHeader: FC<RouteComponentProps> = ({match}) => {
     let layer = 0;
     let toolname;
 
-    let regm = reg.exec(window.location.hash);
+    let regm = reg.exec(window.location.pathname);
     if (regm) {
 
         layer = parseInt(regm[1]);
