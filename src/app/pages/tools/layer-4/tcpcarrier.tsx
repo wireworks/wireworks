@@ -92,9 +92,14 @@ class TcpCarrier extends Component {
 
 	test = () => {
 		this.reset("time to party!!!", () => {
-			this.send("left", 2);
-			this.send("right", 3);
-			this.send("right", 4);
+			this.setPkgState("left", 2, "ok");
+			this.setPkgState("left", 3, "ok");
+			this.setPkgState("left", 4, "ok");
+			this.setPkgState("left", 5, "ok");
+			this.send("right", 2, undefined, () => {this.setPkgState("right", 2, "ok")});
+			this.send("right", 3, undefined, () => {this.setPkgState("right", 3, "ok")});
+			this.send("right", 4, undefined, () => {this.setPkgState("right", 4, "ok")});
+			this.send("right", 5, undefined, () => {this.setPkgState("right", 5, "ok")});
 		});		
 		this.setState({lWindow: 5, lWindowSize: 4});
 	}

@@ -50,7 +50,7 @@ main#tcp-carrier {
 	content: '';
 	background: #d9d8d8;
 	position: absolute;
-	height: 2px;
+	height: 1px;
 	left: $ball-size + $margin-size + 5px;
 	right: $ball-size + $margin-size + 5px;
 }
@@ -80,6 +80,7 @@ main#tcp-carrier {
 	font-size: 1.5em;
 	user-select: none;
 	box-shadow: 0 0 10px -3px rgba(0, 0, 0, 0.5);
+	text-shadow: 3px 3px 3px rgba(0, 0, 0, 0.25);
 }
 
 .tcp-state-ok {
