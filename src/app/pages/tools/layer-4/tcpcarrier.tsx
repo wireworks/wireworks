@@ -16,19 +16,18 @@ interface Pkg {
 
 const TcpPacket: FC<Pkg> = (props) =>
 
-<div className="tcp-p-rail">
-	{props.progress.map((el, ind) => {
-		return (
-			<div key={ind} className="tcp-p-slider" style={{transform: `translateX(${el.toSide === "left" ? 100 - el.prog : el.prog}%)`}}>
-				<div className="tcp-p-ball" onClick={el.onClick}> <span>{props.content}</span> </div>
-			</div>
-		);
-	})}
-	
+<div className="tcp-p-rail">	
 	<div className="tcp-p-asd">
 		<div className={`tcp-p-ball tcp-state-${props.lState}`}> <span>{props.lState==="blank" ? "" : props.content}</span> </div>
 		<div className={`tcp-p-ball tcp-state-${props.rState}`}> <span>{props.rState==="blank" ? "" : props.content}</span> </div>
 	</div>
+	{props.progress.map((el, ind) => {
+		return (
+			<div key={ind} className="tcp-p-slider" style={{transform: `translateX(${el.toSide === "left" ? 100 - el.prog : el.prog}%)`}}>
+				<div className="tcp-p-ball tcp-state-moving" onClick={el.onClick}> <span>{props.content}</span> </div>
+			</div>
+		);
+	})}
 </div>
 
 
@@ -97,6 +96,7 @@ class TcpCarrier extends Component {
 			this.send("right", 3);
 			this.send("right", 4);
 		});		
+		this.setState({lWindow: 5, lWindowSize: 4});
 	}
 
 	get length() {
