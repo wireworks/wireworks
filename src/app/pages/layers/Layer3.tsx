@@ -6,7 +6,7 @@ import { RouteComponentProps } from "react-router";
 class Layer3 extends Component<RouteComponentProps> {
 
 	render () {
-		return <Menu title="Camada 3" description="Camada de Rede" theme="layer3">
+		return <Menu title="Camada 3" description="Camada de Rede">
 
             <ToolItem 	name="IPBits"
                         path={`${this.props.match.path}/ipbits`}

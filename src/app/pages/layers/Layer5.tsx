@@ -6,7 +6,7 @@ import { RouteComponentProps } from "react-router";
 class Layer5 extends Component<RouteComponentProps> {
 
     render () {
-        return <Menu title="Camada 5" description="Camada de Aplicação" theme="layer5">
+        return <Menu title="Camada 5" description="Camada de Aplicação">
 
             <ToolItem 	name="DNSTree"
                         path={`${this.props.match.path}/dnstree`}

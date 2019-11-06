@@ -5,7 +5,7 @@
 
 import React, { Component, RefObject } from "react";
 
-import FlowCanvas, { FlowCanvasProps, Node, Label, NodeConnection, Line } from "../../../components/FlowCanvas";
+import FlowCanvas, { Node, Label, NodeConnection, Line } from "../../../components/FlowCanvas";
 import ErrorBox from "../../../components/ErrorBox";
 import { Domain, ERROR_INVALID_LABEL, ERROR_FULL_NAME_RANGE, ERROR_SMALL_DOMAIN } from "../../../wireworks/networking/layers/layer-5/domain";
 
@@ -99,8 +99,6 @@ class DnsFlow extends Component {
 
 				let tmpDomain = Domain.extractDomain(new Domain(".", undefined), fullName);	
 				
-				console.log(tmpDomain);				
-
 				this.setState(
 					{
 						domain: tmpDomain,
@@ -142,12 +140,6 @@ class DnsFlow extends Component {
 		}
 	}	
 
-	componentDidMount() {
-
-		document.body.className = "theme-layer5";
-
-	}
-
 	constructor(props: any) {
 		super(props);
 		this.txtDomain = React.createRef();
@@ -172,10 +164,10 @@ class DnsFlow extends Component {
 					<div>
 						<label htmlFor="speed">Velocidade</label>
 						<h1>
-							<select name="speed" id="speed" ref={this.selectSpeed}>
+							<select name="speed" id="speed" ref={this.selectSpeed} defaultValue="normal">
 								<option value="veryslow">Muito Lento</option>
 								<option value="slow">Lento</option>
-								<option value="normal" selected>Normal</option>
+								<option value="normal">Normal</option>
 								<option value="fast">Rápido</option>
 								<option value="veryfast">Muito Rápido</option>
 							</select>
@@ -193,17 +185,17 @@ class DnsFlow extends Component {
 					<div>
 						<label>Local</label>
 						<div>
-							<select id="local_mode" ref={this.selectLocalMode}>
+							<select id="local_mode" ref={this.selectLocalMode} defaultValue="recursive">
 								<option value="iterative">Iterativo</option>
-								<option value="recursive" selected>Recursivo</option>
+								<option value="recursive">Recursivo</option>
 							</select>
 						</div>
 					</div>
 					<div>
 						<label>Root</label>
 						<div>
-							<select id="root_mode" ref={this.selectRootMode}>
-								<option value="iterative" selected>Iterativo</option>
+							<select id="root_mode" ref={this.selectRootMode} defaultValue="iterative">
+								<option value="iterative">Iterativo</option>
 								<option value="recursive">Recursivo</option>
 							</select>
 						</div>
@@ -211,8 +203,8 @@ class DnsFlow extends Component {
 					<div>
 						<label>TLD</label>
 						<div>
-							<select id="tld_mode" ref={this.selectTldMode}>
-								<option value="iterative" selected>Iterativo</option>
+							<select id="tld_mode" ref={this.selectTldMode} defaultValue="iterative">
+								<option value="iterative">Iterativo</option>
 								<option value="recursive">Recursivo</option>
 							</select>
 						</div>
@@ -220,8 +212,8 @@ class DnsFlow extends Component {
 					<div>
 						<label>Intermediários</label>
 						<div>
-							<select id="inter_mode" ref={this.selectInterMode}>
-								<option value="iterative" selected>Iterativos</option>
+							<select id="inter_mode" ref={this.selectInterMode} defaultValue="iterative">
+								<option value="iterative">Iterativos</option>
 								<option value="recursive">Recursivos</option>
 							</select>
 						</div>

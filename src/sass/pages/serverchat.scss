@@ -1,0 +1,111 @@
+$asset-root-path: "../../" !default;
+
+@import "../main";
+
+.chat-panel {
+
+	flex: 1;
+	border: 2px solid theme(gray);
+	border-radius: 15px;
+	margin-left: 15px;
+
+	&:first-child {
+		margin-left: 0;
+	}
+
+	header {
+		padding: 1rem;
+		border-bottom: 2px solid theme(gray);
+		.subtitle {
+			color: #808080;
+		}
+		.name {
+			color: theme(text);
+			font-size: $font-size-big;
+		}
+	}
+
+	.content {
+		padding: 1rem;
+		height: 20rem;
+		display: flex;
+		flex-direction: column;
+
+		.messages {
+			overflow-y: scroll;
+			padding-right: 1rem;
+			flex: 1;
+			.message-wrapper {
+				margin: 10px 0;
+				display: flex;
+				flex-direction: row;
+				.message {
+					display: inline-block;
+					color: black;
+					padding: 10px;
+					background: theme(gray-light);
+					border-radius: 20px;
+					animation-name: grow;
+					animation-duration: 0.3s;
+				}
+				&.self {
+					flex-direction: row-reverse;
+					.message {
+						background: theme(secondary);
+						color: white;
+					}
+				}
+			}
+		}
+
+		.input {
+			height: 2.7em;
+			border: 2px solid theme(gray);
+			border-radius: 2em;
+			margin-top: 15px;
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap-reverse;
+			justify-content: flex-end;
+			align-items: stretch;
+			padding: 0 5px;
+			.flag {		
+				display: flex;	
+				align-items: center;
+				background: theme(secondary);
+				color: white;
+				font-size: ($font-size-medium + $font-size-base) / 2;
+				margin: 5px 0 5px 5px;
+				padding: 0.3em 0.6em;
+				border-radius: 0.8em;
+				user-select: none;
+				cursor: pointer;
+				transition: padding 0.4s;
+				&:hover	{
+					padding-right: 1.2em;
+				}
+			}
+		}
+	}
+}
+
+@keyframes grow {
+	from {transform: scaleY(0.7)}
+	to {transform: scaleY(1)}
+}
+
+.log-wrapper {
+	border-radius: 15px;
+	padding: 1rem;
+	color: white;
+	background: #585858;
+	ul {
+		font-family: $font-family-mono;
+		height: 10em;
+		max-height: 10em;
+		overflow: auto;
+		li {
+			margin: 6px 0;
+		}
+	}
+}

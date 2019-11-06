@@ -8,7 +8,7 @@ import { copyToClipboard } from "../../../wireworks/utils/dom";
 import { isCharNumeric, isStringNumeric } from "../../../wireworks/utils/string";
 import { clamp } from "../../../wireworks/utils/math";
 import { Byte } from "../../../wireworks/networking/byte";
-import { joinBitIndex, Address, Byte4Zero, splitBitIndex } from "../../../wireworks/networking/layers/layer-3/address";
+import { joinBitIndex, IP, Byte4Zero, splitBitIndex } from "../../../wireworks/networking/layers/layer-3/ip";
 import "src/sass/pages/ipbits.scss";
 
 /**
@@ -70,9 +70,9 @@ class Ipbits extends Component {
 	private copyIPText: RefObject<HTMLSpanElement>;
 	
 	/**
-	 * Returns the Address, extracted from the DOM elements.
+	 * Returns the IP Address, extracted from the DOM elements.
 	 */
-	private extractAddress(): Address {
+	private extractIPAddress(): IP {
 
 		let ipBytes = Byte4Zero()
 		let maskBytes = Byte4Zero()
@@ -84,7 +84,7 @@ class Ipbits extends Component {
 			}
 		}
 
-		return new Address(ipBytes,maskBytes);
+		return new IP(ipBytes,maskBytes);
 
 	}
 
@@ -120,7 +120,7 @@ class Ipbits extends Component {
 	 */
 	private updateIPShort(str?: string): void {
 
-		this.ipDisplayShort.current.textContent = str ? str : this.extractAddress().toString(true);
+		this.ipDisplayShort.current.textContent = str ? str : this.extractIPAddress().toString(true);
 
 	}
 
@@ -130,25 +130,25 @@ class Ipbits extends Component {
 	 */
 	private updateMaskShort(str?: string): void {
 
-		this.maskDisplayShort.current.textContent = str ? str : this.extractAddress().shortMaskString();
+		this.maskDisplayShort.current.textContent = str ? str : this.extractIPAddress().shortMaskString();
 
 	}
 
 	/**
 	 * Updates the big displays for the IP and mask.
-	 * @param  {Address} address? The address that will be displayed. If not given, it will be calculated.
+	 * @param  {IP} ip? The IP address that will be displayed. If not given, it will be calculated.
 	 */
-	private updateDisplays = (address?: Address): void => {
+	private updateDisplays = (ip?: IP): void => {
 
-		address = address? address : this.extractAddress();
+		ip = ip? ip : this.extractIPAddress();
 
 		for (let i = 0; i < 4; i++) {
-			this.ipDisplays[i].current.value = "" + address.getIp()[i].getDecimal();
-			this.maskDisplays[i].current.textContent = "" + address.getMask()[i].getDecimal();
+			this.ipDisplays[i].current.value = "" + ip.getIp()[i].getDecimal();
+			this.maskDisplays[i].current.textContent = "" + ip.getMask()[i].getDecimal();
 		}
 
-		this.updateIPShort(address.toString(true));
-		this.updateMaskShort(address.shortMaskString());
+		this.updateIPShort(ip.toString(true));
+		this.updateMaskShort(ip.shortMaskString());
 
 	}
 
@@ -158,13 +158,13 @@ class Ipbits extends Component {
 	 */
 	private selectMaskBit = (index: number): void => {
 
-		let { bitIndex: bitIndex, byteIndex: byteIndex } = splitBitIndex(index);
+		let { bitIndex, byteIndex } = splitBitIndex(index);
 
 		index += this.MASK[byteIndex][bitIndex].current.checked ? 1 : 0;
 
 		for (let byte4Index = 0; byte4Index < 32; byte4Index++) {
 			
-			let { bitIndex: bitIndex, byteIndex: byteIndex } = splitBitIndex(byte4Index);
+			let { bitIndex, byteIndex } = splitBitIndex(byte4Index);
 			let on = byte4Index < index;
 
 			this.MASK[byteIndex][bitIndex].current.checked = on;
@@ -183,7 +183,7 @@ class Ipbits extends Component {
 
 		let scope: Ipbits = this;
 
-		copyToClipboard(this.extractAddress().toString(true), function (success: boolean): void {
+		copyToClipboard(this.extractIPAddress().toString(true), function (success: boolean): void {
 
 			let text = scope.copyIPText.current;
 			text.style.transition = "";
@@ -204,7 +204,7 @@ class Ipbits extends Component {
 
 		let scope: Ipbits = this;
 
-		copyToClipboard(this.extractAddress().maskString(), function (success: boolean): void {
+		copyToClipboard(this.extractIPAddress().maskString(), function (success: boolean): void {
 
 			let text = scope.copyMaskText.current;
 			text.style.transition = "";
@@ -244,7 +244,7 @@ class Ipbits extends Component {
 		
 		display.select();
 
-		let originalAddress = this.extractAddress();
+		let originalAddress = this.extractIPAddress();
 		this.blurByte = originalAddress.getIp()[byteIndex];
 
 	}
@@ -270,7 +270,7 @@ class Ipbits extends Component {
 			return;
 		}
 
-		let selectedText = window.getSelection().anchorNode == display.parentNode ? window.getSelection().toString() : "";
+		let selectedText = window.getSelection().anchorNode === display.parentNode ? window.getSelection().toString() : "";
 
 		if (additionalKeys.indexOf(evt.key) === -1 && display.value.length >= 3 && selectedText === "")  evt.preventDefault();
 
@@ -283,7 +283,7 @@ class Ipbits extends Component {
 				
 		let next = byteIndex < 3 ? this.ipDisplays[byteIndex + 1].current : undefined;
 
-		let selectedText = window.getSelection().anchorNode == display.parentNode ? window.getSelection().toString() : "";
+		let selectedText = window.getSelection().anchorNode === display.parentNode ? window.getSelection().toString() : "";
 
 		if (additionalKeys.indexOf(evt.key) === -1 && display.value.length >= 3 && selectedText === "") {
 
@@ -302,7 +302,7 @@ class Ipbits extends Component {
 		
 		if (display.value === "") {
 						
-			let address = this.extractAddress();
+			let address = this.extractIPAddress();
 
 			let minByte = address.getIp()[byteIndex];
 			let mask = address.getMask()[byteIndex];
@@ -320,7 +320,7 @@ class Ipbits extends Component {
 
 			if (isStringNumeric(display.value)){
 
-				let address = this.extractAddress();
+				let address = this.extractIPAddress();
 
 				let minByte = address.getIp()[byteIndex];
 				let maxByte = minByte.clone();
@@ -378,9 +378,9 @@ class Ipbits extends Component {
 
 	}
 
-	componentDidMount() {
-		document.body.className = "theme-layer3";
+	componentDidMount() {		
 		this.updateDisplays();
+		this.updateIPShort();
 	}
 
 	render() {
@@ -451,14 +451,14 @@ class Ipbits extends Component {
 			<main>
 				<div className="spacer">
 					<h2>Máscara <i className="far fa-clipboard copy-icon" ref={this.copyMaskButton} onClick={this.copyMaskToClipboard}></i> <span className="copy-text" ref={this.copyMaskText}>Máscara copiada</span></h2>
-					<h2 className="text-light font-light" ref={this.maskDisplayShort}></h2>
+					<h2 className="text-light font-light" ref={this.maskDisplayShort}>/0</h2>
 				</div>
 				
 				<div className="box"> {maskBox} </div>
 				
 				<div className="spacer">
 					<h2>IP <i className="far fa-clipboard copy-icon" ref={this.copyIPButton} onClick={this.copyIPToClipboard}></i> <span className="copy-text" ref={this.copyIPText}>IP Copiado</span></h2>
-					<h2 className="text-light font-light" ref={this.ipDisplayShort}></h2>
+					<h2 className="text-light font-light" ref={this.ipDisplayShort}>0.0.0.0</h2>
 				</div>
 				
 				<div className="box"> {ipBox} </div>

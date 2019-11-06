@@ -11,13 +11,13 @@
 	flex-direction: column;
 	justify-content: space-between;
 
-	.content, footer {
+	&>.content, &>footer {
 		flex-shrink: 0;
 	}
 
-	.content {
+	&>.content {
 
-		header {
+		&>header {
 
 			color: white;
 			background: transparent;
@@ -44,7 +44,7 @@
 
 		}
 
-		main {
+		&>main {
 
 			background: white;
 			padding: 25px;
