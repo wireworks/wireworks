@@ -1,7 +1,6 @@
 import React, { Component, FC } from "react";
 import "src/sass/pages/tcpcarrier.scss";
-import { ballSize, marginSize } from "src/sass/pages/tcpcarrier.scss";
-
+import { ballSize, marginSize } from "../../../../sass/pages/tcpcarrier.scss";
 
 interface Pkg {
     content: string
@@ -107,8 +106,8 @@ class TcpCarrier extends Component {
         for (let f of msg) {
             const p = {
                 content: f,
-                lState: "waiting",
-                rState: "waiting",
+                lState: "waiting" as "ok" | "waiting"| "blank",
+                rState: "waiting" as "ok" | "waiting"| "blank",
                 progress: new Array<{prog: number, toSide: "left"|"right"}>()
             }
             arr.push(p);
