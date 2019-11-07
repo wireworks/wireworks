@@ -11,7 +11,7 @@ input, button, select {
 
 }
 
-input[type="text"], select {
+input[type="text"], input[type="number"], select {
 	
 	padding: 0.25em;
 	border: 2px solid theme(secondary);
