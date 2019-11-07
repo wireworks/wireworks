@@ -19,6 +19,7 @@ $asset-root-path: '..' !default;
 @import "components/loading";
 @import "components/materialicons";
 @import "components/flowcanvas";
+@import "components/datacarrier";
 
 html {
 	height: 100%;

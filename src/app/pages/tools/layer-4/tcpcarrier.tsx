@@ -1,191 +1,93 @@
-import React, { Component, FC } from "react";
+import React, { Component, FC, RefObject } from "react";
 import "src/sass/pages/tcpcarrier.scss";
-import { ballSize, marginSize } from "../../../../sass/pages/tcpcarrier.scss";
-
-interface Pkg {
-	content: string
-	lState: "ok" | "waiting"| "blank",
-	rState: "ok" | "waiting" | "blank",
-	progress: Array<{
-		onClick?: () => void,
-		onArrive?: () => void,
-		toSide: "left"|"right",
-		prog: number
-	}>
-}
-
-const TcpPacket: FC<Pkg> = (props) =>
-
-<div className="tcp-p-rail">	
-	<div className="tcp-p-asd">
-		<div className={`tcp-p-ball tcp-state-${props.lState}`}> <span>{props.lState==="blank" ? "" : props.content}</span> </div>
-		<div className={`tcp-p-ball tcp-state-${props.rState}`}> <span>{props.rState==="blank" ? "" : props.content}</span> </div>
-	</div>
-	{props.progress.map((el, ind) => {
-		return (
-			<div key={ind} className="tcp-p-slider" style={{transform: `translateX(${el.toSide === "left" ? 100 - el.prog : el.prog}%)`}}>
-				<div className="tcp-p-ball tcp-state-moving" onClick={el.onClick}> <span>{props.content}</span> </div>
-			</div>
-		);
-	})}
-</div>
-
+import DataCarrier from "../../../components/DataCarrier";
+import ErrorBox from "../../../components/ErrorBox";
 
 class TcpCarrier extends Component {
 
-	running = true;
+	private txtMessage: RefObject<HTMLInputElement>;
+	private txtWindow: RefObject<HTMLInputElement>;
+	private carrier: RefObject<DataCarrier>;
 
 	state = {
-		lWindow: 0,
-		rWindow: 0,
+		errorMessage: null as string
+	}
 
-		lWindowSize: 1,
-		rWindowSize: 1,
+	private start = (str?: string, window?: number) => {
+		this.setState({errorMessage: null});
+		const c = this.carrier.current;
+		if (window === undefined) {
+			window = parseInt(this.txtWindow.current.value.trim());
+			if (!str) {
+				str = this.txtMessage.current.value.trim();
+				window = Math.min(window, str.length);
+				this.txtWindow.current.value = "" + window;
+			}
+		}
+		if (!str) {
+			str = this.txtMessage.current.value.trim();
+		}
+		if (str.length > 0) {
+			if (window >= 1) {
+				c.setState({lWindowSize: window, rWindowSize: window});
+				c.reset(str);
+			}
+			else {
+				this.setState({errorMessage: "Entrada Inválida. A sua janela deve ser maior que 0."});
+			}
+		}
+		else {
+			this.setState({errorMessage: "Entrada Inválida. A sua mensagem deve possuir mais de 0 caracteres."});
+		}
+	}
 
-		speed: 0.5,
-		arr: new Array<Pkg>()
+	constructor(props) {
+		super(props);
+		this.carrier = React.createRef();
+		this.txtMessage = React.createRef();
+		this.txtWindow = React.createRef();
 	}
 
 	componentDidMount() {
-		this.reset("Hello World");
-		window.requestAnimationFrame(this.update);
+		this.start(Math.random() > 0.0001 ? "Wireworks" : "Machinna", 4);
 	}
-
-	componentWillUnmount() {
-		this.running = false;
-	}
-
-	private clamp = (n: number) => {
-		if (n > 100)
-			return 100
-		if (n < 0)
-			return 0
-		return n;
-	}
-
-	update = () => {
-		if (this.running) {
-
-			const arr = this.state.arr;
-
-			for (let pkg of arr) {
-				for (let i=pkg.progress.length-1; i >= 0; i--) {
-					const ball = pkg.progress[i];
-					if (ball.prog != 100) {
-						let newVal = ball.prog + this.state.speed;
-						if (newVal >= 100) {
-							newVal = 100;
-							if (ball.onArrive) ball.onArrive();
-							pkg.progress.splice(i,1);
-						}
-						ball.prog = newVal;
-					}
-				}
-			}
-
-			this.setState({arr: arr});
-			window.requestAnimationFrame(this.update);
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////
-
-	test = () => {
-		this.reset("time to party!!!", () => {
-			this.setPkgState("left", 2, "ok");
-			this.setPkgState("left", 3, "ok");
-			this.setPkgState("left", 4, "ok");
-			this.setPkgState("left", 5, "ok");
-			this.send("right", 2, undefined, () => {this.setPkgState("right", 2, "ok")});
-			this.send("right", 3, undefined, () => {this.setPkgState("right", 3, "ok")});
-			this.send("right", 4, undefined, () => {this.setPkgState("right", 4, "ok")});
-			this.send("right", 5, undefined, () => {this.setPkgState("right", 5, "ok")});
-		});		
-		this.setState({lWindow: 5, lWindowSize: 4});
-	}
-
-	get length() {
-		return this.state.arr.length;
-	}
-
-	set speed(spd: number) {
-		this.setState({speed: spd});
-	}
-
-	reset = (msg: string, callback?: ()=>void) => {
-		const arr = new Array<Pkg>();
-		for (let f of msg) {
-			const p = {
-				content: f,
-				lState: "waiting",
-				rState: "blank",
-				progress: new Array<{prog: number, toSide: "left"|"right"}>()
-			} as Pkg;
-			arr.push(p);
-		}
-		this.setState({arr: arr}, callback);
-	}
-
-	setPkgState = (side: "left"|"right", index: number, state: "ok"|"waiting"|"blank") => {
-		const arr = this.state.arr;
-		if (side == "left") {
-			arr[index].lState = state;
-		} else {
-			arr[index].rState = state;
-		}
-	}
-
-	send = (to: "left"|"right", index: number, onClick?: () => void, onArrive?: () => void) => {
-		const p = {
-			toSide: to,
-			onClick: onClick,
-			onArrive: onArrive,
-			prog: 0,
-		};
-		this.state.arr[index].progress.push(p);
-	}
-
-	changeWindow = (side: "left"|"right", toIndex: number, toSize: number) => {
-		if (side == "left") {
-			this.setState({lWindow: toIndex, lWindowSize: toSize});
-		} else {
-			this.setState({rWindow: toIndex, rWindowSize: toSize});
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////
 
 	render() {
-
 		return (
-			<main id="tcp-carrier">
+			<main>
+				<div className="hbox">
+					<DataCarrier ref={this.carrier} />
 
-				{/* TCP animation */}
-				<div className="tcp-cont-packet">
+					<div className="ml-3">
 
-					<div className="tcp-cont-window"> 
-						<div style={{transform: `translateY(${this.state.lWindow*100}%)`}} className="tcp-window-wrapper tcp-left">
-							<div style={{minHeight: ((parseInt(ballSize) + parseInt(marginSize) * 2) * this.state.lWindowSize) + "px"}} className="tcp-window"></div>
+						<div className="hbox align-end mb-3">
+							<div>
+								<label htmlFor="message">Mensagem</label>
+								<div>
+									<input className="mr-0" type="text" id="message" ref={this.txtMessage} onKeyDown={(ev) => { if (ev.key === "Enter") this.start() }} placeholder="Sua mensagem" />
+								</div>
+							</div>
 						</div>
-						<div style={{transform: `translateY(${this.state.rWindow*100}%)`}} className="tcp-window-wrapper tcp-right">
-							<div style={{height: ((parseInt(ballSize) + parseInt(marginSize) * 2) * this.state.rWindowSize)}} className="tcp-window"></div>
+
+						<div className="hbox align-end mb-3">
+							<div>
+								<label htmlFor="window_size">Tamanho da Janela</label>
+								<div>
+									<input className="mr-0" type="number" min="1" id="window_size" ref={this.txtWindow} onKeyDown={(ev) => { if (ev.key === "Enter") this.start() }} placeholder="1" />
+								</div>
+							</div>
 						</div>
+
+						<div className="hbox fill">
+							<button onClick={() => { this.start() }}>Iniciar</button>
+							<button className="ml-2">Parar</button>
+						</div>
+
 					</div>
-
-					{this.state.arr.map((el, ind) => {
-						return <TcpPacket key={ind} rState={el.rState} lState={el.lState} content={el.content} progress={el.progress}/>
-					})}
-
 				</div>
 
-				{/* Menu */}
-				<div className="tcp-cont-menu">
-					<div>
-						<button onClick={this.test}>Start</button>
-						<button>Stop</button>
-					</div>
-				</div>
-				
+				<ErrorBox className="mt-3" errorMessage={this.state.errorMessage}/>
+
 			</main>
 		);
 	}
