@@ -13,24 +13,32 @@ class TcpCarrier extends Component {
 		errorMessage: null as string
 	}
 
-	private start = (str?: string, window?: number) => {
+	private start = (str?: string, windowSize?: number) => {
 		this.setState({errorMessage: null});
 		const c = this.carrier.current;
-		if (window === undefined) {
-			window = parseInt(this.txtWindow.current.value.trim());
+		if (windowSize === undefined) {
+			windowSize = parseInt(this.txtWindow.current.value.trim());
 			if (!str) {
 				str = this.txtMessage.current.value.trim();
-				window = Math.min(window, str.length);
-				this.txtWindow.current.value = "" + window;
+				windowSize = Math.min(windowSize, str.length);
+				this.txtWindow.current.value = "" + windowSize;
 			}
 		}
 		if (!str) {
 			str = this.txtMessage.current.value.trim();
 		}
 		if (str.length > 0) {
-			if (window >= 1) {
-				c.setState({lWindowSize: window, rWindowSize: window});
+			if (windowSize >= 1) {
+				c.setState({lWindowSize: windowSize, rWindowSize: windowSize});
 				c.reset(str);
+				let i = 0;
+				let timer = setInterval(()=>{
+					c.setState({lWindow: i, lWindowSize: Math.min(windowSize, c.length-i)});
+					c.send("right", i);
+					i++;
+					if (i >= c.length) clearInterval(timer);
+				},500);
+
 			}
 			else {
 				this.setState({errorMessage: "Entrada Inválida. A sua janela deve ser maior que 0."});
