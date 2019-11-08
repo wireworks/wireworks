@@ -32,7 +32,7 @@ class TcpCarrier extends Component {
 		}
 		if (str.length > 0) {
 			if (windowSize >= 1) {
-				c.setState({ lWindowSize: windowSize, rWindowSize: windowSize });
+				c.setState({ lWindowSize: windowSize, rWindowSize: windowSize, lWindow: 0, rWindow: 0 });
 				this.sender = new Array<boolean>(str.length).fill(false);
 				this.receiver = new Array<boolean>(str.length).fill(false);
 				c.reset(str, this.start);
@@ -83,7 +83,7 @@ class TcpCarrier extends Component {
 	private start = () => {
 		let c = this.carrier.current;
 		let iter = this.sendWindowIterator();
-		const cont = () => {
+		let cont = () => {
 			setTimeout(() => {
 				let res = iter.next();
 				if (!res.done) {
