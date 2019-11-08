@@ -1,33 +1,33 @@
 import React, { Component, FC } from "react";
-import {ballSize, marginSize} from "../../sass/components/_datacarrier.scss";
+import { ballSize, marginSize } from "../../sass/components/_datacarrier.scss";
 
 interface Pkg {
 	content: string
-	lState: "ok" | "waiting"| "blank",
+	lState: "ok" | "waiting" | "blank",
 	rState: "ok" | "waiting" | "blank",
 	progress: Array<{
 		onClick?: () => void,
 		onArrive?: () => void,
-		toSide: "left"|"right",
+		toSide: "left" | "right",
 		prog: number
 	}>
 }
 
 const TcpPacket: FC<Pkg> = (props) =>
 
-<div className="carrier-p-rail">	
-	<div className="carrier-p-asd">
-		<div className={`carrier-p-ball carrier-state-${props.lState}`}> <span>{props.lState==="blank" ? "" : props.content}</span> </div>
-		<div className={`carrier-p-ball carrier-state-${props.rState}`}> <span>{props.rState==="blank" ? "" : props.content}</span> </div>
+	<div className="carrier-p-rail">
+		<div className="carrier-p-asd">
+			<div className={`carrier-p-ball carrier-state-${props.lState}`}> <span>{props.lState === "blank" ? "" : props.content}</span> </div>
+			<div className={`carrier-p-ball carrier-state-${props.rState}`}> <span>{props.rState === "blank" ? "" : props.content}</span> </div>
+		</div>
+		{props.progress.map((el, ind) => {
+			return (
+				<div key={ind} className="carrier-p-slider" style={{ transform: `translateX(${el.toSide === "left" ? 100 - el.prog : el.prog}%)` }}>
+					<div className="carrier-p-ball carrier-state-moving" onClick={el.onClick}> <span>{props.content}</span> </div>
+				</div>
+			);
+		})}
 	</div>
-	{props.progress.map((el, ind) => {
-		return (
-			<div key={ind} className="carrier-p-slider" style={{transform: `translateX(${el.toSide === "left" ? 100 - el.prog : el.prog}%)`}}>
-				<div className="carrier-p-ball carrier-state-moving" onClick={el.onClick}> <span>{props.content}</span> </div>
-			</div>
-		);
-	})}
-</div>
 
 export default class DataCarrier extends Component {
 	running = true;
@@ -39,7 +39,7 @@ export default class DataCarrier extends Component {
 		lWindowSize: 1,
 		rWindowSize: 1,
 
-		speed: 0.5,
+		speed: 1,
 		arr: new Array<Pkg>()
 	}
 
@@ -65,21 +65,21 @@ export default class DataCarrier extends Component {
 			const arr = this.state.arr;
 
 			for (let pkg of arr) {
-				for (let i=pkg.progress.length-1; i >= 0; i--) {
+				for (let i = pkg.progress.length - 1; i >= 0; i--) {
 					const ball = pkg.progress[i];
 					if (ball.prog != 100) {
 						let newVal = ball.prog + this.state.speed;
 						if (newVal >= 100) {
 							newVal = 100;
 							if (ball.onArrive) ball.onArrive();
-							pkg.progress.splice(i,1);
+							pkg.progress.splice(i, 1);
 						}
 						ball.prog = newVal;
 					}
 				}
 			}
 
-			this.setState({arr: arr});
+			this.setState({ arr: arr });
 			window.requestAnimationFrame(this.update);
 		}
 	}
@@ -107,24 +107,24 @@ export default class DataCarrier extends Component {
 	}
 
 	set speed(spd: number) {
-		this.setState({speed: spd});
+		this.setState({ speed: spd });
 	}
 
-	reset = (msg: string, callback?: ()=>void) => {
+	reset = (msg: string, callback?: () => void) => {
 		const arr = new Array<Pkg>();
 		for (let f of msg) {
 			const p = {
 				content: f,
 				lState: "waiting",
 				rState: "blank",
-				progress: new Array<{prog: number, toSide: "left"|"right"}>()
+				progress: new Array<{ prog: number, toSide: "left" | "right" }>()
 			} as Pkg;
 			arr.push(p);
 		}
-		this.setState({arr: arr}, callback);
+		this.setState({ arr: arr }, callback);
 	}
 
-	setPkgState = (side: "left"|"right", index: number, state: "ok"|"waiting"|"blank") => {
+	setPkgState = (side: "left" | "right", index: number, state: "ok" | "waiting" | "blank") => {
 		const arr = this.state.arr;
 		if (side == "left") {
 			arr[index].lState = state;
@@ -133,7 +133,7 @@ export default class DataCarrier extends Component {
 		}
 	}
 
-	send = (to: "left"|"right", index: number, onClick?: () => void, onArrive?: () => void) => {
+	send = (to: "left" | "right", index: number, onClick?: () => void, onArrive?: () => void) => {
 		const p = {
 			toSide: to,
 			onClick: onClick,
@@ -143,11 +143,11 @@ export default class DataCarrier extends Component {
 		this.state.arr[index].progress.push(p);
 	}
 
-	changeWindow = (side: "left"|"right", toIndex: number, toSize: number) => {
+	changeWindow = (side: "left" | "right", toIndex: number, toSize: number) => {
 		if (side == "left") {
-			this.setState({lWindow: toIndex, lWindowSize: toSize});
+			this.setState({ lWindow: toIndex, lWindowSize: toSize });
 		} else {
-			this.setState({rWindow: toIndex, rWindowSize: toSize});
+			this.setState({ rWindow: toIndex, rWindowSize: toSize });
 		}
 	}
 
@@ -158,17 +158,17 @@ export default class DataCarrier extends Component {
 		return (
 			<div className="data-carrier">
 
-				<div className="carrier-cont-window"> 
-					<div style={{transform: `translateY(${this.state.lWindow*100}%)`}} className="carrier-window-wrapper carrier-left">
-						<div style={{minHeight: ((parseInt(ballSize) + parseInt(marginSize) * 2) * this.state.lWindowSize) + "px"}} className="carrier-window"></div>
+				<div className="carrier-cont-window">
+					<div style={{ transform: `translateY(${this.state.lWindow * 100}%)` }} className="carrier-window-wrapper carrier-left">
+						<div style={{ minHeight: ((parseInt(ballSize) + parseInt(marginSize) * 2) * this.state.lWindowSize) + "px" }} className="carrier-window"></div>
 					</div>
-					<div style={{transform: `translateY(${this.state.rWindow*100}%)`}} className="carrier-window-wrapper carrier-right">
-						<div style={{height: ((parseInt(ballSize) + parseInt(marginSize) * 2) * this.state.rWindowSize)}} className="carrier-window"></div>
+					<div style={{ transform: `translateY(${this.state.rWindow * 100}%)` }} className="carrier-window-wrapper carrier-right">
+						<div style={{ height: ((parseInt(ballSize) + parseInt(marginSize) * 2) * this.state.rWindowSize) }} className="carrier-window"></div>
 					</div>
 				</div>
 
 				{this.state.arr.map((el, ind) => {
-					return <TcpPacket key={ind} rState={el.rState} lState={el.lState} content={el.content} progress={el.progress}/>
+					return <TcpPacket key={ind} rState={el.rState} lState={el.lState} content={el.content} progress={el.progress} />
 				})}
 
 			</div>

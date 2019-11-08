@@ -17,7 +17,7 @@ class TcpCarrier extends Component {
 	}
 
 	private setup = (str?: string, windowSize?: number) => {
-		this.setState({errorMessage: null});
+		this.setState({ errorMessage: null });
 		const c = this.carrier.current;
 		if (windowSize === undefined) {
 			windowSize = parseInt(this.txtWindow.current.value.trim());
@@ -32,38 +32,64 @@ class TcpCarrier extends Component {
 		}
 		if (str.length > 0) {
 			if (windowSize >= 1) {
-				c.setState({lWindowSize: windowSize, rWindowSize: windowSize});
+				c.setState({ lWindowSize: windowSize, rWindowSize: windowSize });
 				this.sender = new Array<boolean>(str.length).fill(false);
 				this.receiver = new Array<boolean>(str.length).fill(false);
 				c.reset(str, this.start);
 			}
 			else {
-				this.setState({errorMessage: "Entrada Inválida. A sua janela deve ser maior que 0."});
+				this.setState({ errorMessage: "Entrada Inválida. A sua janela deve ser maior que 0." });
 			}
 		}
 		else {
-			this.setState({errorMessage: "Entrada Inválida. A sua mensagem deve possuir mais de 0 caracteres."});
+			this.setState({ errorMessage: "Entrada Inválida. A sua mensagem deve possuir mais de 0 caracteres." });
 		}
 	}
 
-	private sendWindow = function* () {
+	private sendWindowIterator = function* () {
 		const c = this.carrier.current;
+		const ogWinSize = c.lWindowSize;
+		const onReachReceiver = (recI: number) => {
+			this.receiver[recI] = true;
+			c.setPkgState("right", recI, "ok");
+			for (let j = 0; j < this.receiver.length + 1; j++) {
+				if (!this.receiver[j]) {
+					let senI = j - 1;
+					c.send("left", senI, undefined, () => {
+						// alert(senI);
+						this.sender[senI] = true;
+						c.setPkgState("left", (senI), "ok");
+						if (senI < c.length - 1) {
+							let newWin = c.lWindow + 1;
+							let newWinSize = Math.min(c.lWindowSize, c.length - (senI + 1));
+							c.changeWindow("left", newWin, newWinSize);
+							if (ogWinSize === newWinSize) {
+								c.send("right", newWin + newWinSize - 1, undefined, () => { onReachReceiver(newWin + newWinSize - 1) });
+							}
+						}
+					});
+					break;
+				}
+			}
+		}
 		for (let i = 0; i < c.lWindowSize; i++) {
-			c.send("right", c.lWindow + i, undefined, undefined);
-			yield;
+			if (!this.sender[i]) {
+				c.send("right", c.lWindow + i, undefined, () => { onReachReceiver(i) });
+				yield;
+			}
 		}
 	}
 
 	private start = () => {
 		let c = this.carrier.current;
-		let iter = this.sendWindow();
-		let cont = () => {
-			setTimeout(()=>{
+		let iter = this.sendWindowIterator();
+		const cont = () => {
+			setTimeout(() => {
 				let res = iter.next();
 				if (!res.done) {
 					cont();
 				}
-			},300);
+			}, 300);
 		};
 		cont();
 	}
@@ -113,7 +139,7 @@ class TcpCarrier extends Component {
 					</div>
 				</div>
 
-				<ErrorBox className="mt-3" errorMessage={this.state.errorMessage}/>
+				<ErrorBox className="mt-3" errorMessage={this.state.errorMessage} />
 
 			</main>
 		);
