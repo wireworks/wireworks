@@ -90,6 +90,22 @@ export default class DataCarrier extends Component {
 		return this.state.arr.length;
 	}
 
+	get lWindowSize() {
+		return this.state.lWindowSize;
+	}
+
+	get lWindow() {
+		return this.state.lWindow;
+	}
+
+	get rWindowSize() {
+		return this.state.rWindowSize;
+	}
+
+	get rWindow() {
+		return this.state.rWindow;
+	}
+
 	set speed(spd: number) {
 		this.setState({speed: spd});
 	}

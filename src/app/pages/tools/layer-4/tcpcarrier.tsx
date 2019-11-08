@@ -9,11 +9,14 @@ class TcpCarrier extends Component {
 	private txtWindow: RefObject<HTMLInputElement>;
 	private carrier: RefObject<DataCarrier>;
 
+	private sender = [] as boolean[];
+	private receiver = [] as boolean[];
+
 	state = {
 		errorMessage: null as string
 	}
 
-	private start = (str?: string, windowSize?: number) => {
+	private setup = (str?: string, windowSize?: number) => {
 		this.setState({errorMessage: null});
 		const c = this.carrier.current;
 		if (windowSize === undefined) {
@@ -30,15 +33,9 @@ class TcpCarrier extends Component {
 		if (str.length > 0) {
 			if (windowSize >= 1) {
 				c.setState({lWindowSize: windowSize, rWindowSize: windowSize});
-				c.reset(str);
-				let i = 0;
-				let timer = setInterval(()=>{
-					c.setState({lWindow: i, lWindowSize: Math.min(windowSize, c.length-i)});
-					c.send("right", i);
-					i++;
-					if (i >= c.length) clearInterval(timer);
-				},500);
-
+				this.sender = new Array<boolean>(str.length).fill(false);
+				this.receiver = new Array<boolean>(str.length).fill(false);
+				c.reset(str, this.start);
 			}
 			else {
 				this.setState({errorMessage: "Entrada Inválida. A sua janela deve ser maior que 0."});
@@ -49,6 +46,28 @@ class TcpCarrier extends Component {
 		}
 	}
 
+	private sendWindow = function* () {
+		const c = this.carrier.current;
+		for (let i = 0; i < c.lWindowSize; i++) {
+			c.send("right", c.lWindow + i, undefined, undefined);
+			yield;
+		}
+	}
+
+	private start = () => {
+		let c = this.carrier.current;
+		let iter = this.sendWindow();
+		let cont = () => {
+			setTimeout(()=>{
+				let res = iter.next();
+				if (!res.done) {
+					cont();
+				}
+			},300);
+		};
+		cont();
+	}
+
 	constructor(props) {
 		super(props);
 		this.carrier = React.createRef();
@@ -57,7 +76,7 @@ class TcpCarrier extends Component {
 	}
 
 	componentDidMount() {
-		this.start(Math.random() > 0.0001 ? "Wireworks" : "Machinna", 4);
+		this.setup(Math.random() > 0.0001 ? "Wireworks" : "Machinna", 4);
 	}
 
 	render() {
@@ -72,7 +91,7 @@ class TcpCarrier extends Component {
 							<div>
 								<label htmlFor="message">Mensagem</label>
 								<div>
-									<input className="mr-0" type="text" id="message" ref={this.txtMessage} onKeyDown={(ev) => { if (ev.key === "Enter") this.start() }} placeholder="Sua mensagem" />
+									<input className="mr-0" type="text" id="message" ref={this.txtMessage} onKeyDown={(ev) => { if (ev.key === "Enter") this.setup() }} placeholder="Sua mensagem" />
 								</div>
 							</div>
 						</div>
@@ -81,13 +100,13 @@ class TcpCarrier extends Component {
 							<div>
 								<label htmlFor="window_size">Tamanho da Janela</label>
 								<div>
-									<input className="mr-0" type="number" min="1" id="window_size" ref={this.txtWindow} onKeyDown={(ev) => { if (ev.key === "Enter") this.start() }} placeholder="1" />
+									<input className="mr-0" type="number" min="1" id="window_size" ref={this.txtWindow} onKeyDown={(ev) => { if (ev.key === "Enter") this.setup() }} placeholder="1" />
 								</div>
 							</div>
 						</div>
 
 						<div className="hbox fill">
-							<button onClick={() => { this.start() }}>Iniciar</button>
+							<button onClick={() => { this.setup() }}>Iniciar</button>
 							<button className="ml-2">Parar</button>
 						</div>
 
