@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { WireworksHeader } from "./app/components/Header";
 import Footer from "./app/components/Footer";
 import "src/sass/pages/index.scss"
-import BitFlux from "./app/pages/tools/layer-1/bitflux";
 
 
 const Layer1 = lazy(() => import("./app/pages/layers/Layer1"));
@@ -13,6 +12,9 @@ const Layer2 = lazy(() => import("./app/pages/layers/Layer2"));
 const Layer3 = lazy(() => import("./app/pages/layers/Layer3"));
 const Layer4 = lazy(() => import("./app/pages/layers/Layer4"));
 const Layer5 = lazy(() => import("./app/pages/layers/Layer5"));
+
+const BitFlux = lazy(() => import("./app/pages/tools/layer-1/bitflux"));
+const Framer = lazy(() => import("./app/pages/tools/layer-1/framer"));
 
 const MacFetch = lazy(() => import("./app/pages/tools/layer-2/macfetch"));
 
@@ -57,6 +59,7 @@ const Wireworks: FC = () =>
 
 				{/* Layer 1 */}
 				<Route path="/layers/1/bitflux" component={BitFlux} />
+				<Route path="/layers/1/framer" component={Framer} />
 
 				{/* Layer 2*/}
 				<Route path="/layers/2/macfetch" render={() => {return <MacFetch ipFetch={false}/>;}} />
