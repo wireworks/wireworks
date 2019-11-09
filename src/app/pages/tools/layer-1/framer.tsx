@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import "src/sass/pages/framer.scss";
 
 
 class Framer extends Component {

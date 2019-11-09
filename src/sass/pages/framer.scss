@@ -1,0 +1,29 @@
+$asset-root-path: '../../' !default;
+
+@import "../main";
+
+.framer-noise {
+	background-color: bisque;
+}
+
+.framer-preamble {
+	background-color: aqua;
+}
+
+.framer-sfd {
+	background-color: chartreuse;
+}
+
+.framer-framedata {
+	background-color: blueviolet;
+}
+
+.framer-fcs {
+	background-color: cadetblue;
+}
+
+
+.framer-container {
+	display: flex;
+	flex-wrap: wrap;
+}
