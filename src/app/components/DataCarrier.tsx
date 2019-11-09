@@ -1,16 +1,18 @@
 import React, { Component, FC } from "react";
 import { ballSize, marginSize } from "../../sass/components/_datacarrier.scss";
 
+interface Progress {
+	onClick?: () => void,
+	onArrive?: () => void,
+	toSide: "left" | "right",
+	prog: number
+}
+
 interface Pkg {
 	content: string
 	lState: "ok" | "waiting" | "blank",
 	rState: "ok" | "waiting" | "blank",
-	progress: Array<{
-		onClick?: () => void,
-		onArrive?: () => void,
-		toSide: "left" | "right",
-		prog: number
-	}>
+	progress: Array<Progress>
 }
 
 const TcpPacket: FC<Pkg> = (props) =>
@@ -39,7 +41,7 @@ export default class DataCarrier extends Component {
 		lWindowSize: 1,
 		rWindowSize: 1,
 
-		speed: 1,
+		speed: 0.5,
 		arr: new Array<Pkg>()
 	}
 
@@ -133,7 +135,7 @@ export default class DataCarrier extends Component {
 		}
 	}
 
-	send = (to: "left" | "right", index: number, onClick?: () => void, onArrive?: () => void) => {
+	send = (to: "left" | "right", index: number, onClick?: () => void, onArrive?: () => void): Progress => {
 		const p = {
 			toSide: to,
 			onClick: onClick,
@@ -141,6 +143,11 @@ export default class DataCarrier extends Component {
 			prog: 0,
 		};
 		this.state.arr[index].progress.push(p);
+		return p;
+	}
+
+	removeMoving = (index: number, prog: Progress) => {
+		this.state.arr[index].progress.splice(this.state.arr[index].progress.indexOf(prog),1);
 	}
 
 	changeWindow = (side: "left" | "right", toIndex: number, toSize: number) => {

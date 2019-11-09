@@ -9,7 +9,10 @@ class TcpCarrier extends Component {
 	private txtWindow: RefObject<HTMLInputElement>;
 	private carrier: RefObject<DataCarrier>;
 
-	private sender = [] as boolean[];
+	private ogWinSize = 1;
+	private timers = [] as NodeJS.Timeout[];
+	private sent = [] as boolean[];
+	private confirmed = [] as boolean[];
 	private receiver = [] as boolean[];
 
 	state = {
@@ -33,8 +36,12 @@ class TcpCarrier extends Component {
 		if (str.length > 0) {
 			if (windowSize >= 1) {
 				c.setState({ lWindowSize: windowSize, rWindowSize: windowSize, lWindow: 0, rWindow: 0 });
-				this.sender = new Array<boolean>(str.length).fill(false);
+				for (let i = 0; i < this.timers.length; i++) clearTimeout(this.timers[i]);
+				this.timers = [];
+				this.sent = new Array<boolean>(str.length).fill(false);
+				this.confirmed = new Array<boolean>(str.length).fill(false);
 				this.receiver = new Array<boolean>(str.length).fill(false);
+				this.ogWinSize = windowSize;
 				c.reset(str, this.start);
 			}
 			else {
@@ -46,52 +53,113 @@ class TcpCarrier extends Component {
 		}
 	}
 
-	private sendWindowIterator = function* () {
+	private receiveData = (recI: number) => {
+		
 		const c = this.carrier.current;
-		const ogWinSize = c.lWindowSize;
-		const onReachReceiver = (recI: number) => {
-			this.receiver[recI] = true;
-			c.setPkgState("right", recI, "ok");
-			for (let j = 0; j < this.receiver.length + 1; j++) {
-				if (!this.receiver[j]) {
-					let senI = j - 1;
-					c.send("left", senI, undefined, () => {
-						// alert(senI);
-						this.sender[senI] = true;
-						c.setPkgState("left", (senI), "ok");
-						if (senI < c.length - 1) {
-							let newWin = c.lWindow + 1;
-							let newWinSize = Math.min(c.lWindowSize, c.length - (senI + 1));
-							c.changeWindow("left", newWin, newWinSize);
-							if (ogWinSize === newWinSize) {
-								c.send("right", newWin + newWinSize - 1, undefined, () => { onReachReceiver(newWin + newWinSize - 1) });
-							}
-						}
-					});
-					break;
+
+		this.receiver[recI] = true;
+		c.setPkgState("right", recI, "ok");
+
+		for (let i = 0; i < this.receiver.length + 1; i++) {
+			if (!this.receiver[i]) {
+				if (i !== 0) {
+					let newWinSize = Math.max(Math.min(c.rWindowSize, c.length - (i)),1);
+					c.changeWindow("right", Math.min(i,c.length-1), newWinSize);
+					this.confirmData(i-1);
 				}
-			}
-		}
-		for (let i = 0; i < c.lWindowSize; i++) {
-			if (!this.sender[i]) {
-				c.send("right", c.lWindow + i, undefined, () => { onReachReceiver(i) });
-				yield;
+				break;
 			}
 		}
 	}
 
-	private start = () => {
-		let c = this.carrier.current;
-		let iter = this.sendWindowIterator();
-		let cont = () => {
+	private sendData = (index: number) => {
+
+		const c = this.carrier.current;
+
+		this.sent[index] = true;
+		let ball = c.send("right", index, () => { c.removeMoving(index, ball) }, () => { this.receiveData(index) });
+
+		if (!this.timers[index]) {
+			this.timers[index] = setInterval(()=>{this.sendData(index)},8000);
+		}
+
+	}
+
+	private confirmData = (index: number) => {
+
+		const c = this.carrier.current;
+
+		let ball = c.send("left", index, () => { c.removeMoving(index, ball) }, () => {
+
+			if (!this.confirmed[index]) {
+				this.markConfirmed(index);
+
+				if (index < c.length) {
+					let newWin = index + 1;
+					let newWinSize = Math.min(c.lWindowSize, c.length - (index + 1));
+
+					for (let i = 0; i < newWin; i++) {
+						this.markConfirmed(i);
+					}
+
+					if (newWin < c.length) {
+						c.changeWindow("left", newWin, newWinSize);
+					}
+					else {
+						c.changeWindow("left", c.length - 1, 1);
+					}
+
+					this.sendMultiple(newWinSize, newWin);
+
+				}
+			}
+
+		});
+
+	}
+
+	private markConfirmed = (index: number) => {
+
+		this.confirmed[index] = true;
+		this.sent[index] = true;
+
+		this.carrier.current.setPkgState("left", (index), "ok");
+
+		if (this.timers[index]) {
+			clearInterval(this.timers[index]);
+			this.timers[index] = undefined;
+		}
+
+	}
+
+	private sendMultiple = (count: number, startFrom: number) => {
+
+		let tcp = this;
+
+		const iterator = function* () {			
+			for (let i = 0; i < count; i++) {
+				if (!tcp.sent[startFrom + i]) {
+					tcp.sendData(startFrom + i);
+					yield;
+				}
+			}
+		}();
+		
+		const nextBall = () => {
 			setTimeout(() => {
-				let res = iter.next();
+				let res = iterator.next();
 				if (!res.done) {
-					cont();
+					nextBall();
 				}
 			}, 300);
 		};
-		cont();
+
+		nextBall();
+	}
+
+	private start = () => {
+		const c = this.carrier.current;
+		this.sendMultiple(c.lWindowSize, c.lWindow);
 	}
 
 	constructor(props) {

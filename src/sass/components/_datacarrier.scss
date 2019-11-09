@@ -110,6 +110,7 @@ $margin-size: 10px;
     border-radius: $ball-size / 2 + $margin-size;
 	border: 3px solid theme(primary);
 	background: rgba(131, 172, 83, 0.1);
+	transition: all 550ms;
 }
 
 ////////////////////////////////////////////////////
