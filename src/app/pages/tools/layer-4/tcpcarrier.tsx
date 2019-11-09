@@ -10,6 +10,7 @@ class TcpCarrier extends Component {
 	private carrier: RefObject<DataCarrier>;
 
 	private ogWinSize = 1;
+	private extraTimers = [] as NodeJS.Timeout[];
 	private timers = [] as NodeJS.Timeout[];
 	private sent = [] as boolean[];
 	private confirmed = [] as boolean[];
@@ -146,12 +147,14 @@ class TcpCarrier extends Component {
 		}();
 		
 		const nextBall = () => {
-			setTimeout(() => {
+			let extra = setTimeout(() => {
 				let res = iterator.next();
 				if (!res.done) {
 					nextBall();
 				}
+				this.extraTimers.splice(this.extraTimers.indexOf(extra), 1);
 			}, 300);
+			this.extraTimers.push(extra);
 		};
 
 		nextBall();
@@ -171,6 +174,11 @@ class TcpCarrier extends Component {
 
 	componentDidMount() {
 		this.setup(Math.random() > 0.0001 ? "Wireworks" : "Machinna", 4);
+	}
+
+	componentWillUnmount() {
+		for (let i = 0; i < this.timers.length; i++) clearTimeout(this.timers[i]);
+		for (let i = 0; i < this.extraTimers.length; i++) clearTimeout(this.extraTimers[i]);
 	}
 
 	render() {
