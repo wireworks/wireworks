@@ -26,4 +26,12 @@ $asset-root-path: '../../' !default;
 .framer-container {
 	display: flex;
 	flex-wrap: wrap;
+
+	span {
+		font-family: monospace;
+		font-size: 1.2em;
+		padding: 0.2em;
+		margin: 0.3em;
+	}
+
 }
