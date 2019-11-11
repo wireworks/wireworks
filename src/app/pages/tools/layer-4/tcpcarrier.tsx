@@ -3,12 +3,21 @@ import "src/sass/pages/tcpcarrier.scss";
 import DataCarrier from "../../../components/DataCarrier";
 import ErrorBox from "../../../components/ErrorBox";
 
+const delays = {
+	slowmo: 30,
+	veryslow: 15,
+	slow: 10,
+	normal: 5,
+	fast: 2,
+	veryfast: 1
+}
+
 class Timer {
 
 	private _paused = false;
 	private t: NodeJS.Timeout;
 	private loop = false;
-	private delay: number;
+	private _delay: number;
 	private callback: ()=>void;
 	private t0 = 0;
 	private totalElapsed = 0;
@@ -16,7 +25,7 @@ class Timer {
 
 	constructor(callback: ()=>void, delay: number, loop = false, startPaused = false) {
 		this.loop = loop;
-		this.delay = delay;
+		this._delay = delay;
 		this.callback = callback;
 
 		this.totalElapsed = 0;
@@ -39,7 +48,7 @@ class Timer {
 					else this.finished = true;
 				}
 	
-			}, this.delay - prerun);
+			}, (1000*this._delay) - prerun);
 		}
 	}
 
@@ -75,6 +84,20 @@ class Timer {
 		return this._paused;
 	}
 
+	set delay(del: number) {
+		let ratio = del / this._delay;
+		if (!this.paused){
+			this.paused = true;
+			this.totalElapsed *= ratio;
+			this._delay = del;
+			this.paused = false;
+		}
+		else {
+			this.totalElapsed *= ratio;
+			this._delay = del;
+		}
+	}
+
 	clear = () => {
 		clearTimeout(this.t);
 		this.t = undefined;
@@ -96,7 +119,7 @@ class TcpCarrier extends Component {
 	state = {
 		errorMessage: null as string,
 		paused: true,
-		focusedOnce: false
+		selectedDelay: delays.normal
 	}
 
 	private setup = (str?: string, windowSize?: number) => {
@@ -159,7 +182,7 @@ class TcpCarrier extends Component {
 		let ball = c.send("right", index, () => { c.removeMoving(index, ball) }, () => { this.receiveData(index) });
 
 		if (!this.timers[index]) {
-			this.timers[index] = new Timer(()=>{this.sendData(index)},8000,true,this.state.paused);
+			this.timers[index] = new Timer(()=>{this.sendData(index)},this.state.selectedDelay,true,this.state.paused);
 		}
 
 	}
@@ -231,7 +254,7 @@ class TcpCarrier extends Component {
 					nextBall();
 				}
 				this.extraTimers.splice(this.extraTimers.indexOf(extra), 1);
-			}, 300, false, this.state.paused);
+			}, 0.04 * this.state.selectedDelay, false, this.state.paused);
 			this.extraTimers.push(extra);
 		};
 
@@ -245,7 +268,6 @@ class TcpCarrier extends Component {
 
 	togglePaused = (pause: boolean) => {
 		this.setState({paused: pause}, ()=>{
-			console.log(this.extraTimers);
 			
 			for (let i = 0; i < this.timers.length; i++) {if (this.timers[i]) this.timers[i].paused = pause;}
 			for (let i = 0; i < this.extraTimers.length; i++) {if (this.extraTimers[i]) this.extraTimers[i].paused = pause;}
@@ -255,6 +277,20 @@ class TcpCarrier extends Component {
 	}
 
 	componentDidMount() {
+		
+		this.carrier.current.delay = this.state.selectedDelay / 2.5;
+		this.togglePaused(true);
+		let pausedBefore = false;
+
+		window.onfocus = ()=> {
+			if (!pausedBefore) this.togglePaused(false);
+		};
+
+		window.onblur = ()=>{
+			pausedBefore = this.state.paused;
+			this.togglePaused(true);
+		};
+
 		this.setup(Math.random() > 0.0001 ? "Wireworks" : "Machinna", 4);
 	}
 
@@ -268,20 +304,6 @@ class TcpCarrier extends Component {
 		this.carrier = React.createRef();
 		this.txtMessage = React.createRef();
 		this.txtWindow = React.createRef();
-		this.setState({paused: false});
-		let pausedBefore = false;
-		window.onfocus = ()=> {
-			if (!this.state.focusedOnce) {
-				this.state.focusedOnce = true;
-				this.togglePaused(false);
-			}
-			else if (!pausedBefore)
-				this.togglePaused(false);
-		};
-		window.onblur = ()=>{
-			pausedBefore = this.state.paused;
-			this.togglePaused(true);
-		};
 	}
 
 	render() {
@@ -297,10 +319,10 @@ class TcpCarrier extends Component {
 						<DataCarrier ref={this.carrier} />
 					</div>
 
-					<div className="ml-3">
+					<div className="tcp-settings">
 
-						<div className="hbox align-end mb-3">
-							<div>
+						<div className="hbox align-end mb-3 full-width">
+							<div className="full-width">
 								<label htmlFor="message">Mensagem</label>
 								<div>
 									<input className="mr-0" type="text" id="message" ref={this.txtMessage} onKeyDown={(ev) => { if (ev.key === "Enter") this.setup() }} placeholder="Sua mensagem" />
@@ -308,8 +330,8 @@ class TcpCarrier extends Component {
 							</div>
 						</div>
 
-						<div className="hbox align-end mb-3">
-							<div>
+						<div className="hbox align-end mb-3 full-width">
+							<div className="full-width">
 								<label htmlFor="window_size">Tamanho da Janela</label>
 								<div>
 									<input className="mr-0" type="number" min="1" id="window_size" ref={this.txtWindow} onKeyDown={(ev) => { if (ev.key === "Enter") this.setup() }} placeholder="1" />
@@ -317,23 +339,46 @@ class TcpCarrier extends Component {
 							</div>
 						</div>
 
-						<div className="hbox fill mb-3">
-							<button onClick={() => { this.setup() }}>
-								<i className="material-icons">replay</i> Reiniciar
-							</button>
+						<div className="hbox align-end mb-3 full-width">
+							<div className="full-width">
+								<label htmlFor="speed">Velocidade</label>
+								<div>
+									<select className="full-width" name="speed" id="speed" defaultValue="normal" onChange={(evt)=>{
+										let delay = delays[evt.target.value];
+										this.setState({selectedDelay: delay});
+										this.carrier.current.delay = delay / 2.5;
+										for (let i = 0; i < this.timers.length; i++) if (this.timers[i]) this.timers[i].delay = delay;
+										for (let i = 0; i < this.extraTimers.length; i++) if (this.extraTimers[i]) this.extraTimers[i].delay = delay * 0.04;
+									}}>
+										<option value="slowmo">Muito, muito lento</option>
+										<option value="veryslow">Muito lento</option>
+										<option value="slow">Lento</option>
+										<option value="normal">Normal</option>
+										<option value="fast">Rápido</option>
+										<option value="veryfast">Muito rápido</option>
+									</select>
+								</div>
+							</div>
 						</div>
 
-						<div className="hbox fill">							
-							<button onClick={()=>{
-								this.togglePaused(!this.state.paused);
-							}}>
-								{
-									this.state.paused ?
-										<><i className="material-icons">play_arrow</i> Continuar</>:
-										<><i className="material-icons">pause</i> Pausar</>
-								}
-							</button>
-						</div>
+						<button className="full-width mb-3" onClick={() => { this.setup() }}>
+							<i className="material-icons">replay</i> Reiniciar
+						</button>
+
+						<button className="full-width mb-3" onClick={()=>{
+							this.togglePaused(!this.state.paused);
+						}}>
+							{
+								this.state.paused ?
+									<><i className="material-icons">play_arrow</i> Continuar</>:
+									<><i className="material-icons">pause</i> Pausar</>
+							}
+						</button>
+
+						{
+							this.state.selectedDelay <= delays.fast ? 
+								<p>* Velocidades altas são instáveis e podem quebrar a simulação.</p> : ""
+						}
 
 					</div>
 				</div>

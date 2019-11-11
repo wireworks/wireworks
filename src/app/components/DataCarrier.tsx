@@ -24,7 +24,7 @@ const TcpPacket: FC<Pkg> = (props) =>
 		</div>
 		{props.progress.map((el, ind) => {
 			return (
-				<div key={ind} className="carrier-p-slider" style={{ transform: `translateX(${el.toSide === "left" ? 100 - el.prog : el.prog}%)` }}>
+				<div key={ind} className="carrier-p-slider" style={{ transform: `translateX(${100*(el.toSide === "left" ? 1 - el.prog : el.prog)}%)` }}>
 					<div className="carrier-p-ball carrier-state-moving" onClick={el.onClick}> {props.content} </div>
 				</div>
 			);
@@ -32,7 +32,9 @@ const TcpPacket: FC<Pkg> = (props) =>
 	</div>
 
 export default class DataCarrier extends Component {
+
 	private _running = true;
+	private lastStamp = performance.now();
 
 	state = {
 		lWindow: 0,
@@ -41,7 +43,7 @@ export default class DataCarrier extends Component {
 		lWindowSize: 1,
 		rWindowSize: 1,
 
-		speed: 0.5,
+		delay: 3,
 		arr: new Array<Pkg>()
 	}
 
@@ -53,15 +55,19 @@ export default class DataCarrier extends Component {
 		this.running = false;
 	}
 
-	private clamp = (n: number) => {
-		if (n > 100)
-			return 100
-		if (n < 0)
-			return 0
+	private clamp = (n: number, min = 0, max = 1) => {
+		if (n > max)
+			return max;
+		if (n < min)
+			return min;
 		return n;
 	}
 
-	update = () => {
+	update = (timestamp: DOMHighResTimeStamp) => {
+
+		let deltaTime = (timestamp - this.lastStamp)/1000;
+		this.lastStamp = timestamp;
+		
 		if (this.running) {
 
 			const arr = this.state.arr;
@@ -69,14 +75,12 @@ export default class DataCarrier extends Component {
 			for (let pkg of arr) {
 				for (let i = pkg.progress.length - 1; i >= 0; i--) {
 					const ball = pkg.progress[i];
-					if (ball.prog != 100) {
-						let newVal = ball.prog + this.state.speed;
-						if (newVal >= 100) {
-							newVal = 100;
+					if (ball.prog < 1) {
+						ball.prog = this.clamp(ball.prog + (deltaTime/this.state.delay));
+						if (ball.prog >= 1) {
 							if (ball.onArrive) ball.onArrive();
 							pkg.progress.splice(i, 1);
 						}
-						ball.prog = newVal;
 					}
 				}
 			}
@@ -88,7 +92,8 @@ export default class DataCarrier extends Component {
 
 	set running (run: boolean) {
 		if (!this._running && run) {
-			window.requestAnimationFrame(this.update);
+			this.lastStamp = performance.now();
+			window.requestAnimationFrame(()=>{window.requestAnimationFrame(this.update)});
 		}
 		this._running = run;
 	}
@@ -119,8 +124,8 @@ export default class DataCarrier extends Component {
 		return this.state.rWindow;
 	}
 
-	set speed(spd: number) {
-		this.setState({ speed: spd });
+	set delay(del: number) {
+		this.setState({ delay: del });
 	}
 
 	reset = (msg: string, callback?: () => void) => {
