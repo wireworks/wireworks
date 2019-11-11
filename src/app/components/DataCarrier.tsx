@@ -19,20 +19,20 @@ const TcpPacket: FC<Pkg> = (props) =>
 
 	<div className="carrier-p-rail">
 		<div className="carrier-p-asd">
-			<div className={`carrier-p-ball carrier-state-${props.lState}`}> <span>{props.lState === "blank" ? "" : props.content}</span> </div>
-			<div className={`carrier-p-ball carrier-state-${props.rState}`}> <span>{props.rState === "blank" ? "" : props.content}</span> </div>
+			<div className={`carrier-p-ball carrier-state-${props.lState}`}> {props.lState === "blank" ? "" : props.content} </div>
+			<div className={`carrier-p-ball carrier-state-${props.rState}`}> {props.rState === "blank" ? "" : props.content} </div>
 		</div>
 		{props.progress.map((el, ind) => {
 			return (
 				<div key={ind} className="carrier-p-slider" style={{ transform: `translateX(${el.toSide === "left" ? 100 - el.prog : el.prog}%)` }}>
-					<div className="carrier-p-ball carrier-state-moving" onClick={el.onClick}> <span>{props.content}</span> </div>
+					<div className="carrier-p-ball carrier-state-moving" onClick={el.onClick}> {props.content} </div>
 				</div>
 			);
 		})}
 	</div>
 
 export default class DataCarrier extends Component {
-	running = true;
+	private _running = true;
 
 	state = {
 		lWindow: 0,
@@ -46,7 +46,7 @@ export default class DataCarrier extends Component {
 	}
 
 	componentDidMount() {
-		window.requestAnimationFrame(this.update);
+		if (this.running) window.requestAnimationFrame(this.update);
 	}
 
 	componentWillUnmount() {
@@ -84,6 +84,17 @@ export default class DataCarrier extends Component {
 			this.setState({ arr: arr });
 			window.requestAnimationFrame(this.update);
 		}
+	}
+
+	set running (run: boolean) {
+		if (!this._running && run) {
+			window.requestAnimationFrame(this.update);
+		}
+		this._running = run;
+	}
+
+	get running () {
+		return this._running;
 	}
 
 	//////////////////////////////////////////////////////////////////
@@ -148,6 +159,7 @@ export default class DataCarrier extends Component {
 
 	removeMoving = (index: number, prog: Progress) => {
 		this.state.arr[index].progress.splice(this.state.arr[index].progress.indexOf(prog),1);
+		this.setState({ arr: this.state.arr });
 	}
 
 	changeWindow = (side: "left" | "right", toIndex: number, toSize: number) => {

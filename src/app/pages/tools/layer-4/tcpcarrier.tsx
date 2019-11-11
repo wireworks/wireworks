@@ -3,21 +3,100 @@ import "src/sass/pages/tcpcarrier.scss";
 import DataCarrier from "../../../components/DataCarrier";
 import ErrorBox from "../../../components/ErrorBox";
 
+class Timer {
+
+	private _paused = false;
+	private t: NodeJS.Timeout;
+	private loop = false;
+	private delay: number;
+	private callback: ()=>void;
+	private t0 = 0;
+	private totalElapsed = 0;
+	private finished = false;
+
+	constructor(callback: ()=>void, delay: number, loop = false, startPaused = false) {
+		this.loop = loop;
+		this.delay = delay;
+		this.callback = callback;
+
+		this.totalElapsed = 0;
+		this.mark();
+		this.tick();		
+
+		if (startPaused) this.paused = true;
+	}
+
+	private tick = (prerun = 0) => {
+		if (!this.finished) {
+			
+			this.t = setTimeout(() => {
+				
+				if (!this._paused) {					
+					this.mark();
+					this.totalElapsed = 0;
+					this.callback();
+					if (this.loop) this.tick();
+					else this.finished = true;
+				}
+	
+			}, this.delay - prerun);
+		}
+	}
+
+	private mark = () => { 
+		let t1 = performance.now();
+		let elapsed = t1 - this.t0;
+		this.t0 = t1;
+		return elapsed;
+	}
+
+	set paused(pause: boolean) {	
+				
+		if (pause != this._paused) {
+
+			if (pause) {
+				this.clear();
+				this.totalElapsed += this.mark();
+			}
+			else if (!this.finished) {
+	
+				this.mark();
+				this.tick(this.totalElapsed);			
+	
+			}
+
+		}
+
+		this._paused = pause;
+
+	}
+
+	get paused() {
+		return this._paused;
+	}
+
+	clear = () => {
+		clearTimeout(this.t);
+		this.t = undefined;
+	}
+}
+
 class TcpCarrier extends Component {
 
 	private txtMessage: RefObject<HTMLInputElement>;
 	private txtWindow: RefObject<HTMLInputElement>;
 	private carrier: RefObject<DataCarrier>;
 
-	private ogWinSize = 1;
-	private extraTimers = [] as NodeJS.Timeout[];
-	private timers = [] as NodeJS.Timeout[];
+	private extraTimers = [] as Timer[];
+	private timers = [] as Timer[];
 	private sent = [] as boolean[];
 	private confirmed = [] as boolean[];
 	private receiver = [] as boolean[];
-
+	
 	state = {
-		errorMessage: null as string
+		errorMessage: null as string,
+		paused: true,
+		focusedOnce: false
 	}
 
 	private setup = (str?: string, windowSize?: number) => {
@@ -37,12 +116,11 @@ class TcpCarrier extends Component {
 		if (str.length > 0) {
 			if (windowSize >= 1) {
 				c.setState({ lWindowSize: windowSize, rWindowSize: windowSize, lWindow: 0, rWindow: 0 });
-				for (let i = 0; i < this.timers.length; i++) clearTimeout(this.timers[i]);
+				for (let i = 0; i < this.timers.length; i++) { if (this.timers[i]) this.timers[i].clear(); }
 				this.timers = [];
 				this.sent = new Array<boolean>(str.length).fill(false);
 				this.confirmed = new Array<boolean>(str.length).fill(false);
 				this.receiver = new Array<boolean>(str.length).fill(false);
-				this.ogWinSize = windowSize;
 				c.reset(str, this.start);
 			}
 			else {
@@ -81,7 +159,7 @@ class TcpCarrier extends Component {
 		let ball = c.send("right", index, () => { c.removeMoving(index, ball) }, () => { this.receiveData(index) });
 
 		if (!this.timers[index]) {
-			this.timers[index] = setInterval(()=>{this.sendData(index)},8000);
+			this.timers[index] = new Timer(()=>{this.sendData(index)},8000,true,this.state.paused);
 		}
 
 	}
@@ -127,7 +205,7 @@ class TcpCarrier extends Component {
 		this.carrier.current.setPkgState("left", (index), "ok");
 
 		if (this.timers[index]) {
-			clearInterval(this.timers[index]);
+			this.timers[index].clear();
 			this.timers[index] = undefined;
 		}
 
@@ -147,13 +225,13 @@ class TcpCarrier extends Component {
 		}();
 		
 		const nextBall = () => {
-			let extra = setTimeout(() => {
+			let extra = new Timer(() => {
 				let res = iterator.next();
 				if (!res.done) {
 					nextBall();
 				}
 				this.extraTimers.splice(this.extraTimers.indexOf(extra), 1);
-			}, 300);
+			}, 300, false, this.state.paused);
 			this.extraTimers.push(extra);
 		};
 
@@ -165,11 +243,15 @@ class TcpCarrier extends Component {
 		this.sendMultiple(c.lWindowSize, c.lWindow);
 	}
 
-	constructor(props) {
-		super(props);
-		this.carrier = React.createRef();
-		this.txtMessage = React.createRef();
-		this.txtWindow = React.createRef();
+	togglePaused = (pause: boolean) => {
+		this.setState({paused: pause}, ()=>{
+			console.log(this.extraTimers);
+			
+			for (let i = 0; i < this.timers.length; i++) {if (this.timers[i]) this.timers[i].paused = pause;}
+			for (let i = 0; i < this.extraTimers.length; i++) {if (this.extraTimers[i]) this.extraTimers[i].paused = pause;}
+			
+			this.carrier.current.running = !pause;
+		});
 	}
 
 	componentDidMount() {
@@ -177,8 +259,29 @@ class TcpCarrier extends Component {
 	}
 
 	componentWillUnmount() {
-		for (let i = 0; i < this.timers.length; i++) clearTimeout(this.timers[i]);
-		for (let i = 0; i < this.extraTimers.length; i++) clearTimeout(this.extraTimers[i]);
+		for (let i = 0; i < this.timers.length; i++) if (this.timers[i]) this.timers[i].clear();
+		for (let i = 0; i < this.extraTimers.length; i++) if (this.extraTimers[i]) this.extraTimers[i].clear();
+	}
+
+	constructor(props) {
+		super(props);
+		this.carrier = React.createRef();
+		this.txtMessage = React.createRef();
+		this.txtWindow = React.createRef();
+		this.setState({paused: false});
+		let pausedBefore = false;
+		window.onfocus = ()=> {
+			if (!this.state.focusedOnce) {
+				this.state.focusedOnce = true;
+				this.togglePaused(false);
+			}
+			else if (!pausedBefore)
+				this.togglePaused(false);
+		};
+		window.onblur = ()=>{
+			pausedBefore = this.state.paused;
+			this.togglePaused(true);
+		};
 	}
 
 	render() {
@@ -207,9 +310,22 @@ class TcpCarrier extends Component {
 							</div>
 						</div>
 
-						<div className="hbox fill">
-							<button onClick={() => { this.setup() }}>Iniciar</button>
-							<button className="ml-2">Parar</button>
+						<div className="hbox fill mb-3">
+							<button onClick={() => { this.setup() }}>
+								<i className="material-icons">replay</i> Reiniciar
+							</button>
+						</div>
+
+						<div className="hbox fill">							
+							<button onClick={()=>{
+								this.togglePaused(!this.state.paused);
+							}}>
+								{
+									this.state.paused ?
+										<><i className="material-icons">play_arrow</i> Continuar</>:
+										<><i className="material-icons">pause</i> Pausar</>
+								}
+							</button>
 						</div>
 
 					</div>
