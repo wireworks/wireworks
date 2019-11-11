@@ -24,7 +24,7 @@ $margin-size: 10px;
     display: flex;
     align-items: center;
 	position: relative;
-	// border: 1px solid black;	
+	z-index: 0;
 }
 
 .carrier-p-rail::after {

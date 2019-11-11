@@ -287,8 +287,15 @@ class TcpCarrier extends Component {
 	render() {
 		return (
 			<main>
-				<div className="hbox">
-					<DataCarrier ref={this.carrier} />
+				<div className="hbox">					
+						
+					<div className="carrier-wrapper">
+						<div className="spacer px-1">
+							<label>Enviador</label>
+							<label>Receptor</label>
+						</div>
+						<DataCarrier ref={this.carrier} />
+					</div>
 
 					<div className="ml-3">
 
