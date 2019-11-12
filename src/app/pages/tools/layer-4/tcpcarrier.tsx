@@ -138,13 +138,26 @@ class TcpCarrier extends Component {
 		}
 		if (str.length > 0) {
 			if (windowSize >= 1) {
-				c.setState({ lWindowSize: windowSize, rWindowSize: windowSize, lWindow: 0, rWindow: 0 });
-				for (let i = 0; i < this.timers.length; i++) { if (this.timers[i]) this.timers[i].clear(); }
-				this.timers = [];
-				this.sent = new Array<boolean>(str.length).fill(false);
-				this.confirmed = new Array<boolean>(str.length).fill(false);
-				this.receiver = new Array<boolean>(str.length).fill(false);
-				c.reset(str, this.start);
+				let okFun = () => {
+					c.setState({ lWindowSize: windowSize, rWindowSize: windowSize, lWindow: 0, rWindow: 0 });
+					for (let i = 0; i < this.timers.length; i++) { if (this.timers[i]) this.timers[i].clear(); }
+					for (let i = 0; i < this.extraTimers.length; i++) { if (this.extraTimers[i]) this.extraTimers[i].clear(); }
+					this.timers = [];
+					this.extraTimers = [];
+					this.sent = new Array<boolean>(str.length).fill(false);
+					this.confirmed = new Array<boolean>(str.length).fill(false);
+					this.receiver = new Array<boolean>(str.length).fill(false);
+					c.reset(str, this.start);
+				}
+				if (str.length > 50) {
+					this.togglePaused(true,()=>{
+						let goodToGo = window.confirm("Esta mensagem é muito grande e provavelmente irá travar o seu computador.\nTem CERTEZA que quer simular mesmo assim?");
+						if (goodToGo) okFun();
+					});					
+				}
+				else {
+					okFun();
+				}
 			}
 			else {
 				this.setState({ errorMessage: "Entrada Inválida. A sua janela deve ser maior que 0." });
@@ -236,14 +249,22 @@ class TcpCarrier extends Component {
 
 	private sendMultiple = (count: number, startFrom: number) => {
 
+		console.log("Someone called me. " + count + " balls from " + startFrom);
+		
 		let tcp = this;
+		let willSend = [] as number[];
+
+		for (let i = 0; i < count; i++) {
+			if (!this.sent[startFrom + i]) {
+				willSend.push(startFrom + i);
+				this.sent[startFrom + i] = true;
+			}
+		}		
 
 		const iterator = function* () {			
-			for (let i = 0; i < count; i++) {
-				if (!tcp.sent[startFrom + i]) {
-					tcp.sendData(startFrom + i);
-					yield;
-				}
+			for (let i = 0; i < willSend.length; i++) {
+				tcp.sendData(willSend[i]);
+				yield;
 			}
 		}();
 		
@@ -266,13 +287,14 @@ class TcpCarrier extends Component {
 		this.sendMultiple(c.lWindowSize, c.lWindow);
 	}
 
-	togglePaused = (pause: boolean) => {
+	togglePaused = (pause: boolean, callback?: ()=>void) => {
 		this.setState({paused: pause}, ()=>{
 			
 			for (let i = 0; i < this.timers.length; i++) {if (this.timers[i]) this.timers[i].paused = pause;}
 			for (let i = 0; i < this.extraTimers.length; i++) {if (this.extraTimers[i]) this.extraTimers[i].paused = pause;}
 			
 			this.carrier.current.running = !pause;
+			if (callback) callback();
 		});
 	}
 
