@@ -68,7 +68,7 @@ class Framer extends Component {
 							</div>
 							<button onClick={() => this.insert(Math.floor(Math.random() * 255).toString(16).toUpperCase().padStart(2, "0"))}>Inserir Aleatório</button>
 						</div>
-						<button className="full-width" onClick={() => this.insert(this.end)}> <i className="material-icons">delete</i> Limpar</button>
+						<button className="full-width" onClick={() => this.setState({ data: "" })}> <i className="material-icons">delete</i> Limpar</button>
 					</div>
 				</div>
 
