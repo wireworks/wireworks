@@ -23,13 +23,13 @@ class Framer extends Component {
 	insert = (str: string) => {
 		let data = this.state.data;
 		data += str;
-		this.setState({data: data});
+		this.setState({ data: data });
 	}
 
 	handleInput = (ev) => {
 		let val = ev.target.value > 255 ? 255 : ev.target.value;
 		val = val < 0 ? 0 : val;
-		this.setState({num: parseInt(val)});
+		this.setState({ num: parseInt(val) });
 	}
 
 	render() {
@@ -39,7 +39,7 @@ class Framer extends Component {
 		const segments = this.state.data.split(this.reg);
 		for (let ind in segments) {
 			const i = parseInt(ind);
-			const cName = "framer-" + this.ty[i%this.ty.length].replace(" ", "").toLowerCase();
+			const cName = "framer-" + this.ty[i % this.ty.length].replace(" ", "").toLowerCase();
 			if (segments[i] !== "") {
 				const bits = segments[i].match(this.reg2)
 				for (let d in bits) {
@@ -50,17 +50,31 @@ class Framer extends Component {
 
 		return (
 			<main>
-				<button onClick={() => this.insert(this.start)}>Inserir Inicio</button>
-				<button onClick={() => this.insert(this.end)}>Inserir Fim</button>
-				<input type="number" onChange={this.handleInput} value={this.state.num}/>
-				<button onClick={() => this.insert(this.state.num.toString(16).toUpperCase().padStart(2, "0"))}>Inserir</button>
-				<button onClick={() => this.insert(Math.floor(Math.random()*255).toString(16).toUpperCase().padStart(2, "0"))}>Inserir Aleatorio</button>
-				<div className="framer-container">
-					{arr}
+				<div className="framer-wrapper">
+					<div className="framer-container-wrapper">
+						<label>Pacote</label>
+						<div className="framer-container">
+							{arr}
+						</div>
+					</div>
+					<div className="framer-configs vbox spacer">
+						<div className="vbox align-stretch">
+							<label>Opções</label>
+							<button className="mb-3" onClick={() => this.insert(this.start)}>Inserir Início</button>
+							<button className="mb-3" onClick={() => this.insert(this.end)}>Inserir Fim</button>
+							<div className="hbox fill mb-3">
+								<input className="full-width" type="number" onChange={this.handleInput} value={this.state.num} />
+								<button className="full-width" onClick={() => this.insert(this.state.num.toString(16).toUpperCase().padStart(2, "0"))}>Inserir</button>
+							</div>
+							<button onClick={() => this.insert(Math.floor(Math.random() * 255).toString(16).toUpperCase().padStart(2, "0"))}>Inserir Aleatório</button>
+						</div>
+						<button className="full-width" onClick={() => this.insert(this.end)}> <i className="material-icons">delete</i> Limpar</button>
+					</div>
 				</div>
-			</main>	
-		); 
-	} 
+
+			</main>
+		);
+	}
 
 }
 

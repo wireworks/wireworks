@@ -3,35 +3,61 @@ $asset-root-path: '../../' !default;
 @import "../main";
 
 .framer-noise {
-	background-color: bisque;
+	background-color: #e7e7e7;
 }
 
 .framer-preamble {
-	background-color: aqua;
+	background-color: #c1db61;
 }
 
 .framer-sfd {
-	background-color: chartreuse;
+	background-color: #83973a;
 }
 
 .framer-framedata {
-	background-color: blueviolet;
+	background-color: theme(secondary-light);
 }
 
 .framer-fcs {
-	background-color: cadetblue;
+	background-color: #d49176;
 }
 
+.framer-wrapper {
+
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;	
+
+}
+
+.framer-container-wrapper {
+	width: 100%;
+	margin-right: 1.5em;
+}
 
 .framer-container {
+
+	width: 100%;
 	display: flex;
 	flex-wrap: wrap;
+	justify-content: flex-start;
+	align-items: flex-start;
+	align-content: flex-start;
+	border: 2px solid $color-gray-light;
+	border-radius: 12px;
+	padding: 20px;
+	min-height: 400px;
 
 	span {
 		font-family: monospace;
 		font-size: 1.2em;
-		padding: 0.2em;
+		padding: 0.3em 0.3em 0.1em 0.3em;
 		margin: 0.3em;
+		border-radius: 4px;
 	}
 
+}
+
+.framer-configs {
+	width: 30%;
 }
