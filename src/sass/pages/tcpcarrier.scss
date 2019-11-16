@@ -2,11 +2,17 @@ $asset-root-path: '../../' !default;
 
 @import "../main";
 
+main {
+	position: relative;
+}
+
 .carrier-wrapper {
 	width: 100%;
 }
 
 .tcp-settings {
+	position: sticky;
+	top: 20px;
 	margin-left: 1.5rem;
 	width: 30%;
 }

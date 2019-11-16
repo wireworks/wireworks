@@ -3,13 +3,20 @@ import "src/sass/pages/tcpcarrier.scss";
 import DataCarrier from "../../../components/DataCarrier";
 import ErrorBox from "../../../components/ErrorBox";
 
+class Delay {
+	constructor(readonly delay: number) {}
+	get resend () { return this.delay * 2.5 }
+	get windowTick () { return this.delay * 0.1 }
+	get travel () { return this.delay }
+}
+
 const delays = {
-	slowmo: 30,
-	veryslow: 15,
-	slow: 10,
-	normal: 5,
-	fast: 2,
-	veryfast: 1
+	slowmo: new Delay(24),
+	veryslow: new Delay(12),
+	slow: new Delay(6),
+	normal: new Delay(3),
+	fast: new Delay(1.5),
+	veryfast: new Delay(0.75)
 }
 
 class Timer {
@@ -48,12 +55,12 @@ class Timer {
 					else this.finished = true;
 				}
 	
-			}, (1000*this._delay) - prerun);
+			}, Math.floor(1000*this._delay) - prerun);
 		}
 	}
 
 	private mark = () => { 
-		let t1 = performance.now();
+		let t1 = Math.floor(performance.now());
 		let elapsed = t1 - this.t0;
 		this.t0 = t1;
 		return elapsed;
@@ -88,12 +95,12 @@ class Timer {
 		let ratio = del / this._delay;
 		if (!this.paused){
 			this.paused = true;
-			this.totalElapsed *= ratio;
+			this.totalElapsed = Math.floor(this.totalElapsed * ratio);
 			this._delay = del;
 			this.paused = false;
 		}
 		else {
-			this.totalElapsed *= ratio;
+			this.totalElapsed = Math.floor(this.totalElapsed * ratio);
 			this._delay = del;
 		}
 	}
@@ -110,8 +117,10 @@ class TcpCarrier extends Component {
 	private txtWindow: RefObject<HTMLInputElement>;
 	private carrier: RefObject<DataCarrier>;
 
-	private extraTimers = [] as Timer[];
+	private windowQueue = [];
+	private windowTimer: Timer;
 	private timers = [] as Timer[];
+
 	private sent = [] as boolean[];
 	private confirmed = [] as boolean[];
 	private receiver = [] as boolean[];
@@ -141,9 +150,10 @@ class TcpCarrier extends Component {
 				let okFun = () => {
 					c.setState({ lWindowSize: windowSize, rWindowSize: windowSize, lWindow: 0, rWindow: 0 });
 					for (let i = 0; i < this.timers.length; i++) { if (this.timers[i]) this.timers[i].clear(); }
-					for (let i = 0; i < this.extraTimers.length; i++) { if (this.extraTimers[i]) this.extraTimers[i].clear(); }
 					this.timers = [];
-					this.extraTimers = [];
+					this.windowQueue = [];
+					if (this.windowTimer) this.windowTimer.clear();
+					this.windowTimer = new Timer(this.windowTick, this.state.selectedDelay.windowTick, true, this.state.paused);
 					this.sent = new Array<boolean>(str.length).fill(false);
 					this.confirmed = new Array<boolean>(str.length).fill(false);
 					this.receiver = new Array<boolean>(str.length).fill(false);
@@ -195,7 +205,7 @@ class TcpCarrier extends Component {
 		let ball = c.send("right", index, () => { c.removeMoving(index, ball) }, () => { this.receiveData(index) });
 
 		if (!this.timers[index]) {
-			this.timers[index] = new Timer(()=>{this.sendData(index)},this.state.selectedDelay,true,this.state.paused);
+			this.timers[index] = new Timer(()=>{this.sendData(index)},this.state.selectedDelay.resend,true,this.state.paused);
 		}
 
 	}
@@ -249,37 +259,22 @@ class TcpCarrier extends Component {
 
 	private sendMultiple = (count: number, startFrom: number) => {
 
-		console.log("Someone called me. " + count + " balls from " + startFrom);
-		
-		let tcp = this;
-		let willSend = [] as number[];
-
 		for (let i = 0; i < count; i++) {
 			if (!this.sent[startFrom + i]) {
-				willSend.push(startFrom + i);
+				this.windowQueue.push(startFrom + i);
 				this.sent[startFrom + i] = true;
 			}
-		}		
+		}
 
-		const iterator = function* () {			
-			for (let i = 0; i < willSend.length; i++) {
-				tcp.sendData(willSend[i]);
-				yield;
-			}
-		}();
+	}
+
+	private windowTick = () => {
 		
-		const nextBall = () => {
-			let extra = new Timer(() => {
-				let res = iterator.next();
-				if (!res.done) {
-					nextBall();
-				}
-				this.extraTimers.splice(this.extraTimers.indexOf(extra), 1);
-			}, 0.04 * this.state.selectedDelay, false, this.state.paused);
-			this.extraTimers.push(extra);
-		};
+		if (this.windowQueue.length > 0) {
+			this.sendData(this.windowQueue[0]);
+			this.windowQueue.shift();
+		}
 
-		nextBall();
 	}
 
 	private start = () => {
@@ -291,7 +286,7 @@ class TcpCarrier extends Component {
 		this.setState({paused: pause}, ()=>{
 			
 			for (let i = 0; i < this.timers.length; i++) {if (this.timers[i]) this.timers[i].paused = pause;}
-			for (let i = 0; i < this.extraTimers.length; i++) {if (this.extraTimers[i]) this.extraTimers[i].paused = pause;}
+			if (this.windowTimer) this.windowTimer.paused = pause;
 			
 			this.carrier.current.running = !pause;
 			if (callback) callback();
@@ -300,9 +295,9 @@ class TcpCarrier extends Component {
 
 	componentDidMount() {
 		
-		this.carrier.current.delay = this.state.selectedDelay / 2.5;
+		this.carrier.current.delay = this.state.selectedDelay.travel;
 		this.togglePaused(true);
-		let pausedBefore = false;
+		let pausedBefore = true;
 
 		window.onfocus = ()=> {
 			if (!pausedBefore) this.togglePaused(false);
@@ -318,7 +313,7 @@ class TcpCarrier extends Component {
 
 	componentWillUnmount() {
 		for (let i = 0; i < this.timers.length; i++) if (this.timers[i]) this.timers[i].clear();
-		for (let i = 0; i < this.extraTimers.length; i++) if (this.extraTimers[i]) this.extraTimers[i].clear();
+		if (this.windowTimer) this.windowTimer.clear();
 	}
 
 	constructor(props) {
@@ -331,7 +326,7 @@ class TcpCarrier extends Component {
 	render() {
 		return (
 			<main>
-				<div className="hbox">					
+				<div className="hbox align-start">					
 						
 					<div className="carrier-wrapper">
 						<div className="spacer px-1">
@@ -347,7 +342,7 @@ class TcpCarrier extends Component {
 							<div className="full-width">
 								<label htmlFor="message">Mensagem</label>
 								<div>
-									<input className="mr-0" type="text" id="message" ref={this.txtMessage} onKeyDown={(ev) => { if (ev.key === "Enter") this.setup() }} placeholder="Sua mensagem" />
+									<input className="mr-0" type="text" defaultValue="Wireworks" id="message" ref={this.txtMessage} onKeyDown={(ev) => { if (ev.key === "Enter") this.setup() }} placeholder="Sua mensagem" />
 								</div>
 							</div>
 						</div>
@@ -356,7 +351,7 @@ class TcpCarrier extends Component {
 							<div className="full-width">
 								<label htmlFor="window_size">Tamanho da Janela</label>
 								<div>
-									<input className="mr-0" type="number" min="1" id="window_size" ref={this.txtWindow} onKeyDown={(ev) => { if (ev.key === "Enter") this.setup() }} placeholder="1" />
+									<input className="mr-0" type="number" min="1" defaultValue="4" id="window_size" ref={this.txtWindow} onKeyDown={(ev) => { if (ev.key === "Enter") this.setup() }} placeholder="1" />
 								</div>
 							</div>
 						</div>
@@ -366,11 +361,11 @@ class TcpCarrier extends Component {
 								<label htmlFor="speed">Velocidade</label>
 								<div>
 									<select className="full-width" name="speed" id="speed" defaultValue="normal" onChange={(evt)=>{
-										let delay = delays[evt.target.value];
+										let delay = delays[evt.target.value] as Delay;
 										this.setState({selectedDelay: delay});
-										this.carrier.current.delay = delay / 2.5;
-										for (let i = 0; i < this.timers.length; i++) if (this.timers[i]) this.timers[i].delay = delay;
-										for (let i = 0; i < this.extraTimers.length; i++) if (this.extraTimers[i]) this.extraTimers[i].delay = delay * 0.04;
+										this.carrier.current.delay = delay.travel;
+										for (let i = 0; i < this.timers.length; i++) if (this.timers[i]) this.timers[i].delay = delay.resend;
+										this.windowTimer.delay = delay.windowTick;
 									}}>
 										<option value="slowmo">Muito, muito lento</option>
 										<option value="veryslow">Muito lento</option>
@@ -398,7 +393,7 @@ class TcpCarrier extends Component {
 						</button>
 
 						{
-							this.state.selectedDelay <= delays.fast ? 
+							this.state.selectedDelay.delay <= delays.fast.delay ? 
 								<p>* Velocidades altas são instáveis e podem quebrar a simulação.</p> : ""
 						}
 
