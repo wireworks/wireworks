@@ -2,6 +2,7 @@ import React, { Component, FC, RefObject } from "react";
 import "src/sass/pages/tcpcarrier.scss";
 import DataCarrier from "../../../components/DataCarrier";
 import ErrorBox from "../../../components/ErrorBox";
+import { beep } from "../../../wireworks/utils/debug";
 
 class Delay {
 	constructor(readonly delay: number) {}
@@ -153,7 +154,7 @@ class TcpCarrier extends Component {
 					this.timers = [];
 					this.windowQueue = [];
 					if (this.windowTimer) this.windowTimer.clear();
-					this.windowTimer = new Timer(this.windowTick, this.state.selectedDelay.windowTick, true, this.state.paused);
+					this.windowTimer = undefined;
 					this.sent = new Array<boolean>(str.length).fill(false);
 					this.confirmed = new Array<boolean>(str.length).fill(false);
 					this.receiver = new Array<boolean>(str.length).fill(false);
@@ -259,21 +260,35 @@ class TcpCarrier extends Component {
 
 	private sendMultiple = (count: number, startFrom: number) => {
 
+		// if (!this.state.paused) this.windowTimer.paused = false;
+
 		for (let i = 0; i < count; i++) {
 			if (!this.sent[startFrom + i]) {
 				this.windowQueue.push(startFrom + i);
 				this.sent[startFrom + i] = true;
 			}
 		}
+		
+		this.windowPreTick();
 
 	}
 
+	private windowPreTick = () => {
+		if (!this.windowTimer) {
+			this.windowTimer = new Timer(this.windowTick, this.state.selectedDelay.windowTick, false, this.state.paused);
+		}
+	}
+
 	private windowTick = () => {
-		
+				
+		this.windowTimer.clear();
+		this.windowTimer = undefined;
+
 		if (this.windowQueue.length > 0) {
 			this.sendData(this.windowQueue[0]);
 			this.windowQueue.shift();
-		}
+			this.windowPreTick();
+		}	
 
 	}
 
@@ -285,10 +300,11 @@ class TcpCarrier extends Component {
 	togglePaused = (pause: boolean, callback?: ()=>void) => {
 		this.setState({paused: pause}, ()=>{
 			
-			for (let i = 0; i < this.timers.length; i++) {if (this.timers[i]) this.timers[i].paused = pause;}
 			if (this.windowTimer) this.windowTimer.paused = pause;
-			
+
+			for (let i = 0; i < this.timers.length; i++) {if (this.timers[i]) this.timers[i].paused = pause;}			
 			this.carrier.current.running = !pause;
+
 			if (callback) callback();
 		});
 	}
@@ -365,7 +381,7 @@ class TcpCarrier extends Component {
 										this.setState({selectedDelay: delay});
 										this.carrier.current.delay = delay.travel;
 										for (let i = 0; i < this.timers.length; i++) if (this.timers[i]) this.timers[i].delay = delay.resend;
-										this.windowTimer.delay = delay.windowTick;
+										if (this.windowTimer) this.windowTimer.delay = delay.windowTick;
 									}}>
 										<option value="slowmo">Muito, muito lento</option>
 										<option value="veryslow">Muito lento</option>
