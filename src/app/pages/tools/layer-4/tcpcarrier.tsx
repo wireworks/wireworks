@@ -203,7 +203,18 @@ class TcpCarrier extends Component {
 		const c = this.carrier.current;
 
 		this.sent[index] = true;
-		let ball = c.send("right", index, () => { c.removeMoving(index, ball) }, () => { this.receiveData(index) });
+		let ball = c.send(
+			"right",
+			index, () => { c.removeMoving(index, ball) },
+			() => { this.receiveData(index) },
+			{
+				title: c.contentAt(index),
+				lines: [
+					"Ack: " + (index+1),
+					"Seq: " + (index+2)
+				]
+			}
+		);
 
 		if (!this.timers[index]) {
 			this.timers[index] = new Timer(()=>{this.sendData(index)},this.state.selectedDelay.resend,true,this.state.paused);
@@ -240,6 +251,12 @@ class TcpCarrier extends Component {
 				}
 			}
 
+		}, {
+			title: c.contentAt(index),
+			lines: [
+				"Ack: " + (index+1),
+				"Seq: " + (index+2)
+			]
 		});
 
 	}

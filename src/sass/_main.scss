@@ -20,6 +20,7 @@ $asset-root-path: '..' !default;
 @import "components/materialicons";
 @import "components/flowcanvas";
 @import "components/datacarrier";
+@import "components/tooltip";
 
 html {
 	height: 100%;

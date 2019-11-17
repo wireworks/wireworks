@@ -1,9 +1,14 @@
 import React, { Component, FC } from "react";
 import { ballSize, marginSize } from "../../sass/components/_datacarrier.scss";
+import TooltipTrigger from "react-popper-tooltip";
+import Tooltip, { TooltipBody } from "./Tooltip";
+
+type HoverText = {title?: string, lines?: string[]};
 
 interface Progress {
 	onClick?: () => void,
 	onArrive?: () => void,
+	hoverText?: HoverText
 	toSide: "left" | "right",
 	prog: number
 }
@@ -25,7 +30,14 @@ const TcpPacket: FC<Pkg> = (props) =>
 		{props.progress.map((el, ind) => {
 			return (
 				<div key={ind} className="carrier-p-slider" style={{ transform: `translateX(${100*(el.toSide === "left" ? 1 - el.prog : el.prog)}%)` }}>
-					<div className="carrier-p-ball carrier-state-moving" onClick={el.onClick}> {props.content} </div>
+					<div className="carrier-p-ball carrier-state-moving" onClick={el.onClick}>
+						{el.hoverText ? 
+							<Tooltip placement="top" trigger="hover" hideArrow={false} tooltip={<TooltipBody title={el.hoverText.title} lines={el.hoverText.lines}/>}>
+								<span>{props.content}</span>
+							</Tooltip> :
+							<span>{props.content}</span>
+						}						
+					</div>
 				</div>
 			);
 		})}
@@ -128,6 +140,10 @@ export default class DataCarrier extends Component {
 		this.setState({ delay: del });
 	}
 
+	contentAt = (index: number) => {
+		return this.state.arr[index].content;
+	}
+
 	reset = (msg: string, callback?: () => void) => {
 		const arr = new Array<Pkg>();
 		for (let f of msg) {
@@ -151,12 +167,13 @@ export default class DataCarrier extends Component {
 		}
 	}
 
-	send = (to: "left" | "right", index: number, onClick?: () => void, onArrive?: () => void): Progress => {
+	send = (to: "left" | "right", index: number, onClick?: () => void, onArrive?: () => void, hoverText?: HoverText): Progress => {
 		const p = {
 			toSide: to,
 			onClick: onClick,
 			onArrive: onArrive,
 			prog: 0,
+			hoverText: hoverText
 		};
 		this.state.arr[index].progress.push(p);
 		return p;
