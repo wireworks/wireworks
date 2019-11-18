@@ -1,14 +1,15 @@
 import React, { FC } from "react";
 
 interface ErrorBoxProps {
-	errorMessage: string
+	errorMessage: string,
+	className?: string
 }
 
-const ErrorBox: FC<ErrorBoxProps> = ({errorMessage}) => {
+const ErrorBox: FC<ErrorBoxProps> = ({errorMessage, className}) => {
 
     if (errorMessage) {
         return (
-            <div className="errorbox">{errorMessage}</div>
+            <div className={"errorbox " + (className? className : "")}>{errorMessage}</div>
         );
     }
 

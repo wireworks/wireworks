@@ -1,12 +1,11 @@
 import React, { FC, lazy, Suspense } from "react";
 import ReactDOM from "react-dom";
-import * as serviceWorker from "./serviceWorker";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import "src/sass/pages/index.scss";
 import { WireworksHeader } from "./app/components/Header";
+import * as serviceWorker from "./serviceWorker";
 import Footer from "./app/components/Footer";
 import "src/sass/pages/index.scss"
-import BitFlux from "./app/pages/tools/layer-1/bitflux";
-
 
 const Layer1 = lazy(() => import("./app/pages/layers/Layer1"));
 const Layer2 = lazy(() => import("./app/pages/layers/Layer2"));
@@ -14,12 +13,15 @@ const Layer3 = lazy(() => import("./app/pages/layers/Layer3"));
 const Layer4 = lazy(() => import("./app/pages/layers/Layer4"));
 const Layer5 = lazy(() => import("./app/pages/layers/Layer5"));
 
+const BitFlux = lazy(() => import("./app/pages/tools/layer-1/bitflux"));
+
 const MacFetch = lazy(() => import("./app/pages/tools/layer-2/macfetch"));
 
 const Ipbits = lazy(() => import("./app/pages/tools/layer-3/ipbits"));
 const Undernets = lazy(() => import("./app/pages/tools/layer-3/undernets"));
 const Planner = lazy(() => import("./app/pages/tools/layer-3/planner"));
 
+const TcpCarrier = lazy(() => import("./app/pages/tools/layer-4/tcpcarrier"));
 const ServerChat = lazy(() => import("./app/pages/tools/layer-4/serverchat"));
 
 const DnsFlow = lazy(() => import("./app/pages/tools/layer-5/dnsflow"));
@@ -68,6 +70,7 @@ const Wireworks: FC = () =>
 				<Route path="/layers/3/planner" component={Planner} />
 
 				{/* Layer 4 */}
+				<Route path="/layers/4/tcpcarrier" component={TcpCarrier} />
 				<Route path="/layers/4/serverchat" component={ServerChat} />
 
 				{/* Layer 5 */}
