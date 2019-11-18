@@ -210,8 +210,8 @@ class TcpCarrier extends Component {
 			{
 				title: c.contentAt(index),
 				lines: [
-					"Ack: " + (index+1),
-					"Seq: " + (index+2)
+					"Ack: " + 1,
+					"Seq: " + (index+1)
 				]
 			}
 		);
@@ -254,8 +254,8 @@ class TcpCarrier extends Component {
 		}, {
 			title: c.contentAt(index),
 			lines: [
-				"Ack: " + (index+1),
-				"Seq: " + (index+2)
+				"Ack: " + (index+2),
+				"Seq: " + 1
 			]
 		});
 
