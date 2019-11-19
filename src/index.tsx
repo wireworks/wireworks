@@ -6,6 +6,7 @@ import { WireworksHeader } from "./app/components/Header";
 import * as serviceWorker from "./serviceWorker";
 import Footer from "./app/components/Footer";
 import "src/sass/pages/index.scss"
+import Exporter from "./app/components/Exporter";
 
 const Layer1 = lazy(() => import("./app/pages/layers/Layer1"));
 const Layer2 = lazy(() => import("./app/pages/layers/Layer2"));
@@ -98,6 +99,8 @@ const Wireworks: FC = () =>
 
 			</Switch>
 		</Suspense>
+
+		<Exporter></Exporter>
 
 	</div>
 
