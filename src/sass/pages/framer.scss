@@ -48,12 +48,14 @@ $asset-root-path: '../../' !default;
 	padding: 20px;
 	min-height: 400px;
 
-	span {
+	.framer-byte {
+		display: inline-block;
+		margin: 0.3em;
+		padding: 0.3em 0.3em 0.1em 0.3em;
 		font-family: monospace;
 		font-size: 1.2em;
-		padding: 0.3em 0.3em 0.1em 0.3em;
-		margin: 0.3em;
 		border-radius: 4px;
+		user-select: none;
 	}
 
 }

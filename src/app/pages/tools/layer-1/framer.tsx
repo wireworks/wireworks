@@ -1,10 +1,18 @@
 import React, { Component } from "react";
 import ErrorBox from "../../../components/ErrorBox";
+import Tooltip, { TooltipBody } from "../../../components/Tooltip"
 import "src/sass/pages/framer.scss";
 
 class Framer extends Component {
 
-	ty = ["Noise", "Preamble", "SFD", "Frame Data", "FCS"];
+	ty = [
+		{ name: "Ruído", className: "framer-noise" },
+		{ name: "Preâmbulo", className: "framer-preamble" },
+		{ name: "SFD", className: "framer-sfd" },
+		{ name: "Frame Data", className: "framer-framedata" },
+		{ name: "FCS", className: "framer-fcs" }
+	];
+
 	reg = /(A{14})(AB)(.*?)(0{24})/g;
 	reg2 = /.{2}/g;
 
@@ -44,11 +52,16 @@ class Framer extends Component {
 		const segments = this.state.data.split(this.reg);
 		for (let ind in segments) {
 			const i = parseInt(ind);
-			const cName = "framer-" + this.ty[i % this.ty.length].replace(" ", "").toLowerCase();
+			const currTy = this.ty[i % this.ty.length];
 			if (segments[i] !== "") {
 				const bits = segments[i].match(this.reg2)
 				for (let d in bits) {
-					arr.push(<span key={`s${i}-i${d}`} className={cName}>{bits[parseInt(d)]}</span>)
+					let byte = bits[parseInt(d)];
+					let byteBin = parseInt(byte, 16).toString(2);
+					byteBin = "00000000".substr(0,8-byteBin.length) + byteBin;
+					arr.push(
+						<Tooltip key={`s${i}-i${d}`} className={"framer-byte " + currTy.className} placement="top" hideArrow={false} tooltip={<TooltipBody title={currTy.name} lines={[byteBin]}/>}>{byte}</Tooltip>
+					)
 				}
 			}
 		}
