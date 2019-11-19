@@ -1,67 +1,67 @@
-$margins: 0.5rem, 1rem, 1.5rem, 2rem, 2.5rem, 3rem;
+$margins: 0, 0.5rem, 1rem, 1.5rem, 2rem, 2.5rem, 3rem;
 
 @each $value in $margins {
 
-	$i: index($margins, $value);
+	$i: index($margins, $value) - 1;
 
 	.m-#{$i} {
-		margin: $value;
+		margin: $value !important;
 	}
 
 	.mx-#{$i} {
-		margin-left: $value;
-		margin-right: $value;
+		margin-left: $value !important;
+		margin-right: $value !important;
 	}
 
 	.my-#{$i} {
-		margin-top: $value;
-		margin-bottom: $value;
+		margin-top: $value !important;
+		margin-bottom: $value !important;
 	}
 
 	.ml-#{$i} {
-		margin-left: $value;
+		margin-left: $value !important;
 	}
 
 	.mr-#{$i} {
-		margin-right: $value;
+		margin-right: $value !important;
 	}
 
 	.mt-#{$i} {
-		margin-top: $value;
+		margin-top: $value !important;
 	}
 
 	.mb-#{$i} {
-		margin-bottom: $value;
+		margin-bottom: $value !important;
 	}
 
 	.p-#{$i} {
-		padding: $value;
+		padding: $value !important;
 	}
 
 	.px-#{$i} {
-		padding-left: $value;
-		padding-right: $value;
+		padding-left: $value !important;
+		padding-right: $value !important;
 	}
 
 	.py-#{$i} {
-		padding-top: $value;
-		padding-bottom: $value;
+		padding-top: $value !important;
+		padding-bottom: $value !important;
 	}
 
 	.pl-#{$i} {
-		padding-left: $value;
+		padding-left: $value !important;
 	}
 
 	.pr-#{$i} {
-		padding-right: $value;
+		padding-right: $value !important;
 	}
 
 	.pt-#{$i} {
-		padding-top: $value;
+		padding-top: $value !important;
 	}
 
 	.pb-#{$i} {
-		padding-bottom: $value;
+		padding-bottom: $value !important;
 	}
 
 }
