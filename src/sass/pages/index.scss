@@ -3,6 +3,10 @@ $asset-root-path: '../../' !default;
 @import "../main";
 @import "../utils/colors/layers";
 
+.hide {
+	display: none;
+}
+
 .layer-5, .layer-4, .layer-3, .layer-2, .layer-1 {
 
 	width: 8em;

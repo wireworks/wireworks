@@ -4,7 +4,13 @@ class Exporter extends Component {
 
 	render() {
 		return (
-			<span>SSSSSSSSSSs</span>
+			<>
+				<button>Export</button>
+				<label htmlFor="exporter-input">Import</label>
+				<div className="hide">
+					<input id="exporter-input" type="file"/>
+				</div>
+			</>
 		);
 	}
 
