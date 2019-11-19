@@ -6,6 +6,13 @@ class Exporter extends Component {
 	reg = /layers\/\d\/(\w+)/;
 
 	handleImport = (ev) => {
+
+		const reader = new FileReader();
+		reader.onload = (a) => {
+			console.log(JSON.parse(a.target.result));
+		}
+		reader.readAsText(ev.target.files[0])
+
 	}
 
 	handleExport = (ev) => {
@@ -36,7 +43,7 @@ class Exporter extends Component {
 				<button onClick={this.handleExport}>Export</button>
 				<label htmlFor="exporter-input">Import</label>
 				<div className="hide">
-					<input onInput={this.handleImport} id="exporter-input" type="file"/>
+					<input onInput={this.handleImport} accept="json" id="exporter-input" type="file"/>
 					<a download="aa.wworks" ref={this.ref}>AA</a>
 				</div>
 			</>
