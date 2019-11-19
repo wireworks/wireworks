@@ -20,7 +20,7 @@ interface Pkg {
 	progress: Array<Progress>
 }
 
-const TcpPacket: FC<Pkg> = (props) =>
+const DataPacket: FC<Pkg> = (props) =>
 
 	<div className="carrier-p-rail">
 		<div className="carrier-p-asd">
@@ -52,8 +52,8 @@ export default class DataCarrier extends Component {
 		lWindow: 0,
 		rWindow: 0,
 
-		lWindowSize: 1,
-		rWindowSize: 1,
+		lWindowSize: 0,
+		rWindowSize: 0,
 
 		delay: 3,
 		arr: new Array<Pkg>()
@@ -200,16 +200,21 @@ export default class DataCarrier extends Component {
 			<div className="data-carrier">
 
 				<div className="carrier-cont-window">
-					<div style={{ transform: `translateY(${this.state.lWindow * 100}%)` }} className="carrier-window-wrapper carrier-left">
-						<div style={{ minHeight: ((parseInt(ballSize) + parseInt(marginSize) * 2) * this.state.lWindowSize) + "px" }} className="carrier-window"></div>
-					</div>
-					<div style={{ transform: `translateY(${this.state.rWindow * 100}%)` }} className="carrier-window-wrapper carrier-right">
-						<div style={{ height: ((parseInt(ballSize) + parseInt(marginSize) * 2) * this.state.rWindowSize) }} className="carrier-window"></div>
-					</div>
+					{ 
+						this.state.lWindowSize > 0 ?
+							<div style={{ transform: `translateY(${this.state.lWindow * 100}%)` }} className="carrier-window-wrapper carrier-left">
+								<div style={{ height: ((parseInt(ballSize) + parseInt(marginSize) * 2) * this.state.lWindowSize) }} className="carrier-window"></div>
+							</div> : ""}
+					{
+						this.state.rWindowSize > 0 ?
+							<div style={{ transform: `translateY(${this.state.rWindow * 100}%)` }} className="carrier-window-wrapper carrier-right">
+								<div style={{ height: ((parseInt(ballSize) + parseInt(marginSize) * 2) * this.state.rWindowSize) }} className="carrier-window"></div>
+							</div> : ""
+					}
 				</div>
 
 				{this.state.arr.map((el, ind) => {
-					return <TcpPacket key={ind} rState={el.rState} lState={el.lState} content={el.content} progress={el.progress} />
+					return <DataPacket key={ind} rState={el.rState} lState={el.lState} content={el.content} progress={el.progress} />
 				})}
 
 			</div>

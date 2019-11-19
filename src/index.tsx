@@ -23,6 +23,7 @@ const Undernets = lazy(() => import("./app/pages/tools/layer-3/undernets"));
 const Planner = lazy(() => import("./app/pages/tools/layer-3/planner"));
 
 const TcpCarrier = lazy(() => import("./app/pages/tools/layer-4/tcpcarrier"));
+const UdpCarrier = lazy(() => import("./app/pages/tools/layer-4/udpcarrier"));
 const ServerChat = lazy(() => import("./app/pages/tools/layer-4/serverchat"));
 
 const DnsFlow = lazy(() => import("./app/pages/tools/layer-5/dnsflow"));
@@ -73,6 +74,7 @@ const Wireworks: FC = () =>
 
 				{/* Layer 4 */}
 				<Route path="/layers/4/tcpcarrier" component={TcpCarrier} />
+				<Route path="/layers/4/udpcarrier" component={UdpCarrier} />
 				<Route path="/layers/4/serverchat" component={ServerChat} />
 
 				{/* Layer 5 */}
