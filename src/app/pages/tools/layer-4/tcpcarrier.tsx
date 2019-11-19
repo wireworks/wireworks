@@ -2,9 +2,9 @@ import React, { Component, FC, RefObject } from "react";
 import "src/sass/pages/tcpcarrier.scss";
 import DataCarrier from "../../../components/DataCarrier";
 import ErrorBox from "../../../components/ErrorBox";
-import { beep } from "../../../wireworks/utils/debug";
+import Timer from "../../../wireworks/utils/timer";
 
-class Delay {
+class TcpDelay {
 	constructor(readonly delay: number) {}
 	get resend () { return this.delay * 2.5 }
 	get windowTick () { return this.delay * 0.1 }
@@ -12,104 +12,12 @@ class Delay {
 }
 
 const delays = {
-	slowmo: new Delay(24),
-	veryslow: new Delay(12),
-	slow: new Delay(6),
-	normal: new Delay(3),
-	fast: new Delay(1.5),
-	veryfast: new Delay(0.75)
-}
-
-class Timer {
-
-	private _paused = false;
-	private t: NodeJS.Timeout;
-	private loop = false;
-	private _delay: number;
-	private callback: ()=>void;
-	private t0 = 0;
-	private totalElapsed = 0;
-	private finished = false;
-
-	constructor(callback: ()=>void, delay: number, loop = false, startPaused = false) {
-		this.loop = loop;
-		this._delay = delay;
-		this.callback = callback;
-
-		this.totalElapsed = 0;
-		this.mark();
-		this.tick();		
-
-		if (startPaused) this.paused = true;
-	}
-
-	private tick = (prerun = 0) => {
-		if (!this.finished) {
-			
-			this.t = setTimeout(() => {
-				
-				if (!this._paused) {					
-					this.mark();
-					this.totalElapsed = 0;
-					this.callback();
-					if (this.loop) this.tick();
-					else this.finished = true;
-				}
-	
-			}, Math.floor(1000*this._delay) - prerun);
-		}
-	}
-
-	private mark = () => { 
-		let t1 = Math.floor(performance.now());
-		let elapsed = t1 - this.t0;
-		this.t0 = t1;
-		return elapsed;
-	}
-
-	set paused(pause: boolean) {	
-				
-		if (pause != this._paused) {
-
-			if (pause) {
-				this.clear();
-				this.totalElapsed += this.mark();
-			}
-			else if (!this.finished) {
-	
-				this.mark();
-				this.tick(this.totalElapsed);			
-	
-			}
-
-		}
-
-		this._paused = pause;
-
-	}
-
-	get paused() {
-		return this._paused;
-	}
-
-	set delay(del: number) {
-		let ratio = del / this._delay;
-		if (!this.paused){
-			this.paused = true;
-			this.totalElapsed = Math.floor(this.totalElapsed * ratio);
-			this._delay = del;
-			this.paused = false;
-		}
-		else {
-			this.totalElapsed = Math.floor(this.totalElapsed * ratio);
-			this._delay = del;
-		}
-	}
-
-	clear = () => {
-		clearTimeout(this.t);
-		this.t = undefined;
-	}
+	slowmo: new TcpDelay(24),
+	veryslow: new TcpDelay(12),
+	slow: new TcpDelay(6),
+	normal: new TcpDelay(3),
+	fast: new TcpDelay(1.5),
+	veryfast: new TcpDelay(0.75)
 }
 
 class TcpCarrier extends Component {
@@ -394,7 +302,7 @@ class TcpCarrier extends Component {
 								<label htmlFor="speed">Velocidade</label>
 								<div>
 									<select className="full-width" name="speed" id="speed" defaultValue="normal" onChange={(evt)=>{
-										let delay = delays[evt.target.value] as Delay;
+										let delay = delays[evt.target.value] as TcpDelay;
 										this.setState({selectedDelay: delay});
 										this.carrier.current.delay = delay.travel;
 										for (let i = 0; i < this.timers.length; i++) if (this.timers[i]) this.timers[i].delay = delay.resend;
