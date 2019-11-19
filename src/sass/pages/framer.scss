@@ -60,4 +60,8 @@ $asset-root-path: '../../' !default;
 
 .framer-configs {
 	width: 30%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;	
 }

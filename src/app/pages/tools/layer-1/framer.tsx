@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import "src/sass/pages/framer.scss";
 
-
 class Framer extends Component {
 
 	ty = ["Noise", "Preamble", "SFD", "Frame Data", "FCS"];
@@ -52,12 +51,12 @@ class Framer extends Component {
 			<main>
 				<div className="framer-wrapper">
 					<div className="framer-container-wrapper">
-						<label>Pacote</label>
+						<label>Bytes</label>
 						<div className="framer-container">
 							{arr}
 						</div>
 					</div>
-					<div className="framer-configs vbox spacer">
+					<div className="framer-configs">
 						<div className="vbox align-stretch">
 							<label>Opções</label>
 							<button className="mb-3" onClick={() => this.insert(this.start)}>Inserir Início</button>

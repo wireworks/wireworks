@@ -10,13 +10,13 @@ class Layer1 extends Component<RouteComponentProps> {
 
 			<ToolItem 	name="Bit Flux"
 						path={`${this.props.match.path}/bitflux`}
-						materialIcon="find_in_page"
+						materialIcon="swap_calls"
 						description="Visualizador do trânsito de informações em binário" />
 			
 			<ToolItem 	name="Framer"
 						path={`${this.props.match.path}/framer`}
-						materialIcon="find_in_page"
-						description="Visualizador do inicio e fim das informações em binário" />
+						materialIcon="border_outer"
+						description="Visualizador da estrutura de um pacote em binário" />
     	</Menu>
     }
 }
