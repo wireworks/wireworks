@@ -1,4 +1,5 @@
 import React, { Component, FC } from "react";
+import { ballSize, marginSize } from "../../sass/components/_datacarrier.scss";
 import TooltipTrigger from "react-popper-tooltip";
 import Tooltip, { TooltipBody } from "./Tooltip";
 
