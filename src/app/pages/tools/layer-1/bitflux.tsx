@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import "src/sass/pages/bitflux.scss";
+import Tool from "../../../components/Tool";
 
 
-class BitFlux extends Component {
+class BitFlux extends Tool {
 
 	readonly bin_start = [true, false, true, false]
 	readonly bin_stop = [false, false, false, false, false, false, false, false];
@@ -19,7 +20,12 @@ class BitFlux extends Component {
 		logArr: []
 	};
 
+	onImport = (data: any) => {
+		console.log(data);
+	}
+
 	componentDidMount() {
+		super.componentDidMount()
 		this.plot();
 		this.toggleAuto();
 	}

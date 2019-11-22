@@ -1,6 +1,13 @@
 import React, { Component } from "react";
 
-class Exporter extends Component {
+export interface IO {
+	io: {
+		onImport: (data: any) => void,
+		onExport: () => any,
+	}
+}
+
+class Exporter extends Component<IO> {
 
 	ref = React.createRef<HTMLAnchorElement>();
 	reg = /layers\/\d\/(\w+)/;
@@ -9,22 +16,13 @@ class Exporter extends Component {
 
 		const reader = new FileReader();
 		reader.onload = (a) => {
-			console.log(JSON.parse(a.target.result));
+			this.props.io.onImport(JSON.parse(a.target["result"]));
 		}
 		reader.readAsText(ev.target.files[0])
 
 	}
 
 	handleExport = (ev) => {
-		const obj = {
-			aa: "nice",
-			ab: [1, 2, 3, 4, "five", {banana: "fine"}],
-			ba: 123,
-			bb: {
-				ff: "nice again",
-				fa: [1, 2, 3],
-			}
-		}
 
 		let fileName = "wireworks"
 		if (this.reg.test(window.location.pathname))
@@ -32,7 +30,7 @@ class Exporter extends Component {
 
 		const anc = this.ref.current;
 
-		anc.href = "data:text/plain;charset=utf-8," + JSON.stringify(obj);
+		anc.href = "data:text/plain;charset=utf-8," + JSON.stringify(this.props.io.onExport());
 		anc.download = fileName + ".wworks";
 		this.ref.current.click();
 	}

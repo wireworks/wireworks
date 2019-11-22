@@ -7,6 +7,7 @@ import * as serviceWorker from "./serviceWorker";
 import Footer from "./app/components/Footer";
 import "src/sass/pages/index.scss"
 import Exporter from "./app/components/Exporter";
+import Tool from "./app/components/Tool";
 
 const Layer1 = lazy(() => import("./app/pages/layers/Layer1"));
 const Layer2 = lazy(() => import("./app/pages/layers/Layer2"));
@@ -41,73 +42,82 @@ const loader = <main>
 	</div>
 </main>
 
-const Wireworks: FC = () =>
+const Wireworks: FC = () => {
 
-<Router>
+	let io = {
+		onImport: undefined as (data: any) => void,
+		onExport: undefined as () => any,
+	};
 
-    <div className="content">
-		
-		<Route path="/" component={WireworksHeader} />
+	function MakeTool(T) {
+		return () => <T io={io}/>
+	}
 
-		<Suspense fallback={loader}>
+	return <Router>
 
-			<Switch>
+		<div className="content">
+			
+			<Route path="/" component={WireworksHeader} />
 
-				{/* All possible Routes */}
+			<Suspense fallback={loader}>
 
-				{/* Main Menu */}
-				<Route path="/" exact component={MainMenu} />
+				<Switch>
 
-				{/* Layer 1 */}
-				<Route path="/layers/1/bitflux" component={BitFlux} />
+					{/* All possible Routes */}
 
-				{/* Layer 2*/}
-				<Route path="/layers/2/macfetch" render={() => {return <MacFetch ipFetch={false}/>;}} />
-				<Route path="/layers/2/ipfetch" render={() => { return <MacFetch ipFetch={true}/>;}} />				
+					{/* Main Menu */}
+					<Route path="/" exact component={MainMenu} />
 
-				{/* Layer 3 */}
-				<Route path="/layers/3/ipbits" component={Ipbits} />
-				<Route path="/layers/3/undernets" component={Undernets} />
-				<Route path="/layers/3/planner" component={Planner} />
+					{/* Layer 1 */}
+					<Route path="/layers/1/bitflux" render={MakeTool(BitFlux)} />
 
-				{/* Layer 4 */}
-				<Route path="/layers/4/tcpcarrier" component={TcpCarrier} />
-				<Route path="/layers/4/serverchat" component={ServerChat} />
+					{/* Layer 2*/}
+					<Route path="/layers/2/macfetch" render={() => {return <MacFetch ipFetch={false}/>;}} />
+					<Route path="/layers/2/ipfetch" render={() => { return <MacFetch ipFetch={true}/>;}} />				
 
-				{/* Layer 5 */}
-				<Route path="/layers/5/dnsflow" component={DnsFlow} />
-				<Route path="/layers/5/dnstree" component={DnsTree} />
+					{/* Layer 3 */}
+					<Route path="/layers/3/ipbits" component={Ipbits} />
+					<Route path="/layers/3/undernets" component={Undernets} />
+					<Route path="/layers/3/planner" render={() => <Planner io={io}/>} />
 
+					{/* Layer 4 */}
+					<Route path="/layers/4/tcpcarrier" component={TcpCarrier} />
+					<Route path="/layers/4/serverchat" component={ServerChat} />
 
-				{/* Layer Tools Menu */}
-				<Route path="/layers/1" component={Layer1} />
-				<Route path="/layers/2" component={Layer2} />
-				<Route path="/layers/3" component={Layer3} />
-				<Route path="/layers/4" component={Layer4} />
-				<Route path="/layers/5" component={Layer5} />
+					{/* Layer 5 */}
+					<Route path="/layers/5/dnsflow" component={DnsFlow} />
+					<Route path="/layers/5/dnstree" component={DnsTree} />
 
 
-				{/* 404 */}
-				<Route component={() =>
-					<main>
-						<h1 className="hbox align-center justify-center font-mono">404</h1>
-						<h2 className="hbox align-center justify-center">Não há nada por aqui.</h2>
-						<h2 className="hbox align-center justify-center">¯\_(ツ)_/¯</h2>
-						<Link className="hbox align-center justify-center" to="/">Menu inicial</Link>
-					</main>
-				} />
+					{/* Layer Tools Menu */}
+					<Route path="/layers/1" component={Layer1} />
+					<Route path="/layers/2" component={Layer2} />
+					<Route path="/layers/3" component={Layer3} />
+					<Route path="/layers/4" component={Layer4} />
+					<Route path="/layers/5" component={Layer5} />
 
-			</Switch>
-		</Suspense>
 
-		<Exporter></Exporter>
+					{/* 404 */}
+					<Route component={() =>
+						<main>
+							<h1 className="hbox align-center justify-center font-mono">404</h1>
+							<h2 className="hbox align-center justify-center">Não há nada por aqui.</h2>
+							<h2 className="hbox align-center justify-center">¯\_(ツ)_/¯</h2>
+							<Link className="hbox align-center justify-center" to="/">Menu inicial</Link>
+						</main>
+					} />
 
-	</div>
+				</Switch>
+			</Suspense>
 
-	<Route path="/" component={Footer}/>
+			<Exporter io={io}/>
 
-</Router>
+		</div>
 
+		<Route path="/" component={Footer}/>
+
+	</Router>
+}
 
 
 ReactDOM.render(<Wireworks/>, document.getElementById('root'));

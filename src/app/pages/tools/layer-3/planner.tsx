@@ -8,10 +8,12 @@ import { IP, ERROR_NOT_NETWORK, ERROR_ADDRESS_PARSE, ERROR_MASK_RANGE } from "..
 import { ERROR_BYTE_RANGE } from "../../../wireworks/networking/byte";
 import ErrorBox from "../../../components/ErrorBox";
 import "src/sass/pages/planner.scss";
+import { IO } from "../../../components/Exporter";
+import Tool from "../../../components/Tool";
 
 // +==============================================+
 
-class Planner extends Component {
+class Planner extends Tool {
 
 	/**
 	 * The reference to the address input.
@@ -32,6 +34,11 @@ class Planner extends Component {
 		hostsStr: "",
 		showTable: false
 	};
+
+	onImport = (obj) => {
+		console.log(obj);
+		this.setState(obj);
+	}
 
 	/**
 	 * Creates a networking plan.
